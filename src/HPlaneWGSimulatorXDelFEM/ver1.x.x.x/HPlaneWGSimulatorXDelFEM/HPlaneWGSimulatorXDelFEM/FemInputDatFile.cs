@@ -38,7 +38,8 @@ namespace HPlaneWGSimulatorXDelFEM
             out MediaInfo[] medias,
             out double firstWaveLength,
             out double lastWaveLength,
-            out int calcCnt
+            out int calcCnt,
+            out FemSolver.LinearSystemEqnSoverDV lsEqnSoverDv
             )
         {
             int eNodeCnt = 0;
@@ -58,6 +59,7 @@ namespace HPlaneWGSimulatorXDelFEM
             firstWaveLength = 0.0;
             lastWaveLength = 0.0;
             calcCnt = 0;
+            lsEqnSoverDv = Constants.DefLsEqnSolverDv;
 
             if (!File.Exists(filename))
             {
@@ -322,10 +324,27 @@ namespace HPlaneWGSimulatorXDelFEM
                         lastWaveLength = double.Parse(tokens[2]);
                         calcCnt = int.Parse(tokens[3]);
                     }
+                    line = sr.ReadLine();
+                    if (line == null || line.Length == 0)
+                    {
+                    }
+                    else
+                    {
+                        tokens = line.Split(delimiter);
+                        if (tokens.Length != 2 || tokens[0] != "LsEqnSolverDv")
+                        {
+                            MessageBox.Show("線形方程式解法区分情報がありません");
+                            return false;
+                        }
+                        string value  = tokens[1];
+                        lsEqnSoverDv = FemSolver.StrToLinearSystemEqnSolverDV(value);
+                    }
+
                 }
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
@@ -350,6 +369,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="firstWaveLength">計算開始波長</param>
         /// <param name="lastWaveLength">計算終了波長</param>
         /// <param name="calcCnt">計算周波数件数</param>
+        /// <param name="lsEqnSolverDv">線形方程式解法区分</param>
         public static void SaveToFileFromCad
             (string filename,
             int nodeCnt, IList<double[]> doubleCoords,
@@ -360,7 +380,8 @@ namespace HPlaneWGSimulatorXDelFEM
             MediaInfo[] medias,
             double firstWaveLength,
             double lastWaveLength,
-            int calcCnt)
+            int calcCnt,
+            FemSolver.LinearSystemEqnSoverDV lsEqnSolverDv)
         {
             //////////////////////////////////////////
             // ファイル出力
@@ -451,10 +472,13 @@ namespace HPlaneWGSimulatorXDelFEM
                     }
                     // 計算対象周波数
                     sw.WriteLine("WaveLengthRange,{0},{1},{2}", firstWaveLength, lastWaveLength, calcCnt);
+                    // 線形方程式解法区分
+                    sw.WriteLine("LsEqnSolverDv,{0}", FemSolver.LinearSystemEqnSolverDVToStr(lsEqnSolverDv));
                 }
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message);
             }
         }
@@ -472,6 +496,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="firstWaveLength">計算開始波長</param>
         /// <param name="lastWaveLength">計算終了波長</param>
         /// <param name="calcCnt">計算件数</param>
+        /// <param name="lsEqnSolverDv">線形方程式解法区分</param>
         /// <returns></returns>
         public static void SaveToFile
             (string filename,
@@ -483,7 +508,8 @@ namespace HPlaneWGSimulatorXDelFEM
             MediaInfo[] medias,
             double firstWaveLength,
             double lastWaveLength,
-            int calcCnt
+            int calcCnt,
+            FemSolver.LinearSystemEqnSoverDV lsEqnSolverDv
             )
         {
             int nodeCnt = nodes.Count;
@@ -519,7 +545,8 @@ namespace HPlaneWGSimulatorXDelFEM
                 medias,
                 firstWaveLength,
                 lastWaveLength,
-                calcCnt);
+                calcCnt,
+                lsEqnSolverDv);
         }
 
 
@@ -530,7 +557,10 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="firstWaveLength">計算対象開始波長</param>
         /// <param name="lastWaveLength">計算対象終了波長</param>
         /// <param name="calcCnt">計算対象周波数件数</param>
-        public static bool UpdateToFile(string filename, double firstWaveLength, double lastWaveLength, int calcCnt)
+        /// <param name="lsEqnSolverDv">線形方程式解法区分</param>
+        public static bool UpdateToFile(string filename,
+            double firstWaveLength, double lastWaveLength, int calcCnt,
+            FemSolver.LinearSystemEqnSoverDV lsEqnSolverDv)
         {
             bool success = false;
             if (!File.Exists(filename))
@@ -546,6 +576,7 @@ namespace HPlaneWGSimulatorXDelFEM
             double dummyFirstWaveLength = 0.0;
             double dummyLastWaveLength = 0.0;
             int dummyCalcCnt = 0;
+            FemSolver.LinearSystemEqnSoverDV dummyLsEqnSolverDv = FemSolver.LinearSystemEqnSoverDV.PCOCG;
             bool loadRet = FemInputDatFile.LoadFromFile(
                 filename,
                 out nodes,
@@ -556,7 +587,8 @@ namespace HPlaneWGSimulatorXDelFEM
                 out medias,
                 out dummyFirstWaveLength,
                 out dummyLastWaveLength,
-                out dummyCalcCnt
+                out dummyCalcCnt,
+                out dummyLsEqnSolverDv
             );
             if (loadRet)
             {
@@ -570,7 +602,8 @@ namespace HPlaneWGSimulatorXDelFEM
                     medias,
                     firstWaveLength,
                     lastWaveLength,
-                    calcCnt
+                    calcCnt,
+                    lsEqnSolverDv
                 );
                 success = true;
             }

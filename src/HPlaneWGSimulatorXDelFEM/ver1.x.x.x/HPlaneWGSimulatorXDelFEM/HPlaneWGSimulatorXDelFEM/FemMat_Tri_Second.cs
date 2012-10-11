@@ -167,7 +167,15 @@ namespace HPlaneWGSimulatorXDelFEM
                     if (ForceNodeNumberH.ContainsKey(jNodeNumber)) continue;
                     int jnoGlobal = toSorted[jNodeNumber];
 
-                    mat[inoGlobal, jnoGlobal] += emat[ino, jno];
+                    //mat[inoGlobal, jnoGlobal] += emat[ino, jno];
+                    if (mat._body[inoGlobal + jnoGlobal * mat.RowSize] == null)
+                    {
+                        mat._body[inoGlobal + jnoGlobal * mat.RowSize] = emat[ino, jno];
+                    }
+                    else
+                    {
+                        mat._body[inoGlobal + jnoGlobal * mat.RowSize] = (Complex)mat._body[inoGlobal + jnoGlobal * mat.RowSize] + emat[ino, jno];
+                    }
                 }
             }
         }

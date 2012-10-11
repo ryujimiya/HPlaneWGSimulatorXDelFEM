@@ -1,5 +1,10 @@
 ﻿#H面導波管シミュレーター X DelFEM  
   
+**News**  
+  2012-10-11 HPlaneWGSimulatorXDelFEM version1.0.0.1 Release  
+　　線形方程式の解法にDelFEMのPCOCGを組み込みました。この解法は回路によっては誤差があったり収束しなかったりしますが計算時間を大幅に短縮できます。  
+　　従来のclapckの直接解法とあわせてご利用ください。  
+  
 **Summary**  
   
 「HPlaneWGSimulator X DelFEM」は、H面導波管回路の散乱パラメータを計算するプログラム「[H面導波管シミュレーター(HPlaneWGSimulator)](https://github.com/ryujimiya/HPlaneWGSimulator)」のDelFEM版です。  
@@ -8,7 +13,7 @@ FEMソルバー部分と電界分布図やSパラメータのグラフ等の結�
   
 最後に本アプリケーションでは下記ライブラリを使用しています。ここに記し深謝致します。  
 - DelFEM  
-CADとメッシュ生成に梅谷信行氏のDelFEMを利用しています。また有限要素法の計算に関して、一部DelFEMを引用しています。  
+CAD、メッシュ生成と線形方程式解法(PCOCG)に梅谷信行氏のDelFEMを利用しています。また有限要素法の計算に関して、一部DelFEMを引用しています。  
 　　DelFEM　[有限要素法(FEM)のページ](http://ums.futene.net/)  
 - Lisys  
 行列の固有値計算及び線形方程式計算にKrdLab氏のLisysを用いています。  

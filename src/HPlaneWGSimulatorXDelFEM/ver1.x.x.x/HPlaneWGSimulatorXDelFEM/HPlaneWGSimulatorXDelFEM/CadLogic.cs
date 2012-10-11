@@ -4264,6 +4264,7 @@ namespace HPlaneWGSimulatorXDelFEM
             double dummyFirstWaveLength = 0.0;
             double dummyLastWaveLength = 0.0;
             int dummyCalcCnt = 0;
+            FemSolver.LinearSystemEqnSoverDV dummyLsEqnSolverDv = FemSolver.LinearSystemEqnSoverDV.PCOCG;
             FemInputDatFile.SaveToFileFromCad(
                 filename,
                 nodeCnt, doubleCoords,
@@ -4274,7 +4275,8 @@ namespace HPlaneWGSimulatorXDelFEM
                 Medias,
                 dummyFirstWaveLength,
                 dummyLastWaveLength,
-                dummyCalcCnt);
+                dummyCalcCnt,
+                dummyLsEqnSolverDv);
                 
         }
 

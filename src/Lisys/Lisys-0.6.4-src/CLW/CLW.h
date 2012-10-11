@@ -936,7 +936,7 @@ namespace KrdLab {
 				int zeroCounter = 0;
 				for (int i = 0; i < A->Length; i++)
 				{
-					if (System::Numerics::Complex::Abs(*A[i]) < CalculationLowerLimit)
+					if (A[i] == nullptr || System::Numerics::Complex::Abs(*A[i]) < CalculationLowerLimit)
 					{
 						zeroCounter++;
 						if (i == A->Length - 1 && zeroCounter > 0)

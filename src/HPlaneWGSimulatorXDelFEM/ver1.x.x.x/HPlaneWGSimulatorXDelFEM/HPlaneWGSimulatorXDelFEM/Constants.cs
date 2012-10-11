@@ -60,7 +60,12 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <summary>
         /// 考慮するモード数
         /// </summary>
-        public const int MaxModeCount = 20;
+        //public const int MaxModeCount = 20;
+        public const int MaxModeCount = int.MaxValue; // 固有値解析で取得可能なすべてのモードを考慮する(境界の節点数)
+        /// <summary>
+        /// 線形方程式解法区分(既定値)
+        /// </summary>
+        public const FemSolver.LinearSystemEqnSoverDV DefLsEqnSolverDv = FemSolver.LinearSystemEqnSoverDV.PCOCG;
         /// <summary>
         /// DelFEMのメッシュ生成機の生成パラメータ：要素長
         /// </summary>

@@ -41,6 +41,8 @@
             this.labelElemSapeDv = new System.Windows.Forms.Label();
             this.cboxElemShapeDv = new System.Windows.Forms.ComboBox();
             this.pbDelFEMLogo = new System.Windows.Forms.PictureBox();
+            this.cboxLsEqnSolverDv = new System.Windows.Forms.ComboBox();
+            this.labelLsEqnSolverDv = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbDelFEMLogo)).BeginInit();
             this.SuspendLayout();
             // 
@@ -94,7 +96,7 @@
             // 
             // btnRun
             // 
-            this.btnRun.Location = new System.Drawing.Point(61, 153);
+            this.btnRun.Location = new System.Drawing.Point(58, 179);
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(75, 23);
             this.btnRun.TabIndex = 0;
@@ -104,7 +106,7 @@
             // 
             // btnAbort
             // 
-            this.btnAbort.Location = new System.Drawing.Point(168, 153);
+            this.btnAbort.Location = new System.Drawing.Point(165, 179);
             this.btnAbort.Name = "btnAbort";
             this.btnAbort.Size = new System.Drawing.Size(75, 23);
             this.btnAbort.TabIndex = 1;
@@ -152,17 +154,38 @@
             // pbDelFEMLogo
             // 
             this.pbDelFEMLogo.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.delfem_logo48x;
-            this.pbDelFEMLogo.Location = new System.Drawing.Point(189, 126);
+            this.pbDelFEMLogo.Location = new System.Drawing.Point(200, 76);
             this.pbDelFEMLogo.Name = "pbDelFEMLogo";
             this.pbDelFEMLogo.Size = new System.Drawing.Size(64, 21);
             this.pbDelFEMLogo.TabIndex = 9;
             this.pbDelFEMLogo.TabStop = false;
             // 
+            // cboxLsEqnSolverDv
+            // 
+            this.cboxLsEqnSolverDv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboxLsEqnSolverDv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cboxLsEqnSolverDv.FormattingEnabled = true;
+            this.cboxLsEqnSolverDv.Location = new System.Drawing.Point(118, 137);
+            this.cboxLsEqnSolverDv.Name = "cboxLsEqnSolverDv";
+            this.cboxLsEqnSolverDv.Size = new System.Drawing.Size(135, 20);
+            this.cboxLsEqnSolverDv.TabIndex = 9;
+            // 
+            // labelLsEqnSolverDv
+            // 
+            this.labelLsEqnSolverDv.AutoSize = true;
+            this.labelLsEqnSolverDv.Location = new System.Drawing.Point(12, 137);
+            this.labelLsEqnSolverDv.Name = "labelLsEqnSolverDv";
+            this.labelLsEqnSolverDv.Size = new System.Drawing.Size(89, 12);
+            this.labelLsEqnSolverDv.TabIndex = 0;
+            this.labelLsEqnSolverDv.Text = "線形方程式解法";
+            // 
             // CalcSettingFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 188);
+            this.ClientSize = new System.Drawing.Size(284, 214);
+            this.Controls.Add(this.cboxLsEqnSolverDv);
+            this.Controls.Add(this.labelLsEqnSolverDv);
             this.Controls.Add(this.pbDelFEMLogo);
             this.Controls.Add(this.cboxElemShapeDv);
             this.Controls.Add(this.labelElemSapeDv);
@@ -203,6 +226,8 @@
         private System.Windows.Forms.Label labelElemSapeDv;
         private System.Windows.Forms.ComboBox cboxElemShapeDv;
         private System.Windows.Forms.PictureBox pbDelFEMLogo;
+        private System.Windows.Forms.ComboBox cboxLsEqnSolverDv;
+        private System.Windows.Forms.Label labelLsEqnSolverDv;
 
     }
 }

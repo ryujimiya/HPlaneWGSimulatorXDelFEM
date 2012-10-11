@@ -612,6 +612,20 @@ namespace MyUtilLib.Matrix
         */
 
         // [X] = [A]t
+        public static MyDoubleMatrix matrix_Transpose(MyDoubleMatrix matA)
+        {
+            MyDoubleMatrix matX = new MyDoubleMatrix(matA.ColumnSize, matA.RowSize);
+            for (int i = 0; i < matX.RowSize; i++)
+            {
+                for (int j = 0; j < matX.ColumnSize; j++)
+                {
+                    matX[i, j] = matA[j, i];
+                }
+            }
+            return matX;
+        }
+
+        // [X] = [A]t
         public static MyComplexMatrix matrix_Transpose(MyComplexMatrix matA)
         {
             MyComplexMatrix matX = new MyComplexMatrix(matA.ColumnSize, matA.RowSize);
@@ -620,6 +634,20 @@ namespace MyUtilLib.Matrix
                 for (int j = 0; j < matX.ColumnSize; j++)
                 {
                     matX[i, j] = matA[j, i];
+                }
+            }
+            return matX;
+        }
+
+        // [X] = ([A]*)t
+        public static MyComplexMatrix matrix_ConjugateTranspose(MyComplexMatrix matA)
+        {
+            MyComplexMatrix matX = new MyComplexMatrix(matA.ColumnSize, matA.RowSize);
+            for (int i = 0; i < matX.RowSize; i++)
+            {
+                for (int j = 0; j < matX.ColumnSize; j++)
+                {
+                    matX[i, j] = new Complex(matA[j, i].Real, -matA[j, i].Imaginary);
                 }
             }
             return matX;

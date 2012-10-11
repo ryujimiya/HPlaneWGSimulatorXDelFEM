@@ -335,7 +335,8 @@ namespace HPlaneWGSimulatorXDelFEM
             // 等高線図の凡例
             UpdateFValueLegend(FValueLegendPanel, labelFreqValue);
             // 等高線図
-            FValuePanel.Invalidate();
+            //FValuePanel.Invalidate();
+            FValuePanel.Refresh();
             // 固有値チャート初期化
             // この段階ではMaxModeの値が0なので、後に計算値ロード後一回だけ初期化する
             ResetEigenValueChart(BetaChart);
@@ -610,7 +611,8 @@ namespace HPlaneWGSimulatorXDelFEM
             // 等高線図の凡例
             UpdateFValueLegend(FValueLegendPanel, labelFreqValue);
             // 等高線図
-            FValuePanel.Invalidate();
+            //FValuePanel.Invalidate();
+            FValuePanel.Refresh();
             // 固有ベクトル表示
             SetEigenVecToChart(EigenVecChart);
         }

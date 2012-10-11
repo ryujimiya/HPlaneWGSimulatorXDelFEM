@@ -702,16 +702,23 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void CadPanel_Paint(object sender, PaintEventArgs e)
         {
-            Graphics g = e.Graphics;
-            if (CadLgc != null)
+            try
             {
-                CadLgc.CadPanelPaint(g);
+                Graphics g = e.Graphics;
+                if (CadLgc != null)
+                {
+                    CadLgc.CadPanelPaint(g);
+                }
+                //if (PostPro != null && isCalculating)
+                //{
+                //    // 計算実行中はメッシュ表示
+                //    PostPro.DrawMesh(g, CadPanel);
+                //}
             }
-            //if (PostPro != null && isCalculating)
-            //{
-            //    // 計算実行中はメッシュ表示
-            //    PostPro.DrawMesh(g, CadPanel);
-            //}
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+            }
         }
 
         /// <summary>
@@ -766,19 +773,26 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void FValuePanel_Paint(object sender, PaintEventArgs e)
         {
-            Graphics g = e.Graphics;
-
-            if (PostPro != null)
+            try
             {
-                PostPro.DrawField(g, FValuePanel);
-                if (PostPro != null && IsCalculating)
+                Graphics g = e.Graphics;
+
+                if (PostPro != null)
                 {
-                    //見づらいので削除
-                    // 計算実行中はメッシュ表示
-                    //PostPro.DrawMesh(g, FValuePanel, true);
+                    PostPro.DrawField(g, FValuePanel);
+                    if (PostPro != null && IsCalculating)
+                    {
+                        //見づらいので削除
+                        // 計算実行中はメッシュ表示
+                        //PostPro.DrawMesh(g, FValuePanel, true);
+                    }
+                    // 媒質の境界を表示
+                    PostPro.DrawMediaB(g, FValuePanel, true);
                 }
-                // 媒質の境界を表示
-                PostPro.DrawMediaB(g, FValuePanel, true);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
             }
         }
 
@@ -824,7 +838,7 @@ namespace HPlaneWGSimulatorXDelFEM
             // 計算範囲ダイアログを表示する
             CalcSettingFrm calcSettingFrm = new CalcSettingFrm(
                 Solver.FirstNormalizedFreq, Solver.LastNormalizedFreq, Solver.CalcFreqCnt,
-                Solver.ElemShapeDvToBeSet, Solver.ElemOrderToBeSet);
+                Solver.ElemShapeDvToBeSet, Solver.ElemOrderToBeSet, Solver.LsEqnSolverDv);
             DialogResult result = calcSettingFrm.ShowDialog();
             if (result != DialogResult.OK)
             {
@@ -844,7 +858,9 @@ namespace HPlaneWGSimulatorXDelFEM
             // 解析機へ入力データを読み込む
             Solver.Load(FemInputDatFilePath);
             // 解析機の情報が確定したので、計算範囲画面で設定した計算範囲をファイルへ書き込み
-            Solver.UpdateAndSaveToInputFile(FemInputDatFilePath, calcSettingFrm.NormalizedFreq1, calcSettingFrm.NormalizedFreq2, calcSettingFrm.CalcFreqCnt);
+            Solver.UpdateAndSaveToInputFile(FemInputDatFilePath,
+                calcSettingFrm.NormalizedFreq1, calcSettingFrm.NormalizedFreq2, calcSettingFrm.CalcFreqCnt,
+                calcSettingFrm.LsEqnSolverDv);
 
             // ポストプロセッサの初期化
             PostPro.InitData(
@@ -905,6 +921,8 @@ namespace HPlaneWGSimulatorXDelFEM
                                         EigenVecChart,
                                         true);
                                 }));
+                            // 描画イベントを処理させる
+                            Application.DoEvents();
 
                         });
                     // 解析実行
@@ -948,8 +966,18 @@ namespace HPlaneWGSimulatorXDelFEM
         {
             //btnCalc.Enabled = enabled;
             // ポストプロセッサ系ボタン
-            btnPrevFreq.Enabled = enabled;
-            btnNextFreq.Enabled = enabled;
+            //BUGFIX 読み込み後に前の周波数ボタンが無効にならないバグ
+            //btnPrevFreq.Enabled = enabled;
+            //btnNextFreq.Enabled = enabled;
+            if (enabled)
+            {
+                setupBtnFreqEnable();
+            }
+            else
+            {
+                btnPrevFreq.Enabled = enabled;
+                btnNextFreq.Enabled = enabled;
+            }
             // 編集系ボタン
             btnNew.Enabled = enabled;
             btnOpen.Enabled = enabled;
@@ -1629,6 +1657,8 @@ namespace HPlaneWGSimulatorXDelFEM
             // 要素形状、補間次数の退避
             Constants.FemElementShapeDV elemShapeDv = Solver.ElemShapeDvToBeSet;
             int elemOrder = Solver.ElemOrderToBeSet;
+            // 線形方程式解法区分の退避
+            FemSolver.LinearSystemEqnSoverDV lsEqnSolverDv = Solver.LsEqnSolverDv;
             if (calcFreqCnt == 0)
             {
                 firstNormalizedFreq = Constants.DefNormalizedFreqRange[0];
@@ -1636,6 +1666,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 calcFreqCnt = Constants.DefCalcFreqencyPointCount;
                 elemShapeDv = Constants.DefElemShapeDv;
                 elemOrder = Constants.DefElementOrder;
+                lsEqnSolverDv = Constants.DefLsEqnSolverDv;
             }
 
             // Fem入出力データの削除
@@ -1669,7 +1700,9 @@ namespace HPlaneWGSimulatorXDelFEM
             // 解析機へ入力データを読み込む
             Solver.Load(FemInputDatFilePath);
             // 解析機の情報が確定したので、計算範囲画面で設定した計算範囲をファイルへ書き込み
-            Solver.UpdateAndSaveToInputFile(FemInputDatFilePath, firstNormalizedFreq, lastNormalizedFreq, calcFreqCnt);
+            Solver.UpdateAndSaveToInputFile(FemInputDatFilePath,
+                firstNormalizedFreq, lastNormalizedFreq, calcFreqCnt,
+                lsEqnSolverDv);
             // ポストプロセッサの入力データ初期化
             PostPro.InitData(
                 Solver,

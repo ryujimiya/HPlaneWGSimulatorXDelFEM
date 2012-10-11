@@ -453,6 +453,30 @@ namespace MyUtilLib
                 MessageBox.Show(exception.Message);
             }
         }
+
+        /// <summary>
+        /// メッセージウィンドウ(INFO)を表示する
+        /// </summary>
+        /// <param name="">チャンネル名</param>
+        public static  void MessageBox_ShowAsync(string text, string caption = "")
+        {
+            new Thread(new ThreadStart(delegate()
+            {
+                MessageBox.Show(text, caption, MessageBoxButtons.OK);
+            })).Start();
+        }
+
+        /// <summary>
+        /// メッセージウィンドウ(エラー)を表示する
+        /// </summary>
+        /// <param name="">チャンネル名</param>
+        public static void MessageBox_ShowErrorAsync(string text, string caption)
+        {
+            new Thread(new ThreadStart(delegate()
+            {
+                MessageBox.Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            })).Start();
+        }
     }
 
 }

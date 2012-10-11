@@ -57,6 +57,40 @@ namespace HPlaneWGSimulatorXDelFEM
                 return Text;
             }
         }
+        /// <summary>
+        /// リニアシステムソルバー区分構造体
+        /// </summary>
+        struct LinearSystemEqnSolverStruct
+        {
+            /// <summary>
+            /// リニアシステムソルバー区分
+            /// </summary>
+            public FemSolver.LinearSystemEqnSoverDV LsEqnSolverDv;
+            /// <summary>
+            /// 表示テキスト
+            /// </summary>
+            public string Text;
+            /// <summary>
+            /// コンストラクタ
+            /// </summary>
+            /// <param name="lsSolverDv">リニアシステムソルバー区分</param>
+            /// <param name="text">表示テキスト</param>
+            public LinearSystemEqnSolverStruct(FemSolver.LinearSystemEqnSoverDV lsEqnSolverDv, string text)
+            {
+                LsEqnSolverDv = lsEqnSolverDv;
+                Text = text;
+            }
+            /// <summary>
+            /// 文字列に変換する
+            ///    コンボボックスの表示用テキストを返却する
+            /// </summary>
+            /// <returns></returns>
+            public override string ToString()
+            {
+                //return base.ToString();
+                return Text;
+            }
+        }
         /////////////////////////////////////////////////////////////////////////////
         // フィールド
         /////////////////////////////////////////////////////////////////////////////
@@ -100,6 +134,14 @@ namespace HPlaneWGSimulatorXDelFEM
             get;
             private set;
         }
+        /// <summary>
+        /// 線形方程式解法区分
+        /// </summary>
+        public FemSolver.LinearSystemEqnSoverDV LsEqnSolverDv
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// コンストラクタ
@@ -109,8 +151,9 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="calcFreqCnt">計算点数</param>
         /// <param name="elemShapeDv">要素形状区分</param>
         /// <param name="elemOrder">要素次数</param>
+        /// <param name="lsEqnSolverDv">線形方程式解法区分</param>
         public CalcSettingFrm(double normalizedFreq1, double normalizedFreq2, int calcFreqCnt,
-            Constants.FemElementShapeDV elemShapeDv, int elemOrder)
+            Constants.FemElementShapeDV elemShapeDv, int elemOrder, FemSolver.LinearSystemEqnSoverDV lsEqnSolverDv)
         {
             InitializeComponent();
 
@@ -122,6 +165,7 @@ namespace HPlaneWGSimulatorXDelFEM
             CalcFreqCnt = calcFreqCnt;
             ElemShapeDv = elemShapeDv;
             ElemOrder = elemOrder;
+            LsEqnSolverDv = lsEqnSolverDv;
             if (CalcFreqCnt == 0)
             {
                 // 既定値を設定
@@ -154,6 +198,20 @@ namespace HPlaneWGSimulatorXDelFEM
                     cboxElemShapeDv.SelectedItem = es;
                 }
             }
+            // 線形方程式解法
+            LinearSystemEqnSolverStruct[] lsList = 
+            {
+                new LinearSystemEqnSolverStruct(FemSolver.LinearSystemEqnSoverDV.PCOCG, "PCOCG"),
+                new LinearSystemEqnSolverStruct(FemSolver.LinearSystemEqnSoverDV.Zgesv, "zgesv"),
+            };
+            foreach (LinearSystemEqnSolverStruct ls in lsList)
+            {
+                cboxLsEqnSolverDv.Items.Add(ls);
+                if (ls.LsEqnSolverDv == LsEqnSolverDv)
+                {
+                    cboxLsEqnSolverDv.SelectedItem = ls;
+                }
+            }
         }
 
         /// <summary>
@@ -183,6 +241,8 @@ namespace HPlaneWGSimulatorXDelFEM
             double deltaFreq = double.Parse(textBoxDeltaFreq.Text);
             // 要素形状・次数
             ElemShapeStruct selectedEs = (ElemShapeStruct)cboxElemShapeDv.SelectedItem;
+            // 線形方程式解法
+            LinearSystemEqnSolverStruct selectedLs = (LinearSystemEqnSolverStruct)cboxLsEqnSolverDv.SelectedItem;
 
             /* 規格化周波数の制限は外す
             if (minFreq < Constants.DefNormalizedFreqRange[0] - Constants.PrecisionLowerLimit || minFreq > Constants.DefNormalizedFreqRange[1] + Constants.PrecisionLowerLimit)
@@ -220,6 +280,7 @@ namespace HPlaneWGSimulatorXDelFEM
             NormalizedFreq2 = maxFreq;
             ElemShapeDv = selectedEs.ElemShapeDv;
             ElemOrder = selectedEs.Order;
+            LsEqnSolverDv = selectedLs.LsEqnSolverDv;
             
             DialogResult = DialogResult.OK;
         }

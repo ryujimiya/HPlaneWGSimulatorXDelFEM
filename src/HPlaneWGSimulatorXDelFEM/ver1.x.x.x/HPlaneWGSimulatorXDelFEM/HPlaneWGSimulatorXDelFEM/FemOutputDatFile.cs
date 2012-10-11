@@ -131,6 +131,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
@@ -148,6 +149,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
@@ -178,6 +180,9 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             try
             {
+                // 周波数が順番に並んでいない場合を考慮
+                int minFreq = int.MaxValue;
+                int maxFreq = int.MinValue;
                 using (StreamReader sr = new StreamReader(indexfilename))
                 {
                     string line;
@@ -196,18 +201,34 @@ namespace HPlaneWGSimulatorXDelFEM
                             return freqCnt;
                         }
                         long tmpFOfs = long.Parse(tokens[1]);
-                        if (freqCnt == 0)
+                        //if (freqCnt == 0)
+                        //{
+                        //    firstFreq = tmpfreqNo;
+                        //}
+                        //lastFreq = tmpfreqNo;
+                        // 周波数が順番に並んでいない場合を考慮
+                        if (minFreq > tmpfreqNo)
                         {
-                            firstFreq = tmpfreqNo;
+                            minFreq = tmpfreqNo;
                         }
-                        lastFreq = tmpfreqNo;
+                        if (maxFreq < tmpfreqNo)
+                        {
+                            maxFreq = tmpfreqNo;
+                        }
 
                         freqCnt++;
                     }
                 }
+                // 周波数が順番に並んでいない場合を考慮
+                if (freqCnt > 0)
+                {
+                    firstFreq = minFreq;
+                    lastFreq = maxFreq;
+                }
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return freqCnt;
             }
@@ -297,6 +318,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
@@ -485,6 +507,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
@@ -594,6 +617,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 

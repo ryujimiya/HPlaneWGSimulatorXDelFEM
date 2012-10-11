@@ -32,6 +32,10 @@ namespace HPlaneWGSimulatorXDelFEM
         public override void DrawField(Graphics g, Size ofs, Size delta, Size regionSize, ColorMap colorMap)
         {
             //base.DrawField(g, ofs, delta, regionSize, colorMap);
+            if (_Nodes == null || _FValues == null)
+            {
+                return;
+            }
 
             const int ndim = Constants.CoordDim2D; //2;      // 座標の次元数
             const int vertexCnt = Constants.TriVertexCnt; //3; // 三角形の頂点の数(2次要素でも同じ)

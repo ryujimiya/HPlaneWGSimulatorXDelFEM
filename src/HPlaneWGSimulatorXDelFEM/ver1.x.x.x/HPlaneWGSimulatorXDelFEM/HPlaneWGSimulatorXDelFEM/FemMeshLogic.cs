@@ -1205,6 +1205,42 @@ namespace HPlaneWGSimulatorXDelFEM
                 System.Diagnostics.Debug.Assert(node.No == nodeNumber);
                 pps[ino] = node.Coord;
             }
+            // バウンディングボックス取得
+            double minX = double.MaxValue;
+            double maxX = double.MinValue;
+            double minY = double.MaxValue;
+            double maxY = double.MinValue;
+            foreach (double[] pp in pps)
+            {
+                double xx = pp[0];
+                double yy = pp[1];
+                if (minX > xx)
+                {
+                    minX = xx;
+                }
+                if (maxX < xx)
+                {
+                    maxX = xx;
+                }
+                if (minY > yy)
+                {
+                    minY = yy;
+                }
+                if (maxY < yy)
+                {
+                    maxY = yy;
+                }
+            }
+            // バウンディングボックスでチェック
+            if (test_pp[0] < minX || test_pp[0] > maxX)
+            {
+                return hit;
+            }
+            if (test_pp[1] < minY || test_pp[1] > maxY)
+            {
+                return hit;
+            }
+
             // 頂点？
             foreach (double[] pp in pps)
             {
@@ -1275,6 +1311,41 @@ namespace HPlaneWGSimulatorXDelFEM
                 pps[ino] = node.Coord;
                 nodeNumbers[ino] = nodeNumber;
             }
+            // バウンディングボックス取得
+            double minX = double.MaxValue;
+            double maxX = double.MinValue;
+            double minY = double.MaxValue;
+            double maxY = double.MinValue;
+            foreach (double[] pp in pps)
+            {
+                double xx = pp[0];
+                double yy = pp[1];
+                if (minX > xx)
+                {
+                    minX = xx;
+                }
+                if (maxX < xx)
+                {
+                    maxX = xx;
+                }
+                if (minY > yy)
+                {
+                    minY = yy;
+                }
+                if (maxY < yy)
+                {
+                    maxY = yy;
+                }
+            }
+            // バウンディングボックスでチェック
+            if (test_pp[0] < minX || test_pp[0] > maxX)
+            {
+                return hit;
+            }
+            if (test_pp[1] < minY || test_pp[1] > maxY)
+            {
+                return hit;
+            }
 
             // ２つの三角形に分ける
             //        s
@@ -1296,6 +1367,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 if (hitInsideTri)
                 {
                     hit = true;
+                    break;
                 }
             }
             return hit;

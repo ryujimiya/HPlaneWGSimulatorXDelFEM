@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Numerics; // Complex
+//using System.Numerics; // Complex
+using KrdLab.clapack; // KrdLab.clapack.Complex
 //using System.Text.RegularExpressions;
 using MyUtilLib.Matrix;
 
@@ -113,7 +114,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 };
 
             // 要素剛性行列を作る
-            Complex[,] emat = new Complex[nno, nno];
+            double[,] emat = new Complex[nno, nno];
             for (int ino = 0; ino < nno; ino++)
             {
                 for (int jno = 0; jno < nno; jno++)
@@ -231,7 +232,7 @@ namespace HPlaneWGSimulatorXDelFEM
                             }
 
                             // 汎関数
-                            Complex functional = media_P[0, 0] * dNdX[1, ino] * dNdX[1, jno] + media_P[1, 1] * dNdX[0, ino] * dNdX[0, jno]
+                            double functional = media_P[0, 0] * dNdX[1, ino] * dNdX[1, jno] + media_P[1, 1] * dNdX[0, ino] * dNdX[0, jno]
                                              - k0 * k0 * media_Q[2, 2] * N[ino] * N[jno];
                             emat[ino, jno] += detj * weight * functional;
                         }
@@ -266,14 +267,20 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="Nodes">節点リスト</param>
         /// <param name="Medias">媒質リスト</param>
         /// <param name="ForceNodeNumberH">強制境界節点ハッシュ</param>
-        /// <param name="mat">マージされる全体行列</param>
+        /// <param name="mat">マージされる全体行列(clapack使用時)</param>
+        /// <param name="mat_cc">マージされる全体行列(DelFEM使用時)</param>
+        /// <param name="res_c">マージされる残差ベクトル(DelFEM使用時)</param>
+        /// <param name="tmpBuffer">一時バッファ(DelFEM使用時)</param>
         public static void AddElementMat(double waveLength,
             Dictionary<int, int> toSorted,
             FemElement element,
             IList<FemNode> Nodes,
             MediaInfo[] Medias,
             Dictionary<int, bool> ForceNodeNumberH,
-            ref MyComplexMatrix mat)
+            ref MyComplexMatrix mat,
+            ref DelFEM4NetMatVec.CZMatDia_BlkCrs_Ptr mat_cc,
+            ref DelFEM4NetMatVec.CZVector_Blk_Ptr res_c,
+            ref int[] tmpBuffer)
         {
             // 定数
             const double pi = Constants.pi;
@@ -557,7 +564,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
 
             // 要素剛性行列を作る
-            Complex[,] emat = new Complex[nno, nno];
+            double[,] emat = new double[nno, nno];
             for (int ino = 0; ino < nno; ino++)
             {
                 for (int jno = 0; jno < nno; jno++)
@@ -568,25 +575,60 @@ namespace HPlaneWGSimulatorXDelFEM
             }
 
             // 要素剛性行列にマージする
-            for (int ino = 0; ino < nno; ino++)
+            if (mat_cc != null)
             {
-                int iNodeNumber = no_c[ino];
-                if (ForceNodeNumberH.ContainsKey(iNodeNumber)) continue;
-                int inoGlobal = toSorted[iNodeNumber];
-                for (int jno = 0; jno < nno; jno++)
+                // 全体節点番号→要素内節点インデックスマップ
+                Dictionary<uint, int> inoGlobalDic = new Dictionary<uint,int>();
+                for (int ino = 0; ino < nno; ino++)
                 {
-                    int jNodeNumber = no_c[jno];
-                    if (ForceNodeNumberH.ContainsKey(jNodeNumber)) continue;
-                    int jnoGlobal = toSorted[jNodeNumber];
-
-                    //mat[inoGlobal, jnoGlobal] += emat[ino, jno];
-                    if (mat._body[inoGlobal + jnoGlobal * mat.RowSize] == null)
+                    int iNodeNumber = no_c[ino];
+                    if (ForceNodeNumberH.ContainsKey(iNodeNumber)) continue;
+                    uint inoGlobal = (uint)toSorted[iNodeNumber];
+                    inoGlobalDic.Add(inoGlobal, ino);
+                }
+                // マージ用の節点番号リスト
+                uint[] no_c_tmp = inoGlobalDic.Keys.ToArray<uint>();
+                // マージする節点数("col"と"row"のサイズ)
+                uint ncolrow_tmp = (uint)no_c_tmp.Length;
+                // Note:
+                //   要素の節点がすべて強制境界の場合がある.その場合は、ncolrow_tmpが０
+                if (ncolrow_tmp > 0)
+                {
+                    // マージする要素行列
+                    DelFEM4NetCom.Complex[] ematBuffer = new DelFEM4NetCom.Complex[ncolrow_tmp * ncolrow_tmp];
+                    for (int ino_tmp = 0; ino_tmp < ncolrow_tmp; ino_tmp++)
                     {
-                        mat._body[inoGlobal + jnoGlobal * mat.RowSize] = emat[ino, jno];
+                        int ino = inoGlobalDic[no_c_tmp[ino_tmp]];
+                        for (int jno_tmp = 0; jno_tmp < ncolrow_tmp; jno_tmp++)
+                        {
+                            int jno = inoGlobalDic[no_c_tmp[jno_tmp]];
+                            double value = emat[ino, jno];
+                            DelFEM4NetCom.Complex cvalueDelFEM = new DelFEM4NetCom.Complex(value, 0);
+                            // ematBuffer[ino_tmp, jno_tmp] 横ベクトルを先に埋める(clapack方式でないことに注意)
+                            ematBuffer[ino_tmp * ncolrow_tmp + jno_tmp] = cvalueDelFEM;
+                        }
                     }
-                    else
+                    // 全体行列に要素行列をマージする
+                    mat_cc.Mearge(ncolrow_tmp, no_c_tmp, ncolrow_tmp, no_c_tmp, 1, ematBuffer, ref tmpBuffer);
+                }
+            }
+            else if (mat != null)
+            {
+                for (int ino = 0; ino < nno; ino++)
+                {
+                    int iNodeNumber = no_c[ino];
+                    if (ForceNodeNumberH.ContainsKey(iNodeNumber)) continue;
+                    int inoGlobal = toSorted[iNodeNumber];
+                    for (int jno = 0; jno < nno; jno++)
                     {
-                        mat._body[inoGlobal + jnoGlobal * mat.RowSize] = (Complex)mat._body[inoGlobal + jnoGlobal * mat.RowSize] + emat[ino, jno];
+                        int jNodeNumber = no_c[jno];
+                        if (ForceNodeNumberH.ContainsKey(jNodeNumber)) continue;
+                        int jnoGlobal = toSorted[jNodeNumber];
+
+                        //mat[inoGlobal, jnoGlobal] += emat[ino, jno];
+                        //mat._body[inoGlobal + jnoGlobal * mat.RowSize] += emat[ino, jno];
+                        // 実数部に加算する
+                        mat._body[inoGlobal + jnoGlobal * mat.RowSize].Real += emat[ino, jno];
                     }
                 }
             }

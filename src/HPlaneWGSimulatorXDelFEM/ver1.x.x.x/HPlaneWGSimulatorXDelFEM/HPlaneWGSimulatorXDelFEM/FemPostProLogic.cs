@@ -5,7 +5,8 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Numerics; // Complex
+//using System.Numerics; // Complex
+using KrdLab.clapack; // KrdLab.clapack.Complex
 using System.Drawing;
 
 namespace HPlaneWGSimulatorXDelFEM

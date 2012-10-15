@@ -16,7 +16,7 @@
 計算上必要になるチェックルーチンを定義する．
 </summary>
         </member>
-        <member name="M:KrdLab.clapack.Function.zgeev(System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[],System.Int32,System.Int32,System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[]@,System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[][]@)">
+        <member name="M:KrdLab.clapack.FunctionExt.zgeev(System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[],System.Int32,System.Int32,System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[]@,System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[][]@)">
             <summary>
                 <para>固有値分解</para>
                 <para>計算された固有ベクトルは，大きさ（ユークリッドノルム）が 1 に規格化されている．</para>
@@ -31,13 +31,13 @@
                 <para>対応するCLAPACK関数（CLAPACK/BLAS/SRC/zgeev.c）</para>
                 <code>
 int zgeev_(char *jobvl, char *jobvr, integer *n, 
-		doublecomplex *a, integer *lda, doublecomplex *w, doublecomplex *vl, 
-		integer *ldvl, doublecomplex *vr, integer *ldvr, doublecomplex *work, 
-		integer *lwork, doublereal *rwork, integer *info)
+           doublecomplex *a, integer *lda, doublecomplex *w, doublecomplex *vl, 
+           integer *ldvl, doublecomplex *vr, integer *ldvr, doublecomplex *work, 
+           integer *lwork, doublereal *rwork, integer *info)
 </code>
             </remarks>
         </member>
-        <member name="M:KrdLab.clapack.Function.zgesv(System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[]@,System.Int32@,System.Int32@,System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[],System.Int32,System.Int32,System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[],System.Int32,System.Int32)">
+        <member name="M:KrdLab.clapack.FunctionExt.zgesv(System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[]@,System.Int32@,System.Int32@,System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[],System.Int32,System.Int32,System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[],System.Int32,System.Int32)">
             <summary>
                 <para>A * X = B を解く（ X が解）．</para>
                 <para>A は n×n の行列，X と B は n×nrhs の行列である．</para>
@@ -61,7 +61,7 @@ int zgeev_(char *jobvl, char *jobvr, integer *n,
 この場合，解を求めることができない．
 </exception>
             <remarks>
-                <para>対応するCLAPACK関数（CLAPACK/SRC/dgesv.c）</para>
+                <para>対応するCLAPACK関数（CLAPACK/SRC/zgesv.c）</para>
                 <code>
 int zgesv_(integer *n, integer *nrhs,
            doublecomplex *a, integer *lda, integer *ipiv,
@@ -70,7 +70,7 @@ int zgesv_(integer *n, integer *nrhs,
                 <para>zgesv_ 関数の内部では LU分解が使用されている．</para>
             </remarks>
         </member>
-        <member name="M:KrdLab.clapack.Function.deCompressMat(System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[],doublecomplex*)">
+        <member name="M:KrdLab.clapack.FunctionExt.deCompressMat(System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[],doublecomplex*)">
             <summary>
                 <para>圧縮されたComplex配列を元に戻す</para>
                 <para>A(解凍前)のサイズとa(解凍後)のサイズは同じ.</para>
@@ -78,12 +78,281 @@ int zgesv_(integer *n, integer *nrhs,
             <param name="A">圧縮されたComplex配列</param>
             <param name="a">出力doublecomplex配列(メモリ確保は行われているものとする)</param>
         </member>
-        <member name="M:KrdLab.clapack.Function.CompressMatFor_zgesv(System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[]@)">
+        <member name="M:KrdLab.clapack.FunctionExt.CompressMatFor_zgesv(System.ValueType!System.Numerics.Complex!System.Runtime.CompilerServices.IsBoxed[]@)">
             <summary>
                 <para>Complex配列を圧縮する</para>
                 <para>圧縮前のサイズと圧縮後のサイズは同じ.nullptrに置き換わる分メモリ削減になる</para>
             </summary>
             <param name="A">[IN]対象Complex配列、[OUT]圧縮されたComplex配列</param>
+        </member>
+        <member name="M:KrdLab.clapack.FunctionExt.zgeev(System.Numerics.Complex[],System.Int32,System.Int32,System.Numerics.Complex[]@,System.Numerics.Complex[][]@)">
+            <summary>
+                <para>固有値分解</para>
+                <para>計算された固有ベクトルは，大きさ（ユークリッドノルム）が 1 に規格化されている．</para>
+            </summary>
+            <param name="X">固有値分解される行列（計算の過程で上書きされる）</param>
+            <param name="x_row">行列 <paramref name="X" /> の行数</param>
+            <param name="x_col">行列 <paramref name="X" /> の列数</param>
+            <param name="evals">固有値</param>
+            <param name="evecs">固有ベクトル</param>
+            <returns>常に 0 が返ってくる．</returns>
+            <remarks>
+                <para>対応するCLAPACK関数（CLAPACK/BLAS/SRC/zgeev.c）</para>
+                <code>
+int zgeev_(char *jobvl, char *jobvr, integer *n, 
+           doublecomplex *a, integer *lda, doublecomplex *w, doublecomplex *vl, 
+           integer *ldvl, doublecomplex *vr, integer *ldvr, doublecomplex *work, 
+           integer *lwork, doublereal *rwork, integer *info)
+</code>
+            </remarks>
+        </member>
+        <member name="M:KrdLab.clapack.FunctionExt.zgesv(System.Numerics.Complex[]@,System.Int32@,System.Int32@,System.Numerics.Complex[],System.Int32,System.Int32,System.Numerics.Complex[],System.Int32,System.Int32)">
+            <summary>
+                <para>A * X = B を解く（ X が解）．</para>
+                <para>A は n×n の行列，X と B は n×nrhs の行列である．</para>
+            </summary>
+            <param name="X">
+                <c>A * X = B</c> の解である X が格納される（実際には B と同じオブジェクトを指す）</param>
+            <param name="x_row">行列 X の行数が格納される（<c>== <paramref name="b_row" /></c>）</param>
+            <param name="x_col">行列 X の列数が格納される（<c>== <paramref name="b_col" /></c>）</param>
+            <param name="A">係数行列（LU分解の結果である P*L*U に書き換えられる．P*L*Uについては<see cref="M:KrdLab.clapack.Function.dgetrf(System.Double[],System.Int32,System.Int32,System.Int32[]@)" />を参照）</param>
+            <param name="a_row">行列Aの行数</param>
+            <param name="a_col">行列Aの列数</param>
+            <param name="B">行列 B（内部のCLAPACK関数により X の値が格納される）</param>
+            <param name="b_row">行列Bの行数</param>
+            <param name="b_col">行列Bの列数</param>
+            <returns>常に 0 が返ってくる．</returns>
+            <exception cref="T:KrdLab.clapack.exception.IllegalClapackArgumentException">
+内部で zgesv_関数に渡された引数に問題があると throw される．
+</exception>
+            <exception cref="T:KrdLab.clapack.exception.IllegalClapackResultException">
+行列 A の LU分解において，U[i, i] が 0 となってしまった場合に throw される．
+この場合，解を求めることができない．
+</exception>
+            <remarks>
+                <para>対応するCLAPACK関数（CLAPACK/SRC/zgesv.c）</para>
+                <code>
+int zgesv_(integer *n, integer *nrhs,
+           doublecomplex *a, integer *lda, integer *ipiv,
+           doublecomplex *b, integer *ldb, integer *info)
+</code>
+                <para>zgesv_ 関数の内部では LU分解が使用されている．</para>
+            </remarks>
+        </member>
+        <member name="M:KrdLab.clapack.FunctionExt.zgeev(KrdLab.clapack.Complex[],System.Int32,System.Int32,KrdLab.clapack.Complex[]@,KrdLab.clapack.Complex[][]@)">
+            <summary>
+                <para>固有値分解</para>
+                <para>計算された固有ベクトルは，大きさ（ユークリッドノルム）が 1 に規格化されている．</para>
+            </summary>
+            <param name="X">固有値分解される行列（計算の過程で上書きされる）</param>
+            <param name="x_row">行列 <paramref name="X" /> の行数</param>
+            <param name="x_col">行列 <paramref name="X" /> の列数</param>
+            <param name="evals">固有値</param>
+            <param name="evecs">固有ベクトル</param>
+            <returns>常に 0 が返ってくる．</returns>
+            <remarks>
+                <para>対応するCLAPACK関数（CLAPACK/BLAS/SRC/zgeev.c）</para>
+                <code>
+int zgeev_(char *jobvl, char *jobvr, integer *n, 
+           doublecomplex *a, integer *lda, doublecomplex *w, doublecomplex *vl, 
+           integer *ldvl, doublecomplex *vr, integer *ldvr, doublecomplex *work, 
+           integer *lwork, doublereal *rwork, integer *info)
+</code>
+            </remarks>
+        </member>
+        <member name="M:KrdLab.clapack.FunctionExt.zgesv(KrdLab.clapack.Complex[]@,System.Int32@,System.Int32@,KrdLab.clapack.Complex[],System.Int32,System.Int32,KrdLab.clapack.Complex[],System.Int32,System.Int32)">
+            <summary>
+                <para>A * X = B を解く（ X が解）．</para>
+                <para>A は n×n の行列，X と B は n×nrhs の行列である．</para>
+            </summary>
+            <param name="X">
+                <c>A * X = B</c> の解である X が格納される（実際には B と同じオブジェクトを指す）</param>
+            <param name="x_row">行列 X の行数が格納される（<c>== <paramref name="b_row" /></c>）</param>
+            <param name="x_col">行列 X の列数が格納される（<c>== <paramref name="b_col" /></c>）</param>
+            <param name="A">係数行列（LU分解の結果である P*L*U に書き換えられる．P*L*Uについては<see cref="M:KrdLab.clapack.Function.dgetrf(System.Double[],System.Int32,System.Int32,System.Int32[]@)" />を参照）</param>
+            <param name="a_row">行列Aの行数</param>
+            <param name="a_col">行列Aの列数</param>
+            <param name="B">行列 B（内部のCLAPACK関数により X の値が格納される）</param>
+            <param name="b_row">行列Bの行数</param>
+            <param name="b_col">行列Bの列数</param>
+            <returns>常に 0 が返ってくる．</returns>
+            <exception cref="T:KrdLab.clapack.exception.IllegalClapackArgumentException">
+内部で zgesv_関数に渡された引数に問題があると throw される．
+</exception>
+            <exception cref="T:KrdLab.clapack.exception.IllegalClapackResultException">
+行列 A の LU分解において，U[i, i] が 0 となってしまった場合に throw される．
+この場合，解を求めることができない．
+</exception>
+            <remarks>
+                <para>対応するCLAPACK関数（CLAPACK/SRC/zgesv.c）</para>
+                <code>
+int zgesv_(integer *n, integer *nrhs,
+           doublecomplex *a, integer *lda, integer *ipiv,
+           doublecomplex *b, integer *ldb, integer *info)
+</code>
+                <para>zgesv_ 関数の内部では LU分解が使用されている．</para>
+            </remarks>
+        </member>
+        <member name="T:KrdLab.clapack.FunctionExt">
+            <summary>
+CLAPACK を CLR 上で利用するためのラッパークラス
+  ryujimiya追加分を別にしました
+</summary>
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Divide(KrdLab.clapack.Complex,KrdLab.clapack.Complex)">
+            <summary>
+除算
+   lhs * conj(rhs) / |rhs|^2
+</summary>
+            <param name="lhs" />
+            <param name="rhs" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Multiply(KrdLab.clapack.Complex,KrdLab.clapack.Complex)">
+            <summary>
+乗算
+</summary>
+            <param name="lhs" />
+            <param name="rhs" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Subtract(KrdLab.clapack.Complex,KrdLab.clapack.Complex)">
+            <summary>
+減算
+</summary>
+            <param name="lhs" />
+            <param name="rhs" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Add(KrdLab.clapack.Complex,KrdLab.clapack.Complex)">
+            <summary>
+加算
+</summary>
+            <param name="lhs" />
+            <param name="rhs" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Exp(KrdLab.clapack.Complex)">
+            <summary>
+exp(複素数)
+</summary>
+            <param name="value" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Sqrt(KrdLab.clapack.Complex)">
+            <summary>
+複素数の平方根を取得する
+</summary>
+            <param name="value" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Conjugate(KrdLab.clapack.Complex)">
+            <summary>
+複素数の複素共役を取得する
+</summary>
+            <param name="value" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Abs(KrdLab.clapack.Complex)">
+            <summary>
+複素数の大きさ(絶対値)を取得する
+</summary>
+            <param name="value" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.ToDotNetComplex(KrdLab.clapack.Complex)">
+            <summary>
+System::Numerics::Complex→Complex
+</summary>
+            <param name="value" />
+            <returns />
+            <summary>
+Complex→System::Numerics::Complex
+</summary>
+            <param name="value" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.op_Implicit(System.Int32)~KrdLab.clapack.Complex">
+            <summary>
+int→Complex
+</summary>
+            <param name="value" />
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.op_Implicit(System.Double)~KrdLab.clapack.Complex">
+            <summary>
+double→Complex
+</summary>
+            <param name="value" />
+            <returns />
+        </member>
+        <member name="F:KrdLab.clapack.Complex.ImaginaryOne">
+            <summary>
+虚数単位
+</summary>
+        </member>
+        <member name="F:KrdLab.clapack.Complex.Zero">
+            <summary>
+複素数 0
+</summary>
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Equals(KrdLab.clapack.Complex)">
+            <summary>
+等しい？
+</summary>
+            <param name="value">複素数</param>
+            <returns />
+        </member>
+        <member name="M:KrdLab.clapack.Complex.Equals(System.Object)">
+            <summary>
+等しい？
+</summary>
+            <param name="value">オブジェクト</param>
+            <returns />
+        </member>
+        <member name="P:KrdLab.clapack.Complex.Phase">
+            <summary>
+フェーズ
+</summary>
+        </member>
+        <member name="P:KrdLab.clapack.Complex.Magnitude">
+            <summary>
+大きさ（絶対値)
+</summary>
+        </member>
+        <member name="P:KrdLab.clapack.Complex.Imaginary">
+            <summary>
+虚数部
+</summary>
+        </member>
+        <member name="P:KrdLab.clapack.Complex.Real">
+            <summary>
+実数部
+</summary>
+        </member>
+        <member name="M:KrdLab.clapack.Complex.#ctor(System.Double,System.Double)">
+            <summary>
+コンストラクタ
+</summary>
+            <param name="r_">実数部</param>
+            <param name="i_">虚数部</param>
+        </member>
+        <member name="F:KrdLab.clapack.Complex.i">
+            <summary>
+虚数部
+</summary>
+        </member>
+        <member name="F:KrdLab.clapack.Complex.r">
+            <summary>
+実数部
+</summary>
+        </member>
+        <member name="T:KrdLab.clapack.Complex">
+            <summary>
+複素数構造体
+  clapackのdoublecomplexに対応します
+  pin_ptrを介してdoublecomplex型でアクセスするのがこの構造体の主要用途です
+</summary>
         </member>
         <member name="M:KrdLab.clapack.Function.dgetrf(System.Double[],System.Int32,System.Int32,System.Int32[]@)">
             <summary>

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Windows.Forms;
-using System.Numerics; // Complex
+//using System.Numerics; // Complex
+using KrdLab.clapack; // KrdLab.clapack.Complex
 //using System.Text.RegularExpressions;
 using MyUtilLib.Matrix;
 
@@ -139,6 +140,31 @@ namespace HPlaneWGSimulatorXDelFEM
         }
 
         /// <summary>
+        /// clapack使用時のFEM行列
+        /// </summary>
+        private MyComplexMatrix FemMat = null;
+        /// <summary>
+        /// DelFEM:ワールド座標系
+        /// </summary>
+        private DelFEM4NetFem.Field.CFieldWorld World = null;
+        /// <summary>
+        /// DelFEM:フィールド値のID
+        /// </summary>
+        private uint FieldValId = 0;
+        /// <summary>
+        /// DelFEM:リニアシステム
+        /// </summary>
+        private DelFEM4NetFem.Ls.CZLinearSystem Ls = null;
+        /// <summary>
+        /// DelFEM:プリコンディショナ―
+        /// </summary>
+        private DelFEM4NetFem.Ls.CZPreconditioner_ILU Prec = null;
+        /// <summary>
+        /// DelFEM:行列要素マージで使用する一時バッファ
+        /// </summary>
+        private int[] TmpBuffer = null;
+
+        /// <summary>
         /// 線形方程式解法区分
         /// </summary>
         public LinearSystemEqnSoverDV LsEqnSolverDv
@@ -232,6 +258,7 @@ namespace HPlaneWGSimulatorXDelFEM
             CalcFreqCnt = 0;
             ElemShapeDvToBeSet = Constants.DefElemShapeDv;
             ElemOrderToBeSet = Constants.DefElementOrder;
+            LsEqnSolverDv = Constants.DefLsEqnSolverDv;
         }
 
         /// <summary>
@@ -629,6 +656,28 @@ namespace HPlaneWGSimulatorXDelFEM
                 File.Delete(indexfilename);
             }
 
+            FemMat = null;
+            if (World != null)
+            {
+                World.Clear();
+                World.Dispose();
+                World = null;
+            }
+            if (Ls != null)
+            {
+                Ls.Clear();
+                Ls.Dispose();
+                Ls = null;
+            }
+            if (Prec != null)
+            {
+                Prec.Clear();
+                Prec.Dispose();
+                Prec = null;
+            }
+            FieldValId = 0;
+            TmpBuffer = null;
+
             int calcFreqCnt = CalcFreqCnt;
             double firstNormalizedFreq = FirstNormalizedFreq;
             double lastNormalizedFreq = LastNormalizedFreq;
@@ -652,6 +701,27 @@ namespace HPlaneWGSimulatorXDelFEM
                     break;
                 }
             }
+            FemMat = null;
+            if (World != null)
+            {
+                World.Clear();
+                World.Dispose();
+                World = null;
+            }
+            if (Ls != null)
+            {
+                Ls.Clear();
+                Ls.Dispose();
+                Ls = null;
+            }
+            if (Prec != null)
+            {
+                Prec.Clear();
+                Prec.Dispose();
+                Prec = null;
+            }
+            FieldValId = 0;
+            TmpBuffer = null;
         }
 
         /// <summary>
@@ -672,10 +742,12 @@ namespace HPlaneWGSimulatorXDelFEM
             // 残差ベクトル初期化
             int nodeCnt = nodesRegion.Length;
             Complex[] resVec = new Complex[nodeCnt];
+            /*
             for (int i = 0; i < nodeCnt; i++)
             {
                 resVec[i] = new Complex();
             }
+             */
             Console.WriteLine("runEach 3");
 
             // 開口面境界条件の適用
@@ -715,17 +787,19 @@ namespace HPlaneWGSimulatorXDelFEM
                 valuesAll = null;
 
                 // リニア方程式を解く
-                ValueType[] X = null;
+                Complex[] X = null;
                 // clapackの行列の1次元ベクトルへの変換は列を先に埋める
-                ValueType[] A = MyMatrixUtil.matrix_ToBuffer(mat, false);
-                ValueType[] B = new ValueType[nodeCnt];
+                Complex[] A = MyMatrixUtil.matrix_ToBuffer(mat, false);
+                /*
+                Complex[] B = new Complex[nodeCnt];
                 for (int ino = 0; ino < nodeCnt; ino++)
                 {
                     B[ino] = resVec[ino];
                 }
+                 */
+                Complex[] B = resVec;
                 ///////////////////////
-                // TEST
-                MyMatrixUtil.compressVec(ref A); // 配列圧縮
+                /*
                 mat._body = null;
                 mat = null;
                 resVec = null;
@@ -744,6 +818,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     Console.WriteLine(exception.Message + " " + exception.StackTrace);
                     MessageBox.Show(exception.Message);
                 }
+                 */
                 ///////////////////////
                 int x_row = nodeCnt;
                 int x_col = 1;
@@ -754,8 +829,8 @@ namespace HPlaneWGSimulatorXDelFEM
                 Console.WriteLine("run zgesv");
                 try
                 {
-                    //KrdLab.clapack.Function.zgesv(ref X, ref x_row, ref x_col, A, a_row, a_col, B, b_row, b_col);
-                    KrdLab.clapack.Function.zgesv(ref X, ref x_row, ref x_col, A, a_row, a_col, B, b_row, b_col, true);
+                    KrdLab.clapack.FunctionExt.zgesv(ref X, ref x_row, ref x_col, A, a_row, a_col, B, b_row, b_col);
+                    //KrdLab.clapack.FunctionExt.zgesv(ref X, ref x_row, ref x_col, A, a_row, a_col, B, b_row, b_col, true);
                 }
                 catch (Exception exception)
                 {
@@ -768,6 +843,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     //for (int i = 0; i < nodeCnt; i++) { X[i] = new Complex(); }
                 }
 
+                /*
                 valuesAll = new Complex[nodeCnt];
                 for (int ino = 0; ino < nodeCnt; ino++)
                 {
@@ -775,16 +851,30 @@ namespace HPlaneWGSimulatorXDelFEM
                     //Console.WriteLine("({0})  {1} + {2}i", ino, c.Real, c.Imaginary);
                     valuesAll[ino] = c;
                 }
+                 */
+                valuesAll = X;
             }
             else if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.PCOCG)
             {
                 //---------------------------------------------------------
                 // PCOCG 前処理付き直交共役勾配法 (DelFEM)
                 //---------------------------------------------------------
+                /*
                 valuesAll = null;
 
                 bool isConverged = false;
                 DelFEMLsUtil.SolvePCOCG(ref mat, ref resVec, out valuesAll, out isConverged);
+                if (!isConverged)
+                {
+                    Console.WriteLine("Not converged at  2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth));
+                    //MessageBox.Show(string.Format("解が収束しませんでした 2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth)));
+                    //MyUtilLib.MyUtil.MessageBox_ShowErrorAsync(string.Format("解が収束しませんでした 2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth)), "");
+                    ErrorLogFrm.AddErrorLogMessage(filename, string.Format("解が収束しませんでした 2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth)));
+                }
+                 */
+                valuesAll = null;
+                bool isConverged = false;
+                DelFEMLsUtil.SolvePCOCG(ref World, ref FieldValId, ref Ls, ref Prec, ref TmpBuffer, ref resVec, out valuesAll, out isConverged);
                 if (!isConverged)
                 {
                     Console.WriteLine("Not converged at  2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth));
@@ -839,6 +929,32 @@ namespace HPlaneWGSimulatorXDelFEM
             nodesRegion = null;
             mat = null;
 
+            // DelFEM使用時の変数初期化
+            if (World != null)
+            {
+                World.Clear();
+                World.Dispose();
+                World = null;
+            }
+            if (Ls != null)
+            {
+                Ls.Clear();
+                Ls.Dispose();
+                Ls = null;
+            }
+            if (Prec != null)
+            {
+                Prec.Clear();
+                Prec.Dispose();
+                Prec = null;
+            }
+            // 値のフィールドID
+            FieldValId = 0;
+            // 要素剛性行列(コーナ-コーナー)
+            DelFEM4NetMatVec.CZMatDia_BlkCrs_Ptr mat_cc = null;
+            // 要素残差ベクトル(コーナー) 
+            DelFEM4NetMatVec.CZVector_Blk_Ptr res_c = null;
+
             // 2D節点番号リスト（ソート済み）
             IList<int> sortedNodes = new List<int>();
             // 2D節点番号→ソート済みリストインデックスのマップ
@@ -874,23 +990,52 @@ namespace HPlaneWGSimulatorXDelFEM
             nodesRegion = sortedNodes.ToArray();
 
             // 全体剛性行列初期化
-            mat = new MyComplexMatrix(nodeCnt, nodeCnt, true);
-            /*
-            for (int i = 0; i < nodeCnt; i++)
+            if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgesv)
             {
-                for (int j = 0; j < nodeCnt; j++)
+                //mat = new MyComplexMatrix(nodeCnt, nodeCnt, true);
+                //mat = new MyComplexMatrix(nodeCnt, nodeCnt);
+                // メモリ割り当てのコストが高いので変更する
+                if (FemMat == null)
                 {
-                    mat[i, j] = new Complex();
+                    FemMat = new MyComplexMatrix(nodeCnt, nodeCnt);
                 }
+                else
+                {
+                    System.Diagnostics.Debug.Assert(FemMat.RowSize == nodeCnt);
+                    for (int i = 0; i < nodeCnt * nodeCnt; i++)
+                    {
+                        FemMat._body[i].Real = 0;
+                        FemMat._body[i].Imaginary = 0;
+                    }
+                }
+                mat = FemMat;
+                /*
+                for (int i = 0; i < nodeCnt * nodeCnt; i++)
+                {
+                    mat._body[i] = new Complex();
+                }
+                 */
             }
-             */
-            for (int i = 0; i < nodeCnt * nodeCnt; i++)
+            else if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.PCOCG)
             {
-                mat._body[i] = null;
+                DelFEMLsUtil.SetupLinearSystem(
+                    Nodes, Elements, Ports, ForceBCNodes, nodesRegion,
+                    out World, out FieldValId,
+                    out Ls, out Prec, out TmpBuffer);
+                // 要素剛性行列(コーナ-コーナー)
+                mat_cc = Ls.GetMatrixPtr(FieldValId, DelFEM4NetFem.Field.ELSEG_TYPE.CORNER, World);
+                // 要素残差ベクトル(コーナー)
+                res_c = Ls.GetResidualPtr(FieldValId, DelFEM4NetFem.Field.ELSEG_TYPE.CORNER, World);
+            }
+            else
+            {
+                // 未実装の線形方程式解法
+                System.Diagnostics.Debug.Assert(false);
+                return;
             }
             foreach (FemElement element in Elements)
             {
-                addElementMat(waveLength, toSorted, element, ref mat);
+                addElementMat(waveLength, toSorted, element, ref mat, ref mat_cc, ref res_c, ref TmpBuffer);
             }
         }
 
@@ -901,7 +1046,11 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="toSorted">ソートされた節点インデックス（ 2D節点番号→ソート済みリストインデックスのマップ）</param>
         /// <param name="element">有限要素</param>
         /// <param name="mat">マージされる全体行列</param>
-        private void addElementMat(double waveLength, Dictionary<int, int> toSorted, FemElement element, ref MyComplexMatrix mat)
+        private void addElementMat(double waveLength, Dictionary<int, int> toSorted, FemElement element,
+            ref MyComplexMatrix mat,
+            ref DelFEM4NetMatVec.CZMatDia_BlkCrs_Ptr mat_cc,
+            ref DelFEM4NetMatVec.CZVector_Blk_Ptr res_c,
+            ref int[] tmpBuffer)
         {
             Constants.FemElementShapeDV elemShapeDv;
             int order;
@@ -918,7 +1067,10 @@ namespace HPlaneWGSimulatorXDelFEM
                     Nodes,
                     Medias,
                     ForceNodeNumberH,
-                    ref mat);
+                    ref mat,
+                    ref mat_cc,
+                    ref res_c,
+                    ref tmpBuffer);
             }
             else if (elemShapeDv == Constants.FemElementShapeDV.QuadType2 && order == Constants.SecondOrder)
             {
@@ -930,7 +1082,10 @@ namespace HPlaneWGSimulatorXDelFEM
                     Nodes,
                     Medias,
                     ForceNodeNumberH,
-                    ref mat);
+                    ref mat,
+                    ref mat_cc,
+                    ref res_c,
+                    ref tmpBuffer);
             }
             else if (elemShapeDv == Constants.FemElementShapeDV.Triangle && order == Constants.FirstOrder)
             {
@@ -942,7 +1097,10 @@ namespace HPlaneWGSimulatorXDelFEM
                     Nodes,
                     Medias,
                     ForceNodeNumberH,
-                    ref mat);
+                    ref mat,
+                    ref mat_cc,
+                    ref res_c,
+                    ref tmpBuffer);
             }
             else if (elemShapeDv == Constants.FemElementShapeDV.QuadType2 && order == Constants.FirstOrder)
             {
@@ -954,7 +1112,10 @@ namespace HPlaneWGSimulatorXDelFEM
                     Nodes,
                     Medias,
                     ForceNodeNumberH,
-                    ref mat);
+                    ref mat,
+                    ref mat_cc,
+                    ref res_c,
+                    ref tmpBuffer);
             }
         }
 
@@ -981,7 +1142,9 @@ namespace HPlaneWGSimulatorXDelFEM
             int maxMode = eigenValues.Length;
 
             // 全体剛性行列の作成
-            MyComplexMatrix matB = new MyComplexMatrix(nodeCnt, nodeCnt);
+            MyComplexMatrix matB = null;
+            matB = new MyComplexMatrix(nodeCnt, nodeCnt);
+            /*
             for (int inoB = 0; inoB < nodeCnt; inoB++)
             {
                 for (int jnoB = 0; jnoB < nodeCnt; jnoB++)
@@ -989,6 +1152,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     matB[inoB, jnoB] = new Complex();
                 }
             }
+             */
             for (int imode = 0; imode < maxMode; imode++)
             {
                 Complex betam = eigenValues[imode];
@@ -1004,7 +1168,9 @@ namespace HPlaneWGSimulatorXDelFEM
                 {
                     for (int jnoB = 0; jnoB < nodeCnt; jnoB++)
                     {
-                        matB[inoB, jnoB] += ((new Complex(0.0, 1.0)) / (omega * myu0)) * betam * Complex.Abs(betam) * veci[inoB] * vecj[jnoB];
+                        Complex cvalue = (Complex.ImaginaryOne / (omega * myu0)) * betam * Complex.Abs(betam) * veci[inoB] * vecj[jnoB];
+                        //matB[inoB, jnoB] += cvalue;
+                        matB._body[inoB + jnoB * matB.RowSize] += cvalue;
                     }
                 }
             }
@@ -1012,10 +1178,12 @@ namespace HPlaneWGSimulatorXDelFEM
 
             // 残差ベクトルの作成
             Complex[] resVecB = new Complex[nodeCnt];
+            /*
             for (int inoB = 0; inoB < nodeCnt; inoB++)
             {
                 resVecB[inoB] = 0.0;
             }
+             */
             if (isInputPort)
             {
                 int imode = 0;
@@ -1025,7 +1193,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 Complex[] veci = MyMatrixUtil.product(ryy_1d, fmVec);
                 for (int inoB = 0; inoB < nodeCnt; inoB++)
                 {
-                    resVecB[inoB] = 2.0 * (new Complex(0.0, 1.0)) * betam * veci[inoB];
+                    Complex cvalue = 2.0 * Complex.ImaginaryOne * betam * veci[inoB];
+                    //resVecB[inoB] = cvalue;
+                    resVecB[inoB].Real = cvalue.Real;
+                    resVecB[inoB].Imaginary = cvalue.Imaginary;
                 }
             }
             //printVec("resVecB", resVecB);
@@ -1042,34 +1213,92 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
             }
 
-            // 要素剛性行列にマージ
-            //   この定式化では行列のスパース性は失われている(隣接していない要素の節点間にも関連がある)
-            // 要素剛性行列にマージする
-            for (int inoB = 0; inoB < nodeCnt; inoB++)
+            if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgesv)
             {
-                int iNodeNumber = nodesBoundary[inoB];
-                if (ForceNodeNumberH.ContainsKey(iNodeNumber)) continue;
-                int inoGlobal = toSorted[iNodeNumber];
-                for (int jnoB = 0; jnoB < nodeCnt; jnoB++)
+                // 要素剛性行列にマージ
+                //   この定式化では行列のスパース性は失われている(隣接していない要素の節点間にも関連がある)
+                // 要素剛性行列にマージする
+                for (int inoB = 0; inoB < nodeCnt; inoB++)
                 {
-                    int jNodeNumber = nodesBoundary[jnoB];
-                    if (ForceNodeNumberH.ContainsKey(jNodeNumber)) continue;
-                    int jnoGlobal = toSorted[jNodeNumber];
+                    int iNodeNumber = nodesBoundary[inoB];
+                    if (ForceNodeNumberH.ContainsKey(iNodeNumber)) continue;
+                    int inoGlobal = toSorted[iNodeNumber];
+                    for (int jnoB = 0; jnoB < nodeCnt; jnoB++)
+                    {
+                        int jNodeNumber = nodesBoundary[jnoB];
+                        if (ForceNodeNumberH.ContainsKey(jNodeNumber)) continue;
+                        int jnoGlobal = toSorted[jNodeNumber];
 
-                    mat[inoGlobal, jnoGlobal] += matB[inoB, jnoB];
+                        //mat[inoGlobal, jnoGlobal] += matB[inoB, jnoB];
+                        mat._body[inoGlobal + jnoGlobal * mat.RowSize] += matB._body[inoB + jnoB * matB.RowSize];
+                    }
+                }
+
+                // 残差ベクトルにマージ
+                for (int inoB = 0; inoB < nodeCnt; inoB++)
+                {
+                    int iNodeNumber = nodesBoundary[inoB];
+                    if (ForceNodeNumberH.ContainsKey(iNodeNumber)) continue;
+                    int inoGlobal = toSorted[iNodeNumber];
+
+                    resVec[inoGlobal] += resVecB[inoB];
                 }
             }
-
-            // 残差ベクトルにマージ
-            for (int inoB = 0; inoB < nodeCnt; inoB++)
+            else if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.PCOCG)
             {
-                int iNodeNumber = nodesBoundary[inoB];
-                if (ForceNodeNumberH.ContainsKey(iNodeNumber)) continue;
-                int inoGlobal = toSorted[iNodeNumber];
+                DelFEM4NetMatVec.CZMatDia_BlkCrs_Ptr mat_cc = null;
+                DelFEM4NetMatVec.CZVector_Blk_Ptr res_c = null;
 
-                resVec[inoGlobal] += resVecB[inoB];
+                // 要素剛性行列(コーナ-コーナー)
+                mat_cc = Ls.GetMatrixPtr(FieldValId, DelFEM4NetFem.Field.ELSEG_TYPE.CORNER, World);
+                // 要素残差ベクトル(コーナー)
+                res_c = Ls.GetResidualPtr(FieldValId, DelFEM4NetFem.Field.ELSEG_TYPE.CORNER, World);
+
+                // 全体節点番号→境界上節点インデックスマップ
+                Dictionary<uint, int> inoGlobalDic = new Dictionary<uint, int>();
+                for (int inoB = 0; inoB < nodeCnt; inoB++)
+                {
+                    int iNodeNumber = nodesBoundary[inoB];
+                    if (ForceNodeNumberH.ContainsKey(iNodeNumber)) continue;
+                    uint inoGlobal = (uint)toSorted[iNodeNumber];
+                    inoGlobalDic.Add(inoGlobal, inoB);
+                }
+
+                // マージ用の節点番号リスト
+                uint[] no_c_tmp = inoGlobalDic.Keys.ToArray<uint>();
+                // マージする節点数("col"と"row"のサイズ)
+                uint ncolrow_tmp = (uint)no_c_tmp.Length;
+                // マージする要素行列
+                DelFEM4NetCom.Complex[] ematBuffer = new DelFEM4NetCom.Complex[ncolrow_tmp * ncolrow_tmp];
+                for (int ino_tmp = 0; ino_tmp < ncolrow_tmp; ino_tmp++)
+                {
+                    int inoB = inoGlobalDic[no_c_tmp[ino_tmp]];
+                    for (int jno_tmp = 0; jno_tmp < ncolrow_tmp; jno_tmp++)
+                    {
+                        int jnoB = inoGlobalDic[no_c_tmp[jno_tmp]];
+                        Complex cvalue = matB[inoB, jnoB];
+                        DelFEM4NetCom.Complex cvalueDelFEM = new DelFEM4NetCom.Complex(cvalue.Real, cvalue.Imaginary);
+                        // ematBuffer[ino_tmp, jno_tmp] 横ベクトルを先に埋める(clapack方式でないことに注意)
+                        ematBuffer[ino_tmp * ncolrow_tmp + jno_tmp] = cvalueDelFEM;
+                    }
+                }
+                // 全体行列に要素行列をマージする
+                mat_cc.Mearge(ncolrow_tmp, no_c_tmp, ncolrow_tmp, no_c_tmp, 1, ematBuffer, ref TmpBuffer); 
+
+                // 残差ベクトルにマージ
+                for (int ino_tmp = 0; ino_tmp < ncolrow_tmp; ino_tmp++)
+                {
+                    int inoB = inoGlobalDic[no_c_tmp[ino_tmp]];
+                    Complex cvalue = resVecB[inoB];
+                    DelFEM4NetCom.Complex cvalueDelFEM = new DelFEM4NetCom.Complex(cvalue.Real, cvalue.Imaginary);
+                    res_c.AddValue(no_c_tmp[ino_tmp], 0, cvalueDelFEM);
+                }
             }
-
+            else
+            {
+                System.Diagnostics.Debug.Assert(false);
+                return;
+            }
         }
 
         /// <summary>
@@ -1274,6 +1503,7 @@ namespace HPlaneWGSimulatorXDelFEM
             // ryy_1dマトリクス (線要素)
             ryy_1d = new MyDoubleMatrix(nodeCnt, nodeCnt);
 
+            /*
             for (int i = 0; i < nodeCnt; i++)
             {
                 for (int j = 0; j < nodeCnt; j++)
@@ -1283,7 +1513,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     uzz_1d[i, j] = 0.0;
                 }
             }
-
+            */
             for (int elemIndex = 0; elemIndex < elements.Count; elemIndex++)
             {
                 // 線要素
@@ -1409,23 +1639,26 @@ namespace HPlaneWGSimulatorXDelFEM
         private static bool solveEigen(MyComplexMatrix srcMat, out Complex[] evals, out Complex[,] evecs)
         {
             // Lisys(Lapack)による固有値解析
-            ValueType[] X = MyMatrixUtil.matrix_ToBuffer(srcMat, false);
-            ValueType[] c_evals = null;
-            ValueType[][] c_evecs = null;
-            KrdLab.clapack.Function.zgeev(X, srcMat.RowSize, srcMat.ColumnSize, ref c_evals, ref c_evecs);
+            Complex[] X = MyMatrixUtil.matrix_ToBuffer(srcMat, false);
+            Complex[] c_evals = null;
+            Complex[][] c_evecs = null;
+            KrdLab.clapack.FunctionExt.zgeev(X, srcMat.RowSize, srcMat.ColumnSize, ref c_evals, ref c_evecs);
 
+            /*
             evals = new Complex[c_evals.Length];
             for (int i = 0; i < evals.Length; i++)
             {
-                evals[i] = (Complex)c_evals[i];
+                evals[i] = c_evals[i];
                 //Console.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
             }
+             */
+            evals = c_evals;
             evecs = new Complex[c_evecs.Length, c_evecs[0].Length];
             for (int i = 0; i < evecs.GetLength(0); i++)
             {
                 for (int j = 0; j < evecs.GetLength(1); j++)
                 {
-                    evecs[i, j] = (Complex)c_evecs[i][j];
+                    evecs[i, j] = c_evecs[i][j];
                     //Console.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
                 }
             }
@@ -1450,7 +1683,9 @@ namespace HPlaneWGSimulatorXDelFEM
             evals = new Complex[r_evals.Length];
             for (int i = 0; i < evals.Length; i++)
             {
-                evals[i] = new Complex(r_evals[i], i_evals[i]);
+                //evals[i] = new Complex(r_evals[i], i_evals[i]);
+                evals[i].Real = r_evals[i];
+                evals[i].Imaginary = i_evals[i];
                 //Console.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
             }
             evecs = new Complex[r_evecs.Length, r_evecs[0].Length];
@@ -1458,7 +1693,9 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 for (int j = 0; j < evecs.GetLength(1); j++)
                 {
-                    evecs[i, j] = new Complex(r_evecs[i][j], i_evecs[i][j]);
+                    //evecs[i, j] = new Complex(r_evecs[i][j], i_evecs[i][j]);
+                    evecs[i, j].Real = r_evecs[i][j];
+                    evecs[i, j].Imaginary = i_evecs[i][j];
                     //Console.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
                 }
             }

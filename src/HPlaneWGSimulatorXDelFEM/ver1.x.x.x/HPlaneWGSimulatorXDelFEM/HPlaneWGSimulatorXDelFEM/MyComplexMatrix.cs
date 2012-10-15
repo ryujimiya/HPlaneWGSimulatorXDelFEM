@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using System.Diagnostics;
-using System.Numerics;
+//using System.Numerics;
+using KrdLab.clapack;  // KrdLab.clapack.Complex
 
 namespace MyUtilLib.Matrix
 {
@@ -21,22 +22,15 @@ namespace MyUtilLib.Matrix
     /// </summary>
     public class MyComplexMatrix
     {
-        internal ValueType[] _body = null;
+        internal Complex[] _body = null;
         internal int _rsize = 0;
         internal int _csize = 0;
-
-        public bool IsAllowNullElem
-        {
-            get;
-            protected set;
-        }
 
         /// <summary>
         /// 空のオブジェクトを作成する．
         /// </summary>
         internal MyComplexMatrix()
         {
-            IsAllowNullElem = false;
             Clear();
         }
 
@@ -46,9 +40,8 @@ namespace MyUtilLib.Matrix
         /// <param name="body">コピーされる配列</param>
         /// <param name="rowSize">新しい行数</param>
         /// <param name="columnSize">新しい列数</param>
-        internal MyComplexMatrix(ValueType[] body, int rowSize, int columnSize, bool isAllowNullElem = false)
+        internal MyComplexMatrix(Complex[] body, int rowSize, int columnSize)
         {
-            IsAllowNullElem = isAllowNullElem;
             CopyFrom(body, rowSize, columnSize);
         }
 
@@ -58,9 +51,8 @@ namespace MyUtilLib.Matrix
         /// </summary>
         /// <param name="rowSize">行数</param>
         /// <param name="columnSize">列数</param>
-        public MyComplexMatrix(int rowSize, int columnSize, bool isAllowNullElem = false)
+        public MyComplexMatrix(int rowSize, int columnSize)
         {
-            IsAllowNullElem = isAllowNullElem;
             //Resize(rowSize, columnSize, 0.0); // 一旦削除 メモリ節約の為
             Resize(rowSize, columnSize);
         }
@@ -78,9 +70,8 @@ namespace MyUtilLib.Matrix
         /// 2次元配列から新しい行列を作成する．
         /// </summary>
         /// <param name="arr">行列の要素を格納した2次元配列</param>
-        public MyComplexMatrix(Complex[,] arr, bool isAllowNullElem = false)
+        public MyComplexMatrix(Complex[,] arr)
         {
-            IsAllowNullElem = isAllowNullElem;
             int rsize = arr.GetLength(0);
             int csize = arr.GetLength(1);
 
@@ -109,11 +100,7 @@ namespace MyUtilLib.Matrix
                 {
                     throw new IndexOutOfRangeException();
                 }
-                if (this.IsAllowNullElem && this._body[row + col * this._rsize] == null)
-                {
-                    return new Complex(0.0, 0.0);
-                }
-                return (Complex)this._body[row + col * this._rsize];
+                return this._body[row + col * this._rsize];
             }
             set
             {
@@ -121,19 +108,7 @@ namespace MyUtilLib.Matrix
                 {
                     throw new IndexOutOfRangeException();
                 }
-                //this._body[row + col * this._rsize] = (Complex)value; // Complexへのキャストは、double等がそのまま配列に格納されるのを防ぐため
-                //プロパティの型をComplexにしているので常にvalueはComplex
                 this._body[row + col * this._rsize] = value;
-                
-                //0のときは格納しない
-                //if (this.IsAllowNullElem && (value == null || Complex.Abs(value) < Constants.PrecisionLowerLimit))
-                //{
-                //    this._body[row + col * this._rsize] = null;
-                //}
-                //else
-                //{
-                //    this._body[row + col * this._rsize] = value;
-                //}
             }
         }
 
@@ -158,7 +133,7 @@ namespace MyUtilLib.Matrix
         /// </summary>
         public void Clear()
         {
-            this._body = new ValueType[0];
+            this._body = new Complex[0];
             this._rsize = 0;
             this._csize = 0;
         }
@@ -171,7 +146,7 @@ namespace MyUtilLib.Matrix
         /// <returns>リサイズ後の自身への参照</returns>
         public MyComplexMatrix Resize(int rowSize, int columnSize)
         {
-            this._body = new ValueType[rowSize * columnSize];
+            this._body = new Complex[rowSize * columnSize];
             this._rsize = rowSize;
             this._csize = columnSize;
             return this;
@@ -201,7 +176,6 @@ namespace MyUtilLib.Matrix
         /// <returns>コピー後の自身への参照</returns>
         public MyComplexMatrix CopyFrom(MyComplexMatrix m)
         {
-            this.IsAllowNullElem = m.IsAllowNullElem;
             return CopyFrom(m._body, m._rsize, m._csize);
         }
 
@@ -213,7 +187,7 @@ namespace MyUtilLib.Matrix
         /// <param name="rowSize">行数</param>
         /// <param name="columnSize">列数</param>
         /// <returns>コピー後の自身への参照</returns>
-        internal MyComplexMatrix CopyFrom(ValueType[] body, int rowSize, int columnSize)
+        internal MyComplexMatrix CopyFrom(Complex[] body, int rowSize, int columnSize)
         {
             // 入力の検証
             System.Diagnostics.Debug.Assert(body.Length == rowSize * columnSize);

@@ -1,4 +1,16 @@
 ﻿HPlaneWGSimulatorXDelFEM Release Notes
+version1.0.0.2
+---(2012-10-15)
+  PCOCGを用いた場合の処理のほとんどをDelFEMの形式に変更し、処理を効率化しました。
+  version1.0.0.1では、全体行列作成まではC#のComplexで処理し方程式を解く直前にDelFEMに委譲していたためオーバーヘッドがありました。
+  今回全体行列作成からDelFEMの"matvec"モジュールと複素数線形方程式求解モジュールに処理を委ねるようにしました。
+  更に高速になったと思います。
+
+---(2012-10-14)
+  zgesvのメモリ確保処理を改善しました。
+  KrdLab CLW.dllでのnativeな構造体doublecomplexへの変換のとき、C#のComplexを用いた場合メモリの再確保が必要でしたが
+  新たにKrdLab.clapack.Complexを追加することでそれを解消しました。
+  CLW.dllのI/Fも変更しています(ryujimiya追加分は今までのものと互換性なし)
 
 version1.0.0.1
 ---(2012-10-12)

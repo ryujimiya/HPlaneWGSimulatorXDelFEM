@@ -1,6 +1,11 @@
 ﻿#H面導波管シミュレーター X DelFEM  
   
 **News**  
+  2012-10-16 HPlaneWGSimulatorXDelFEM version1.0.0.2 Release  
+　　PCOCGの求解処理をDelFEMの機能をより多く使用し、計算速度を改善しました。
+　　Version1.2.0.1が最速かなと思っていましたがversion1.2.0.2は同等かそれ以上になっていると思います。  
+　　また、従来のzgesvによる解法の処理も素の”HPlaneWGSimulator”で対応した処理を組み込んで特にメモリの確保処理を改善しています。  
+  
   2012-10-11 HPlaneWGSimulatorXDelFEM version1.0.0.1 Release  
 　　線形方程式の解法にDelFEMのPCOCGを組み込みました。この解法は回路によっては誤差があったり収束しなかったりしますが計算時間を大幅に短縮できます。  
 　　従来のclapckの直接解法とあわせてご利用ください。  

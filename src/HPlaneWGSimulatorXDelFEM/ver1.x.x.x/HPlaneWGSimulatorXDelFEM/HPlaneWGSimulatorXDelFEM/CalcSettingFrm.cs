@@ -202,7 +202,8 @@ namespace HPlaneWGSimulatorXDelFEM
             LinearSystemEqnSolverStruct[] lsList = 
             {
                 new LinearSystemEqnSolverStruct(FemSolver.LinearSystemEqnSoverDV.PCOCG, "PCOCG"),
-                new LinearSystemEqnSolverStruct(FemSolver.LinearSystemEqnSoverDV.Zgesv, "zgesv"),
+                new LinearSystemEqnSolverStruct(FemSolver.LinearSystemEqnSoverDV.Zgbsv, "zgbsv(バンド行列)"),
+                new LinearSystemEqnSolverStruct(FemSolver.LinearSystemEqnSoverDV.Zgesv, "zgesv(一般行列)"),
             };
             foreach (LinearSystemEqnSolverStruct ls in lsList)
             {

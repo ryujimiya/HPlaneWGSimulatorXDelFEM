@@ -24,6 +24,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="Nodes">節点リスト</param>
         /// <param name="Medias">媒質リスト</param>
         /// <param name="ForceNodeNumberH">強制境界節点ハッシュ</param>
+        /// <param name="WaveModeDv">計算する波のモード区分</param>
         /// <param name="mat">マージされる全体行列(clapack使用時)</param>
         /// <param name="mat_cc">マージされる全体行列(DelFEM使用時)</param>
         /// <param name="res_c">マージされる残差ベクトル(DelFEM使用時)</param>
@@ -34,6 +35,7 @@ namespace HPlaneWGSimulatorXDelFEM
             IList<FemNode> Nodes,
             MediaInfo[] Medias,
             Dictionary<int, bool> ForceNodeNumberH,
+            FemSolver.WaveModeDV WaveModeDv,
             ref MyComplexMatrix mat,
             ref DelFEM4NetMatVec.CZMatDia_BlkCrs_Ptr mat_cc,
             ref DelFEM4NetMatVec.CZVector_Blk_Ptr res_c,
@@ -57,9 +59,25 @@ namespace HPlaneWGSimulatorXDelFEM
             int[] nodeNumbers = element.NodeNumbers;
             int[] no_c = new int[nno];
             MediaInfo media = Medias[element.MediaIndex];  // ver1.1.0.0 媒質情報の取得
-            double[,] media_P = media.P;
+            double[,] media_P = null;
+            double[,] media_Q = null;
+            if (WaveModeDv == FemSolver.WaveModeDV.TE)
+            {
+                media_P = media.P;
+                media_Q = media.Q;
+            }
+            else if (WaveModeDv == FemSolver.WaveModeDV.TM)
+            {
+                media_P = media.Q;
+                media_Q = media.P;
+            }
+            else
+            {
+                System.Diagnostics.Debug.Assert(false);
+            }
+            // [p]は逆数をとる
             media_P = MyMatrixUtil.matrix_Inverse(media_P);
-            double[,] media_Q = media.Q;
+
             // 節点座標(IFの都合上配列の配列形式の2次元配列を作成)
             double[][] pp = new double[nno][];
             for (int ino = 0; ino < nno; ino++)
@@ -171,7 +189,9 @@ namespace HPlaneWGSimulatorXDelFEM
                         //mat[inoGlobal, jnoGlobal] += emat[ino, jno];
                         //mat._body[inoGlobal + jnoGlobal * mat.RowSize] += emat[ino, jno];
                         // 実数部に加算する
-                        mat._body[inoGlobal + jnoGlobal * mat.RowSize].Real += emat[ino, jno];
+                        //mat._body[inoGlobal + jnoGlobal * mat.RowSize].Real += emat[ino, jno];
+                        // バンドマトリクス対応
+                        mat._body[mat.GetBufferIndex(inoGlobal, jnoGlobal)].Real += emat[ino, jno];
                     }
                 }
             }

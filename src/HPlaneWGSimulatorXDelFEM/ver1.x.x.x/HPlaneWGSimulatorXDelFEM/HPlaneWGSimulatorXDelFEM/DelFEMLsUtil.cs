@@ -25,23 +25,21 @@ namespace HPlaneWGSimulatorXDelFEM
     class DelFEMLsUtil
     {
         /// <summary>
+        /// フィルインレベル（既定値)
+        /// </summary>
+        //private const int DefFillInLevel = 0;
+        private const int DefFillInLevel = 1;
+
+        /// <summary>
         /// リニアシステム初期化（マージ開始までの処理)
         /// </summary>
-        /// <param name="Nodes"></param>
-        /// <param name="Elements"></param>
-        /// <param name="Ports"></param>
-        /// <param name="ForceBCNodes"></param>
-        /// <param name="nodesRegion"></param>
+        /// <param name="matPattern">行列の非０要素パターン</param>
         /// <param name="Ls"></param>
         /// <param name="Prec"></param>
         /// <param name="World"></param>
         /// <param name="FieldValId"></param>
         public static void SetupLinearSystem(
-            IList<FemNode> Nodes,
-            IList<FemElement> Elements,
-            IList<IList<int>> Ports,
-            IList<int> ForceBCNodes,
-            int[] nodesRegion,
+            bool[,] matPattern,
             out CFieldWorld World, out uint FieldValId,
             out CZLinearSystem Ls, out CZPreconditioner_ILU Prec, out int[] tmpBuffer)
         {
@@ -50,16 +48,7 @@ namespace HPlaneWGSimulatorXDelFEM
             Prec = new CZPreconditioner_ILU();
             tmpBuffer = null;
 
-            // 2D節点番号リスト（ソート済み）
-            IList<int> sortedNodes = (IList<int>)nodesRegion.ToList<int>();
-
-            // 総節点数
-            int nodeCnt = sortedNodes.Count;
-
-            // 全体節点を配列に格納
-            nodesRegion = sortedNodes.ToArray();
-            
-            int matLen = Nodes.Count - ForceBCNodes.Count;
+            int matLen = matPattern.GetLength(0);
 
             //------------------------------------------------------------------
             // ワールド座標系を生成
@@ -72,53 +61,6 @@ namespace HPlaneWGSimulatorXDelFEM
             //    要素の次元: 2次元-->ポイントにしたので0次元？ 界: 複素数スカラー 微分タイプ: 値 要素セグメント: 角節点
             FieldValId = World.MakeField_FieldElemDim(baseId, 0,
                 FIELD_TYPE.ZSCALAR, FIELD_DERIVATION_TYPE.VALUE, ELSEG_TYPE.CORNER);
-
-            //------------------------------------------------------------------
-            // 行列の非０パターンを取得する
-            //------------------------------------------------------------------
-            bool[,] matPattern = new bool[matLen, matLen];
-            for (int ino_global = 0; ino_global < matLen; ino_global++)
-            {
-                for (int jno_global = 0; jno_global < matLen; jno_global++)
-                {
-                    matPattern[ino_global, jno_global] = false;
-                }
-            }
-            // 領域の節点の行列要素パターン
-            foreach (FemElement element in Elements)
-            {
-                int[] nodeNumbers = element.NodeNumbers;
-
-                foreach (int iNodeNumber in nodeNumbers)
-                {
-                    if (ForceBCNodes.Contains(iNodeNumber)) continue;
-                    int ino_global = sortedNodes.IndexOf(iNodeNumber);
-                    foreach (int jNodeNumber in nodeNumbers)
-                    {
-                        if (ForceBCNodes.Contains(jNodeNumber)) continue;
-                        int jno_global = sortedNodes.IndexOf(jNodeNumber);
-                        matPattern[ino_global, jno_global] = true;
-                    }
-                }
-            }
-            // 境界上の節点の行列要素パターン
-            foreach (IList<int> portNodes in Ports)
-            {
-                foreach (int iNodeNumber in portNodes)
-                {
-                    if (ForceBCNodes.Contains(iNodeNumber)) continue;
-                    int ino_global = sortedNodes.IndexOf(iNodeNumber);
-                    foreach (int jNodeNumber in portNodes)
-                    {
-                        if (ForceBCNodes.Contains(jNodeNumber)) continue;
-                        int jno_global = sortedNodes.IndexOf(jNodeNumber);
-                        if (!matPattern[ino_global, jno_global])
-                        {
-                            matPattern[ino_global, jno_global] = true;
-                        }
-                    }
-                }
-            }
 
             //------------------------------------------------------------------
             // 界パターン追加
@@ -215,8 +157,10 @@ namespace HPlaneWGSimulatorXDelFEM
             //   誘電体スラブ導波路だと最低このレベル。これでも収束しない場合がある
             //以上から
             //メインの導波管の計算時間を短くしたいのでフィルインなしにする
-            Prec.SetFillInLevel(0);
+            //Prec.SetFillInLevel(0);
             //    導波管だとこれで十分
+            // フィルインレベルの設定(既定値)
+            Prec.SetFillInLevel(DefFillInLevel);
             // ILU(0)のパターン初期化
             Prec.SetLinearSystem(Ls);
 
@@ -293,7 +237,7 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 isConverged = true;
             }
-            Console.WriteLine("Solve_PCOCG 6");
+            Console.WriteLine("Solve_PCOCG solved");
 
             //------------------------------------------------------------------
             // 計算結果の後処理
@@ -506,8 +450,10 @@ namespace HPlaneWGSimulatorXDelFEM
             //   誘電体スラブ導波路だと最低このレベル。これでも収束しない場合がある
             //以上から
             //メインの導波管の計算時間を短くしたいのでフィルインなしにする
-            Prec.SetFillInLevel(0);
+            //Prec.SetFillInLevel(0);
             //    導波管だとこれで十分
+            // フィルインレベルの設定(既定値)
+            Prec.SetFillInLevel(DefFillInLevel);
             // ILU(0)のパターン初期化
             Prec.SetLinearSystem(Ls);
             Console.WriteLine("SolvePCOCG 4");

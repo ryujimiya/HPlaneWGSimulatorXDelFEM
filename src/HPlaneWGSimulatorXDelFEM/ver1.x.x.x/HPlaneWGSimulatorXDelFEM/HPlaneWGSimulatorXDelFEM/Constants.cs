@@ -12,7 +12,7 @@ namespace HPlaneWGSimulatorXDelFEM
         ////////////////////////////////////////////////////////////////////////
         // 定数
         ////////////////////////////////////////////////////////////////////////
-        public const double pi = 3.1416;
+        public const double pi = Math.PI;//3.1416;
         public const double c0 = 2.99792458e+8;
         public const double myu0 = 4.0e-7 * pi;
         public const double eps0 = 8.85418782e-12;//1.0 / (myu0 * c0 * c0);
@@ -66,6 +66,10 @@ namespace HPlaneWGSimulatorXDelFEM
         /// 線形方程式解法区分(既定値)
         /// </summary>
         public const FemSolver.LinearSystemEqnSoverDV DefLsEqnSolverDv = FemSolver.LinearSystemEqnSoverDV.PCOCG;
+        /// <summary>
+        /// 計算する波のモード区分（既定値）
+        /// </summary>
+        public const FemSolver.WaveModeDV DefWaveModeDv = FemSolver.WaveModeDV.TE;
         /// <summary>
         /// DelFEMのメッシュ生成機の生成パラメータ：要素長
         /// </summary>

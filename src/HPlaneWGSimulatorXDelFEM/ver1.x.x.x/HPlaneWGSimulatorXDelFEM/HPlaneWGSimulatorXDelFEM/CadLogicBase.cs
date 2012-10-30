@@ -378,6 +378,42 @@ namespace HPlaneWGSimulatorXDelFEM
         }
 
         /// <summary>
+        /// 一時ファイルの格納先ディレクトリを削除する
+        /// </summary>
+        public static void RemoveTmpFileDirectory()
+        {
+            // 一時ディレクトリを削除する
+            string dummyTmpFilename = generateTmpFilename();
+            string tmpFileDir = Path.GetDirectoryName(dummyTmpFilename);
+            removeDirectory(tmpFileDir);
+        }
+
+        /// <summary>
+        /// 一時ファイルの格納先ディレクトリを削除する
+        /// </summary>
+        /// <param name="dirname"></param>
+        protected static void removeDirectory(string dirname)
+        {
+            if (dirname != "" && dirname.IndexOf(Application.UserAppDataPath) == 0 && Directory.Exists(dirname))
+            {
+                string[] files = Directory.GetFileSystemEntries(dirname);
+                System.Diagnostics.Debug.Assert(files.Length == 0);
+                if (files.Length == 0)
+                {
+                    try
+                    {
+                        Directory.Delete(dirname);
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                        MessageBox.Show(exception.Message);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// 図面をシリアライズバッファに保存する
         /// </summary>
         protected void saveEditCad2DToSerializedBuffer(CCadObj2D cad2d)

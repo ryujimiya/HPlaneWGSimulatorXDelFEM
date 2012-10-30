@@ -95,15 +95,31 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <summary>
         /// フィールド値の絶対値の最小値
         /// </summary>
-        private double MinfValue = 0.0;
+        private double MinFValue = 0.0;
         /// <summary>
         /// フィールド値の絶対値の最大値
         /// </summary>
-        private double MaxfValue = 1.0;
+        private double MaxFValue = 1.0;
+        /// <summary>
+        /// フィールド値の回転の絶対値の最小値
+        /// </summary>
+        private double MinRotFValue = 0.0;
+        /// <summary>
+        /// フィールド値の回転の絶対値の最大値
+        /// </summary>
+        private double MaxRotFValue = 1.0;
+        /// <summary>
+        /// 複素ポインティングベクトルの絶対値の最小値
+        /// </summary>
+        private double MinPoyntingFValue = 0.0;
+        /// <summary>
+        /// 複素ポインティングベクトルの絶対値の最大値
+        /// </summary>
+        private double MaxPoyntingFValue = 1.0;
         /// <summary>
         /// 散乱行列
         /// </summary>
-        private Complex[] ScatterMat = null;
+        private IList<Complex[]> ScatterVecList = new List<Complex[]>();
         /// <summary>
         /// 導波管幅
         /// </summary>
@@ -132,6 +148,16 @@ namespace HPlaneWGSimulatorXDelFEM
             get;
             private set;
         }
+
+        /// <summary>
+        /// 波のモード区分
+        /// </summary>
+        public FemSolver.WaveModeDV WaveModeDv
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// 要素の数を取得する(表示用)
         /// </summary>
@@ -175,11 +201,61 @@ namespace HPlaneWGSimulatorXDelFEM
         private IList<string> MediaBEdgeList = new List<string>();
 
         /// <summary>
+        /// 表示するフィールドのフィールド区分
+        /// </summary>
+        public FemElement.FieldDV ShowFieldDv
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 表示するフィールドの値区分
+        /// </summary>
+        public FemElement.ValueDV ShowValueDv
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// フィールド値描画を荒くする？
+        /// </summary>
+        private bool _IsCoarseFieldMesh = false;
+
+        /// <summary>
+        /// フィールド値描画を荒くする？
+        /// </summary>
+        public bool IsCoarseFieldMesh
+        {
+            get
+            {
+                return _IsCoarseFieldMesh;
+            }
+            set
+            {
+                if (value != _IsCoarseFieldMesh)
+                {
+                    if (Elements != null)
+                    {
+                        foreach (FemElement element in Elements)
+                        {
+                            element.IsCoarseFieldMesh = value;
+                        }
+                    }
+                }
+                _IsCoarseFieldMesh = value;
+            }
+        }
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         public FemPostProLogic()
         {
             IsInitializedOnce = false;
+            ShowFieldDv = FemElement.FieldDV.Field;
+            ShowValueDv = FemElement.ValueDV.Abs;
             initInput();
             initOutput();
         }
@@ -199,6 +275,8 @@ namespace HPlaneWGSimulatorXDelFEM
             CalcFreqCnt = 0;
             FirstWaveLength = 0.0;
             LastWaveLength = 0.0;
+            WaveModeDv = FemSolver.WaveModeDV.TE;
+            _IsCoarseFieldMesh = false;
         }
 
         /// <summary>
@@ -214,10 +292,13 @@ namespace HPlaneWGSimulatorXDelFEM
             EigenVecsList.Clear();
             //NodesRegion = null;
             //ValuesAll = null;
-            MaxfValue = 1.0;
-            MinfValue = 0.0;
+            MaxFValue = 1.0;
+            MinFValue = 0.0;
+            MaxRotFValue = 1.0;
+            MinRotFValue = 0.0;
+            MaxPoyntingFValue = 1.0;
+            MinPoyntingFValue = 0.0;
 
-            ScatterMat = null;
         }
 
         /// <summary>
@@ -311,12 +392,15 @@ namespace HPlaneWGSimulatorXDelFEM
             FirstWaveLength = solver.FirstWaveLength;
             LastWaveLength = solver.LastWaveLength;
             CalcFreqCnt = solver.CalcFreqCnt;
+            // 波のモード区分を取得
+            WaveModeDv = solver.WaveModeDv;
+
             //if (isInputDataReady())
             // ポートが指定されていなくてもメッシュを表示できるように条件を変更
             if (Elements != null && Elements.Length > 0 && Nodes != null && Nodes.Length > 0 && Medias != null && Medias.Length > 0)
             {
                 // 各要素に節点情報を補完する
-                foreach(FemElement element in Elements)
+                foreach (FemElement element in Elements)
                 {
                     element.SetNodesFromAllNodes(Nodes);
                     element.LineColor = Color.Black;
@@ -367,7 +451,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 out WaveLength, out MaxMode, out incidentPortNo,
                 out nodesBoundaryList, out EigenValuesList, out EigenVecsList,
                 out nodesRegion, out valuesAll,
-                out ScatterMat);
+                out ScatterVecList);
 
             if (ret)
             {
@@ -412,6 +496,23 @@ namespace HPlaneWGSimulatorXDelFEM
                         eigenVecs2 = null;
                     }
                 }
+                if (ScatterVecList != null)
+                {
+                    for (int portIndex = 0; portIndex < ScatterVecList.Count; portIndex++)
+                    {
+                        Complex[] portScatterVec = ScatterVecList[portIndex];
+                        Complex[] portScatterVec2 = new Complex[ShowMaxMode];
+                        for (int imode = 0; imode < portScatterVec.Length; imode++)
+                        {
+                            if (imode >= ShowMaxMode) break;
+                            portScatterVec2[imode] = portScatterVec[imode];
+                        }
+                        // 入れ替える
+                        ScatterVecList[portIndex] = portScatterVec2;
+                        portScatterVec = null;
+                        portScatterVec2 = null;
+                    }
+                }
 
                 // 要素にフィールド値をセットする
                 setupFieldValueToElements(nodesRegion, valuesAll);
@@ -429,6 +530,30 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="valuesAll">節点のフィールド値のリスト</param>
         private void setupFieldValueToElements(int[] nodesRegion, Complex[] valuesAll)
         {
+            //System.Diagnostics.Debug.Assert(Math.Abs(WaveLength) < Constants.PrecisionLowerLimit);
+            if (Math.Abs(WaveLength) < Constants.PrecisionLowerLimit)
+            {
+                return;
+            }
+
+            // 定数
+            const double pi = Constants.pi;
+            const double c0 = Constants.c0;
+            // 波数
+            double k0 = 2.0 * pi / WaveLength;
+            // 角周波数
+            double omega = k0 * c0;
+            // 回転に掛ける因子
+            Complex factorForRot = 1.0;
+            if (WaveModeDv == FemSolver.WaveModeDV.TM)
+            {
+                factorForRot = - 1.0 * Complex.ImaginaryOne / (omega * Constants.eps0);
+            }
+            else
+            {
+                factorForRot = Complex.ImaginaryOne / (omega * Constants.myu0);
+            }
+
             /// 領域内節点の節点番号→インデックスマップ
             Dictionary<int, int> nodesRegionToIndex = new Dictionary<int, int>();
             // 節点番号→インデックスのマップ作成
@@ -443,9 +568,82 @@ namespace HPlaneWGSimulatorXDelFEM
             // 要素リストにフィールド値を格納
             foreach (FemElement element in Elements)
             {
-                element.SetFieldValueFromAllValues(valuesAll, nodesRegionToIndex);
+                MediaInfo media = Medias[element.MediaIndex];
+                double[,] media_Q = null;
+                if (WaveModeDv == FemSolver.WaveModeDV.TM)
+                {
+                    // TMモードの場合、比誘電率
+                    media_Q = media.P;
+                }
+                else
+                {
+                    // TEモードの場合、比透磁率
+                    media_Q = media.Q;
+                }
+                element.SetFieldValueFromAllValues(valuesAll, nodesRegionToIndex,
+                    factorForRot, media_Q, WaveModeDv);
             }
 
+            // フィールド値の絶対値の最小、最大
+            double minFValue = double.MaxValue;
+            double maxFValue = double.MinValue;
+            double minRotFValue = double.MaxValue;
+            double maxRotFValue = double.MinValue;
+            double minPoyntingFValue = double.MaxValue;
+            double maxPoyntingFValue = double.MinValue;
+            foreach (FemElement element in Elements)
+            {
+                int nno = element.NodeNumbers.Length;
+                for (int ino = 0; ino < nno; ino++)
+                {
+                    Complex fValue = element.getFValue(ino);
+                    Complex rotXFValue = element.getRotXFValue(ino);
+                    Complex rotYFValue = element.getRotYFValue(ino);
+                    Complex poyntingXFValue = element.getPoyntingXFValue(ino);
+                    Complex poyntingYFValue = element.getPoyntingYFValue(ino);
+                    double fValueAbs = Complex.Abs(fValue);
+                    //double rotFValueAbs = Math.Sqrt(Math.Pow(rotXFValue.Magnitude, 2) + Math.Pow(rotYFValue.Magnitude, 2));
+                    double rotFValueAbs = Math.Sqrt(Math.Pow(rotXFValue.Real, 2) + Math.Pow(rotYFValue.Real, 2));
+                    //double poyntingFValueAbs = Math.Sqrt(Math.Pow(poyntingXFValue.Magnitude, 2) + Math.Pow(poyntingYFValue.Magnitude, 2));
+                    double poyntingFValueAbs = Math.Sqrt(Math.Pow(poyntingXFValue.Real, 2) + Math.Pow(poyntingYFValue.Real, 2));
+
+                    if (fValueAbs > maxFValue)
+                    {
+                        maxFValue = fValueAbs;
+                    }
+                    if (fValueAbs < minFValue)
+                    {
+                        minFValue = fValueAbs;
+                    }
+                    if (rotFValueAbs > maxRotFValue)
+                    {
+                        maxRotFValue = rotFValueAbs;
+                    }
+                    if (rotFValueAbs < minRotFValue)
+                    {
+                        minRotFValue = rotFValueAbs;
+                    }
+
+                    if (poyntingFValueAbs > maxPoyntingFValue)
+                    {
+                        maxPoyntingFValue = poyntingFValueAbs;
+                    }
+                    if (poyntingFValueAbs < minPoyntingFValue)
+                    {
+                        minPoyntingFValue = poyntingFValueAbs;
+                    }
+                }
+            }
+            // 節点上の値より要素内部の値の方が大きいことがある
+            double scaleFactor = 1.05;
+            MinFValue = minFValue * scaleFactor;
+            MaxFValue = maxFValue * scaleFactor;
+            MinRotFValue = minRotFValue * scaleFactor;
+            MaxRotFValue = maxRotFValue * scaleFactor;
+            MinPoyntingFValue = minPoyntingFValue * scaleFactor;
+            MaxPoyntingFValue = maxPoyntingFValue * scaleFactor;
+
+            /*
             // 等高線図描画の為に最大、最小値を取得する
             // フィールド値の絶対値の最小、最大
             double minfValue = double.MaxValue;
@@ -462,8 +660,9 @@ namespace HPlaneWGSimulatorXDelFEM
                     minfValue = v;
                 }
             }
-            MinfValue = minfValue;
-            MaxfValue = maxfValue;
+            MinFValue = minfValue;
+            MaxFValue = maxfValue;
+             */
         }
 
         /// <summary>
@@ -489,6 +688,15 @@ namespace HPlaneWGSimulatorXDelFEM
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// データが準備できてる？
+        /// </summary>
+        /// <returns></returns>
+        public bool IsDataReady()
+        {
+            return isInputDataReady() && isOutputDataReady();
         }
 
         /// <summary>
@@ -562,7 +770,7 @@ namespace HPlaneWGSimulatorXDelFEM
             //{
             //    return isReady;
             //}
-            if (ScatterMat == null)
+            if (ScatterVecList.Count == 0)
             {
                 return isReady;
             }
@@ -593,14 +801,14 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 return;
             }
-            
+
             if (addFlg)
             {
                 // Sマトリックス周波数特性グラフに計算した点を追加
                 AddScatterMatrixToChart(SMatChart);
                 int firstFreqNo;
                 int lastFreqNo;
-                if (GetCalculatedFreqCnt(FemOutputDatFilePath, out firstFreqNo, out lastFreqNo) == 1) 
+                if (GetCalculatedFreqCnt(FemOutputDatFilePath, out firstFreqNo, out lastFreqNo) == 1)
                 {
                     // 固有値チャート初期化(モード数が変わっているので再度初期化する)
                     ResetEigenValueChart(BetaChart);
@@ -624,7 +832,12 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         /// <param name="g"></param>
         /// <param name="panel"></param>
-        public void DrawMesh(Graphics g, Panel panel, bool fitFlg = false)
+        public void DrawMesh(Graphics g, Panel panel, bool fitFlg = false, bool transparent = false)
+        {
+            DrawMesh(g, panel, panel.ClientRectangle, fitFlg, transparent);
+        }
+
+        public void DrawMesh(Graphics g, Panel panel, Rectangle clientRectangle, bool fitFlg = false, bool transparent = false)
         {
             //if (!isInputDataReady())
             // ポートが指定されていなくてもメッシュを表示できるように条件を変更
@@ -637,17 +850,33 @@ namespace HPlaneWGSimulatorXDelFEM
             Size regionSize;
             if (!fitFlg)
             {
-                getDrawRegion(panel, out delta, out ofs, out regionSize);
+                //getDrawRegion(panel, out delta, out ofs, out regionSize);
+                getDrawRegion(clientRectangle.Width, clientRectangle.Height, out delta, out ofs, out regionSize);
             }
             else
             {
-                getFitDrawRegion(panel, out delta, out ofs, out regionSize);
+                //getFitDrawRegion(panel, out delta, out ofs, out regionSize);
+                getFitDrawRegion(clientRectangle.Width, clientRectangle.Height, out delta, out ofs, out regionSize);
             }
+            ofs.Width += clientRectangle.Left;
+            ofs.Height += clientRectangle.Top;
 
             foreach (FemElement element in Elements)
             {
                 element.LineColor = panel.ForeColor;
+                Color saveBackColor = element.BackColor;
+                Color saveLineColor = element.LineColor;
+                if (transparent)
+                {
+                    element.BackColor = Color.FromArgb(64, saveBackColor.R, saveBackColor.G, saveBackColor.B);
+                    element.LineColor = element.BackColor;
+                }
                 element.Draw(g, ofs, delta, regionSize, true);
+                if (transparent)
+                {
+                    element.LineColor = saveLineColor;
+                    element.BackColor = saveBackColor;
+                }
             }
         }
 
@@ -660,15 +889,20 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="regionSize"></param>
         private void getDrawRegion(Panel panel, out Size delta, out Size ofs, out Size regionSize)
         {
+            getDrawRegion(panel.Width, panel.Height, out delta, out ofs, out regionSize);
+        }
+
+        private void getDrawRegion(int panelWidth, int panelHeight, out Size delta, out Size ofs, out Size regionSize)
+        {
             // 描画領域の方眼桝目の寸法を決定
-            double deltaxx = panel.Width / (double)(Constants.MaxDiv.Width + 2);
+            double deltaxx = panelWidth / (double)(Constants.MaxDiv.Width + 2);
             int deltax = (int)deltaxx;
-            double deltayy = panel.Height / (double)(Constants.MaxDiv.Height + 2);
+            double deltayy = panelHeight / (double)(Constants.MaxDiv.Height + 2);
             int deltay = (int)deltayy;
             //ofs = new Size(deltax, deltay);   // ver1.2.0.0
             ofs = new Size(deltax + deltax * Constants.MaxDiv.Width / 2, deltay - deltax * Constants.MaxDiv.Height / 2);  // for DelFEM mesh(原点が方眼紙の中央)
             delta = new Size(deltax, deltay);
-           regionSize = new Size(delta.Width * Constants.MaxDiv.Width, delta.Height * Constants.MaxDiv.Height);
+            regionSize = new Size(delta.Width * Constants.MaxDiv.Width, delta.Height * Constants.MaxDiv.Height);
         }
 
         /// <summary>
@@ -679,6 +913,11 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="ofs"></param>
         /// <param name="regionSize"></param>
         private void getFitDrawRegion(Panel panel, out Size delta, out Size ofs, out Size regionSize)
+        {
+            getFitDrawRegion(panel.Width, panel.Height, out delta, out ofs, out regionSize);
+        }
+
+        private void getFitDrawRegion(int panelWidth, int panelHeight, out Size delta, out Size ofs, out Size regionSize)
         {
             const int ndim = 2;
 
@@ -701,12 +940,12 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             double[] midPt = new double[] { (minPt[0] + maxPt[0]) * 0.5, (minPt[1] + maxPt[1]) * 0.5 };
 
-            int panel_width = panel.Width;
-            int panel_height = panel_height = (int)((double)panel.Width * (Constants.MaxDiv.Height + 2) / (double)(Constants.MaxDiv.Width + 2));
-            if (panel.Height < panel_height)
+            int panel_width = panelWidth;
+            int panel_height = panel_height = (int)((double)panelWidth * (Constants.MaxDiv.Height + 2) / (double)(Constants.MaxDiv.Width + 2));
+            if (panelHeight < panel_height)
             {
-                panel_height = panel.Height;
-                panel_width = (int)((double)panel.Height * (Constants.MaxDiv.Width + 2) / (double)(Constants.MaxDiv.Height + 2));
+                panel_height = panelHeight;
+                panel_width = (int)((double)panelHeight * (Constants.MaxDiv.Width + 2) / (double)(Constants.MaxDiv.Height + 2));
             }
             // 描画領域の方眼桝目の寸法を決定
             // 図形をパネルのサイズにあわせて拡縮する
@@ -729,8 +968,8 @@ namespace HPlaneWGSimulatorXDelFEM
             ofsx += (int)(deltaxx * (boxWidth - w) * 0.5);
             ofsy -= (int)(deltayy * (boxWidth - h) * 0.5);
             // アスペクト比を調整した分
-            ofsx += (int)((panel.Width - panel_width) * 0.5);
-            ofsy += (int)((panel.Height - panel_height) * 0.5);
+            ofsx += (int)((panelWidth - panel_width) * 0.5);
+            ofsy += (int)((panelHeight - panel_height) * 0.5);
 
             delta = new Size(deltax, deltay);
             ofs = new Size(ofsx, ofsy);
@@ -746,6 +985,16 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="panel"></param>
         public void DrawField(Graphics g, Panel panel)
         {
+            DrawFieldEx(g, panel, panel.ClientRectangle, ShowFieldDv, ShowValueDv);
+        }
+
+        /// <summary>
+        /// フィールド値等高線図描画
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="panel"></param>
+        public void DrawFieldEx(Graphics g, Panel panel, Rectangle clientRectangle, FemElement.FieldDV fieldDv, FemElement.ValueDV valueDv)
+        {
             if (!isInputDataReady())
             {
                 return;
@@ -757,17 +1006,105 @@ namespace HPlaneWGSimulatorXDelFEM
             Size delta;
             Size ofs;
             Size regionSize;
-            getFitDrawRegion(panel, out delta, out ofs, out regionSize);
+            //getFitDrawRegion(panel, out delta, out ofs, out regionSize);
+            getFitDrawRegion(clientRectangle.Width, clientRectangle.Height, out delta, out ofs, out regionSize);
+            ofs.Width += clientRectangle.Left;
+            ofs.Height += clientRectangle.Top;
+
+            double min = 0.0;
+            double max = 1.0;
+            if (fieldDv == FemElement.FieldDV.Field)
+            {
+                min = MinFValue;
+                max = MaxFValue;
+            }
+            else if (fieldDv == FemElement.FieldDV.RotX || fieldDv == FemElement.FieldDV.RotY)
+            {
+                min = MinRotFValue;
+                max = MaxRotFValue;
+            }
+            else
+            {
+                return;
+            }
 
             // カラーマップに最小、最大を設定
-            //FValueColorMap.Min = MinfValue;
-            FValueColorMap.Min = 0.0;
-            FValueColorMap.Max = MaxfValue;
+            if (valueDv == FemElement.ValueDV.Real || valueDv == FemElement.ValueDV.Imaginary)
+            {
+                FValueColorMap.Min = -max;
+                FValueColorMap.Max = max;
+            }
+            else
+            {
+                // 既定値は絶対値で処理する
+                //FValueColorMap.Min = min;
+                FValueColorMap.Min = 0.0;
+                FValueColorMap.Max = max;
+            }
 
-            // 等高線描画
             foreach (FemElement element in Elements)
             {
-                element.DrawField(g, ofs, delta, regionSize, FValueColorMap);
+                // 等高線描画
+                element.DrawField(g, ofs, delta, regionSize, fieldDv, valueDv, FValueColorMap);
+            }
+        }
+
+        /// <summary>
+        /// フィールドの回転ベクトル描画
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="panel"></param>
+        public void DrawRotField(Graphics g, Panel panel)
+        {
+            DrawRotFieldEx(g, panel, panel.ClientRectangle, ShowFieldDv);
+        }
+
+        /// <summary>
+        /// フィールドの回転ベクトル描画
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="panel"></param>
+        public void DrawRotFieldEx(Graphics g, Panel panel, Rectangle clientRectangle, FemElement.FieldDV fieldDv)
+        {
+            if (!isInputDataReady())
+            {
+                return;
+            }
+            if (!isOutputDataReady())
+            {
+                return;
+            }
+            Size delta;
+            Size ofs;
+            Size regionSize;
+            //getFitDrawRegion(panel, out delta, out ofs, out regionSize);
+            getFitDrawRegion(clientRectangle.Width, clientRectangle.Height, out delta, out ofs, out regionSize);
+            ofs.Width += clientRectangle.Left;
+            ofs.Height += clientRectangle.Top;
+
+            Color drawColor = Color.Gray;
+            double min = 0.0;
+            double max = 1.0;
+            if (fieldDv == FemElement.FieldDV.PoyntingXY)
+            {
+                drawColor = Color.Green;//Color.YellowGreen;
+                min = -MaxPoyntingFValue;
+                max = MaxPoyntingFValue;
+            }
+            else if (fieldDv == FemElement.FieldDV.RotXY)
+            {
+                drawColor = Color.Red;
+                min = -MaxRotFValue;
+                max = MaxRotFValue;
+            }
+            else
+            {
+                return;
+            }
+            foreach (FemElement element in Elements)
+            {
+                // 回転ベクトル描画
+                element.DrawRotField(g, ofs, delta, regionSize, drawColor, fieldDv, min, max);
             }
         }
 
@@ -777,6 +1114,11 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="g"></param>
         /// <param name="panel"></param>
         public void DrawMediaB(Graphics g, Panel panel, bool fitFlg = false)
+        {
+            DrawMediaB(g, panel, panel.ClientRectangle, fitFlg);
+        }
+
+        public void DrawMediaB(Graphics g, Panel panel, Rectangle clientRectangle, bool fitFlg = false)
         {
             if (!isInputDataReady())
             {
@@ -791,12 +1133,17 @@ namespace HPlaneWGSimulatorXDelFEM
             Size regionSize;
             if (!fitFlg)
             {
-                getDrawRegion(panel, out delta, out ofs, out regionSize);
+                //getDrawRegion(panel, out delta, out ofs, out regionSize);
+                getDrawRegion(clientRectangle.Width, clientRectangle.Height, out delta, out ofs, out regionSize);
             }
             else
             {
-                getFitDrawRegion(panel, out delta, out ofs, out regionSize);
+                //getFitDrawRegion(panel, out delta, out ofs, out regionSize);
+                getFitDrawRegion(clientRectangle.Width, clientRectangle.Height, out delta, out ofs, out regionSize);
             }
+            ofs.Width += clientRectangle.Left;
+            ofs.Height += clientRectangle.Top;
+
             foreach (string edgeKeyStr in MediaBEdgeList)
             {
                 string[] tokens = edgeKeyStr.Split('_');
@@ -858,6 +1205,11 @@ namespace HPlaneWGSimulatorXDelFEM
         {
             Graphics g = e.Graphics;
 
+            if (ShowFieldDv == FemElement.FieldDV.PoyntingXY || ShowFieldDv == FemElement.FieldDV.RotXY)
+            {
+                // ベクトル表示時はカラーマップを表示しない
+                return;
+            }
             // カラーマップを表示する
             drawFValueLegendColormap(g);
             // カラーマップの目盛を表示する
@@ -896,7 +1248,7 @@ namespace HPlaneWGSimulatorXDelFEM
         private void drawFValueLegendColorScale(Graphics g)
         {
             const int cnt = LegendColorCnt;
-            const int ofsX = 20;
+            const int ofsX = 22;
             const int ofsY = 0;
             const int height = 20; // 1目盛の高さ
             double divValue = 1.0 / (double)cnt;
@@ -904,11 +1256,24 @@ namespace HPlaneWGSimulatorXDelFEM
             using (Font font = new Font("MS UI Gothic", 9))
             using (Brush brush = new SolidBrush(FValueLegendColorPanel.ForeColor))
             {
-                for (int i = 0; i < cnt + 1; i++)
+                if (ShowValueDv == FemElement.ValueDV.Abs)
                 {
-                    int y = i * height;
-                    string text = string.Format("{0}", (cnt - i) * divValue);
-                    g.DrawString(text, font, brush, new Point(ofsX, y + ofsY));
+                    for (int i = 0; i < cnt + 1; i++)
+                    {
+                        int y = i * height;
+                        string text = string.Format("{0:F1}", (cnt - i) * divValue);
+                        g.DrawString(text, font, brush, new Point(ofsX, y + ofsY));
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < cnt + 1; i++)
+                    {
+                        int y = i * height;
+                        double value = ((cnt - i) * 2.0 - cnt) * divValue;
+                        string text = string.Format(value >= 0 ? "+{0:F1}" : "{0:F1}", value);
+                        g.DrawString(text, font, brush, new Point(ofsX, y + ofsY));
+                    }
                 }
             }
         }
@@ -928,6 +1293,8 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 labelFreqValue.Text = string.Format("{0:F2}", GetNormalizedFrequency());
             }
+            // BUGFIX [次の周波数][前の周波数]ボタンで周波数が遅れて表示される不具合を修正
+            labelFreqValue.Refresh();
         }
 
         /// <summary>
@@ -983,11 +1350,40 @@ namespace HPlaneWGSimulatorXDelFEM
                 //MessageBox.Show("入力データがセットされていません", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            for (int portIndex = 0; portIndex < Ports.Count; portIndex++)
+            int showMaxMode = ShowMaxMode;
+            if (showMaxMode == 1)
+            {
+                for (int portIndex = 0; portIndex < Ports.Count; portIndex++)
+                {
+                    Series series = new Series();
+                    series.Name = string.Format("|S{0}{1}|", portIndex + 1, IncidentPortNo);
+                    series.ChartType = SeriesChartType.Line;
+                    series.BorderDashStyle = ChartDashStyle.Solid;
+                    chart1.Series.Add(series);
+                }
+            }
+            else
+            {
+                const int incidentModeIndex = 0;
+                for (int portIndex = 0; portIndex < Ports.Count; portIndex++)
+                {
+                    for (int iMode = 0; iMode < showMaxMode; iMode++)
+                    {
+                        Series series = new Series();
+                        series.Name = string.Format("|S{0}{1}{2}{3}|", portIndex + 1, (iMode + 1), IncidentPortNo, (incidentModeIndex + 1));
+                        series.ChartType = SeriesChartType.Line;
+                        series.BorderDashStyle = ChartDashStyle.Solid;
+                        chart1.Series.Add(series);
+                    }
+                }
+            }
+            // 基本モード以外への電力損失のルート値
             {
                 Series series = new Series();
-                series.Name = string.Format("|S{0}{1}|", portIndex + 1, IncidentPortNo);
+                series.Name = "√|loss|";
                 series.ChartType = SeriesChartType.Line;
+                series.BorderDashStyle = ChartDashStyle.Dash;
+                series.Color = chart1.ChartAreas[0].AxisX.LineColor;//chart1.Parent.ForeColor;
                 chart1.Series.Add(series);
             }
             // 計算されたグラフのプロパティ値をAutoに設定
@@ -1086,15 +1482,36 @@ namespace HPlaneWGSimulatorXDelFEM
                 //MessageBox.Show("出力データがセットされていません", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            int showMaxMode = ShowMaxMode;
+            double totalPower = 0.0;
             for (int portIndex = 0; portIndex < Ports.Count; portIndex++)
             {
-                Series series = chart1.Series[portIndex];
+                Complex[] portScatterVec = ScatterVecList[portIndex];
+                int modeCnt = portScatterVec.Length;
+                for (int iMode = 0; iMode < showMaxMode && iMode < modeCnt; iMode++)
+                {
+                    Series series = chart1.Series[iMode + portIndex * showMaxMode];
 
-                Complex si1 = ScatterMat[portIndex];
-                //DataPoint point = series.Points.Add(Complex.Abs(si1));
-                //point.AxisLabel = string.Format("{0:G4}", 2.0 * WaveguideWidth/WaveLength);
-                //series.Points.AddXY(2.0 * WaveguideWidth / WaveLength, Complex.Abs(si1));
-                series.Points.AddXY(GetNormalizedFrequency(), Complex.Abs(si1));
+                    Complex sim10 = portScatterVec[iMode];
+                    //DataPoint point = series.Points.Add(Complex.Abs(si1));
+                    //point.AxisLabel = string.Format("{0:G4}", 2.0 * WaveguideWidth/WaveLength);
+                    //series.Points.AddXY(2.0 * WaveguideWidth / WaveLength, Complex.Abs(si1));
+                    series.Points.AddXY(GetNormalizedFrequency(), Complex.Abs(sim10));
+
+                    totalPower += (sim10 * Complex.Conjugate(sim10)).Real;
+                }
+            }
+            if (chart1.Series.Count > 0)
+            {
+                // 基本モード以外への損失のルート値をプロットする
+                double loss = 1.0 - totalPower;
+                if (loss < 0.0)
+                {
+                    //loss = 0.0;
+                    loss = -loss; // 誤差扱い
+                }
+                Series series = chart1.Series[chart1.Series.Count - 1];
+                series.Points.AddXY(GetNormalizedFrequency(), Math.Sqrt(loss));
             }
             AdjustSMatChartYAxisMax(chart1);
         }
@@ -1138,7 +1555,6 @@ namespace HPlaneWGSimulatorXDelFEM
                 for (int modeIndex = 0; modeIndex < showMaxMode; modeIndex++)
                 {
                     Series series = new Series();
-                    //series.Name = string.Format("mode{0} at {1}", modeIndex + 1, portIndex + 1);
                     series.Name = string.Format("TE{0}0 at {1}", modeIndex + 1, portIndex + 1);
                     series.ChartType = SeriesChartType.Line;
                     chart1.Series.Add(series);
@@ -1268,6 +1684,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             for (int portIndex = 0; portIndex < Ports.Count; portIndex++)
             {
+                IList<int> portNodes = Ports[portIndex];
                 Complex[,] eigenVecs = EigenVecsList[portIndex];
                 int nodeCnt = eigenVecs.GetLength(1);
                 for (int modeIndex = 0; modeIndex < showMaxMode; modeIndex++)
@@ -1292,19 +1709,29 @@ namespace HPlaneWGSimulatorXDelFEM
                     }
                     Series seriesReal = chart1.Series[(portIndex * showMaxMode + modeIndex) * 2];
                     Series seriesImag = chart1.Series[(portIndex * showMaxMode + modeIndex) * 2 + 1];
-                    seriesReal.Points.AddXY(0, 0); // 実数部
-                    seriesImag.Points.AddXY(0, 0); // 虚数部
-                    for (int ino = 0; ino < nodeCnt; ino++)
                     {
-                        // 正確には座標を取ってくる必要があるが等間隔が保障されていれば、下記で規格化された位置は求まる
-                        double x0 = (ino + 1) / (double)(nodeCnt + 1);  // 始点と終点は強制境界で除かれている 分割数 = 節点数 - 1 で節点数 = nodeCnt + 2 より 分割数 nodeCnt + 1
-                        double real = eigenVecs[modeIndex, ino].Real / maxValue;
-                        double imag = eigenVecs[modeIndex, ino].Imaginary / maxValue;
-                        seriesReal.Points.AddXY(x0, real); // 実数部
-                        seriesImag.Points.AddXY(x0, imag); // 虚数部
+                        int ino = 0;  // 強制境界を除いた節点のインデックス
+                        for (int inoB = 0; inoB < portNodes.Count; inoB++)
+                        {
+                            int nodeNumber = portNodes[inoB];
+                            // 正確には座標を取ってくる必要があるが等間隔が保障されていれば、下記で規格化された位置は求まる
+                            double x0;
+                            x0 = inoB / (double)(portNodes.Count - 1);
+                            if (ForceNodes.Contains(nodeNumber))
+                            {
+                                seriesReal.Points.AddXY(x0, 0.0); // 実数部
+                                seriesImag.Points.AddXY(x0, 0.0); // 虚数部
+                            }
+                            else
+                            {
+                                double real = eigenVecs[modeIndex, ino].Real / maxValue;
+                                double imag = eigenVecs[modeIndex, ino].Imaginary / maxValue;
+                                seriesReal.Points.AddXY(x0, real); // 実数部
+                                seriesImag.Points.AddXY(x0, imag); // 虚数部
+                                ino++;
+                            }
+                        }
                     }
-                    seriesReal.Points.AddXY(1.0, 0); // 実数部
-                    seriesImag.Points.AddXY(1.0, 0); // 虚数部
                 }
             }
         }

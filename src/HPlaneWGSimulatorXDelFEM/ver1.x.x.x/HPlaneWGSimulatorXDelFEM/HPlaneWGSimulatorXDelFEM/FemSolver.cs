@@ -31,6 +31,10 @@ namespace HPlaneWGSimulatorXDelFEM
         /// 導波路の幅既定値  規格化周波数が定義できるように初期値を設定
         /// </summary>
         public const double DefWaveguideWidth = 1000.0; // ありえない幅
+        /// <summary>
+        /// 入射モードインデックス
+        /// </summary>
+        private const int IncidentModeIndex = 0;
 
         ////////////////////////////////////////////////////////////////////////
         // 型
@@ -44,9 +48,15 @@ namespace HPlaneWGSimulatorXDelFEM
             //Default,
             // clapack zgesvを使用(KrdLab Lisys)
             Zgesv,
+            // clapack zgbsv
+            Zgbsv,
             // Preconditioned Orthogonal Conjugate Gradient Method(PCOCG)を使用(DelFEM)
             PCOCG
         }
+        /// <summary>
+        /// 波のモード区分
+        /// </summary>
+        public enum WaveModeDV { TE, TM };
 
         ////////////////////////////////////////////////////////////////////////
         // フィールド
@@ -104,6 +114,14 @@ namespace HPlaneWGSimulatorXDelFEM
             get;
             private set;
         }
+        /// <summary>
+        /// 計算する波のモード区分
+        /// </summary>
+        public WaveModeDV WaveModeDv
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// 設定された要素形状区分(これはSolver内部では使用しない。要素形状は要素分割データから判断する)
@@ -143,6 +161,14 @@ namespace HPlaneWGSimulatorXDelFEM
         /// clapack使用時のFEM行列
         /// </summary>
         private MyComplexMatrix FemMat = null;
+        /// <summary>
+        /// ソート済み節点番号リスト
+        /// </summary>
+        private IList<int> SortedNodes = null;
+        /// <summary>
+        /// FEM行列の非０要素パターン
+        /// </summary>
+        private bool[,] FemMatPattern = null;
         /// <summary>
         /// DelFEM:ワールド座標系
         /// </summary>
@@ -188,8 +214,11 @@ namespace HPlaneWGSimulatorXDelFEM
             else if (confValue == "Zgesv")
             {
                 lsEqnSoverDv = LinearSystemEqnSoverDV.Zgesv;
-
             }
+            else if (confValue == "Zgbsv")
+            {
+                lsEqnSoverDv = LinearSystemEqnSoverDV.Zgbsv;
+            }            
             else
             {
                 throw new InvalidDataException("線形方程式解法区分が不正です");
@@ -212,6 +241,10 @@ namespace HPlaneWGSimulatorXDelFEM
             else if (lsEqnSolverDv == LinearSystemEqnSoverDV.Zgesv)
             {
                 confValue = "Zgesv";
+            }
+            else if (lsEqnSolverDv == LinearSystemEqnSoverDV.Zgbsv)
+            {
+                confValue = "Zgbsv";
             }
             else
             {
@@ -256,6 +289,7 @@ namespace HPlaneWGSimulatorXDelFEM
             FirstWaveLength = 0.0;
             LastWaveLength = 0.0;
             CalcFreqCnt = 0;
+            WaveModeDv = Constants.DefWaveModeDv;
             ElemShapeDvToBeSet = Constants.DefElemShapeDv;
             ElemOrderToBeSet = Constants.DefElementOrder;
             LsEqnSolverDv = Constants.DefLsEqnSolverDv;
@@ -644,7 +678,9 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             string basefilename = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(filename);
             string outfilename = basefilename + Constants.FemOutputExt;
-            string indexfilename = basefilename + Constants.FemOutputIndexExt;
+            //string indexfilename = basefilename + Constants.FemOutputIndexExt;
+            // BUGFIX インデックスファイル名は.out.idx
+            string indexfilename = outfilename + Constants.FemOutputIndexExt;
 
             // 結果出力ファイルの削除(結果を追記モードで書き込むため)
             if (File.Exists(outfilename))
@@ -657,6 +693,8 @@ namespace HPlaneWGSimulatorXDelFEM
             }
 
             FemMat = null;
+            SortedNodes = null;
+            FemMatPattern = null;
             if (World != null)
             {
                 World.Clear();
@@ -677,6 +715,21 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             FieldValId = 0;
             TmpBuffer = null;
+            try
+            {
+                Console.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
+                // GC.Collect 呼び出し後に GC.WaitForPendingFinalizers を呼び出します。これにより、すべてのオブジェクトに対するファイナライザが呼び出されるまで、現在のスレッドは待機します。
+                // ファイナライザ作動後は、回収すべき、(ファイナライズされたばかりの) アクセス不可能なオブジェクトが増えます。もう1度 GC.Collect を呼び出し、それらを回収します。
+                GC.Collect(); // アクセス不可能なオブジェクトを除去
+                GC.WaitForPendingFinalizers(); // ファイナライゼーションが終わるまでスレッド待機
+                GC.Collect(0); // ファイナライズされたばかりのオブジェクトに関連するメモリを開放
+                Console.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                MessageBox.Show(exception.Message);
+            }
 
             int calcFreqCnt = CalcFreqCnt;
             double firstNormalizedFreq = FirstNormalizedFreq;
@@ -702,6 +755,8 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
             }
             FemMat = null;
+            SortedNodes = null;
+            FemMatPattern = null;
             if (World != null)
             {
                 World.Clear();
@@ -733,10 +788,18 @@ namespace HPlaneWGSimulatorXDelFEM
         private void runEach(int freqNo, string filename, double waveLength, int maxMode)
         {
             Console.WriteLine("runEach 1");
+            bool ret;
             // 全体剛性行列作成
             int[] nodesRegion = null;
             MyComplexMatrix mat = null;
-            getHelmholtzLinearSystemMatrix(waveLength, out nodesRegion, out mat);
+            ret = getHelmholtzLinearSystemMatrix(waveLength, out nodesRegion, out mat);
+            if (!ret)
+            {
+                Console.WriteLine("Error at getHelmholtzLinearSystemMatrix ret: {0}", ret);
+                // 計算を中止する
+                IsCalcAborted = true;
+                return;
+            }
             Console.WriteLine("runEach 2");
 
             // 残差ベクトル初期化
@@ -777,9 +840,50 @@ namespace HPlaneWGSimulatorXDelFEM
                 addPortBC(waveLength, isInputPort, nodesBoundary, ryy_1d, eigenValues, eigenVecs, nodesRegion, mat, resVec);
             }
             Console.WriteLine("runEach 4");
-
             Complex[] valuesAll = null;
-            if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgesv)
+            if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgbsv)
+            {
+                System.Diagnostics.Debug.Assert(mat is MyComplexBandMatrix);
+
+                valuesAll = null;
+
+                MyComplexBandMatrix bandMat = mat as MyComplexBandMatrix;
+                int rowcolSize = bandMat.RowSize;
+                int subdiaSize = bandMat.SubdiaSize;
+                int superdiaSize = bandMat.SuperdiaSize;
+
+                // リニア方程式を解く
+                Complex[] X = null;
+                // clapackの行列の1次元ベクトルへの変換は列を先に埋める
+                // バンドマトリクス用の格納方法で格納する
+                Complex[] A = MyMatrixUtil.matrix_ToBuffer(bandMat, false);
+                Complex[] B = resVec;
+                int x_row = nodeCnt;
+                int x_col = 1;
+                int a_row = rowcolSize;
+                int a_col = rowcolSize;
+                int kl = subdiaSize;
+                int ku = superdiaSize;
+                int b_row = nodeCnt;
+                int b_col = 1;
+                Console.WriteLine("run zgbsv");
+                try
+                {
+                    KrdLab.clapack.FunctionExt.zgbsv(ref X, ref x_row, ref x_col, A, a_row, a_col, kl, ku, B, b_row, b_col);
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                    MessageBox.Show(string.Format("計算中にエラーが発生しました。2W/λ = {0}" + System.Environment.NewLine + "    {1}",
+                        GetNormalizedFreq(waveLength, WaveguideWidth), exception.Message));
+                    return;
+                    // ダミーデータ
+                    //X = new ValueType[nodeCnt];
+                    //for (int i = 0; i < nodeCnt; i++) { X[i] = new Complex(); }
+                }
+                valuesAll = X;
+            }
+            else if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgesv)
             {
                 //---------------------------------------------------------
                 // clapack zgesv (KrdLab Lisys)
@@ -800,6 +904,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 Complex[] B = resVec;
                 ///////////////////////
                 /*
+                MyMatrixUtil.compressVec(ref A); // 配列圧縮
                 mat._body = null;
                 mat = null;
                 resVec = null;
@@ -891,10 +996,11 @@ namespace HPlaneWGSimulatorXDelFEM
 
             // 散乱行列Sij
             // ポートj = IncidentPortNoからの入射のみ対応
+            /*
             Complex[] scatterVec = new Complex[Ports.Count];
             for (int portIndex = 0; portIndex < Ports.Count; portIndex++)
             {
-                int iMode = 0;
+                int iMode = IncidentModeIndex;
                 bool isIncidentMode = (portIndex == IncidentPortNo - 1);
                 int[] nodesBoundary = nodesBoundaryList[portIndex];
                 MyDoubleMatrix ryy_1d = ryy_1dList[portIndex];
@@ -906,6 +1012,45 @@ namespace HPlaneWGSimulatorXDelFEM
                 Console.WriteLine("s{0}{1} = {2} + {3}i (|S| = {4} |S|^2 = {5})", portIndex + 1, IncidentPortNo, si1.Real, si1.Imaginary, Complex.Abs(si1), Complex.Abs(si1) * Complex.Abs(si1));
                 scatterVec[portIndex] = si1;
             }
+             */
+            // 拡張散乱行列Simjn
+            //   出力ポートi モードmの散乱係数
+            //   入射ポートj = IncindentPortNo n = 0(基本モード)のみ対応
+            IList<Complex[]> scatterVecList = new List<Complex[]>();
+            double totalPower = 0.0;
+            for (int portIndex = 0; portIndex < Ports.Count; portIndex++)
+            {
+                int[] nodesBoundary = nodesBoundaryList[portIndex];
+                MyDoubleMatrix ryy_1d = ryy_1dList[portIndex];
+                Complex[] eigenValues = eigenValuesList[portIndex];
+                Complex[,] eigenVecs = eigenVecsList[portIndex];
+                int modeCnt = eigenValues.Length;
+                Complex[] portScatterVec = new Complex[modeCnt];
+                Console.WriteLine("port {0}", portIndex);
+                for (int iMode = 0; iMode < eigenValues.Length; iMode++)
+                {
+                    bool isPropagationMode = (eigenValues[iMode].Real >= Constants.PrecisionLowerLimit);
+                    bool isIncidentMode = ((portIndex == IncidentPortNo - 1) && iMode == 0);
+                    Complex sim10 = getWaveguidePortReflectionCoef(waveLength, iMode, isIncidentMode,
+                                                                 nodesBoundary, ryy_1d, eigenValues, eigenVecs,
+                                                                 nodesRegion, valuesAll);
+                    portScatterVec[iMode] = sim10;
+                    if (isPropagationMode)
+                    {
+                        totalPower += (sim10 * Complex.Conjugate(sim10)).Real;
+                    }
+                    // check
+                    if (iMode == 0)
+                    {
+                        Console.WriteLine("  {0} s{1}{2}{3}{4} = {5} + {6}i " + System.Environment.NewLine + "        (|S| = {7} |S|^2 = {8})",
+                            isPropagationMode ? "P" : "E",
+                            portIndex + 1, (iMode + 1), IncidentPortNo, (IncidentModeIndex + 1),
+                            sim10.Real, sim10.Imaginary, Complex.Abs(sim10), Complex.Abs(sim10) * Complex.Abs(sim10));
+                    }
+                }
+                scatterVecList.Add(portScatterVec);
+            }
+            Console.WriteLine("totalPower:{0}", totalPower);
 
             /////////////////////////////////////
             // 結果をファイルに出力
@@ -915,7 +1060,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 Ports.Count, IncidentPortNo,
                 nodesBoundaryList, eigenValuesList, eigenVecsList,
                 nodesRegion, valuesAll,
-                scatterVec);
+                scatterVecList);
         }
 
         /// <summary>
@@ -924,7 +1069,8 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="waveLength"></param>
         /// <param name="nodesRegion"></param>
         /// <param name="mat"></param>
-        private void getHelmholtzLinearSystemMatrix(double waveLength, out int[] nodesRegion, out MyComplexMatrix mat)
+        /// <returns>true: 成功 false:失敗(メモリの確保に失敗)</returns>
+        private bool getHelmholtzLinearSystemMatrix(double waveLength, out int[] nodesRegion, out MyComplexMatrix mat)
         {
             nodesRegion = null;
             mat = null;
@@ -959,28 +1105,143 @@ namespace HPlaneWGSimulatorXDelFEM
             IList<int> sortedNodes = new List<int>();
             // 2D節点番号→ソート済みリストインデックスのマップ
             Dictionary<int, int> toSorted = new Dictionary<int, int>();
+            // 非０要素のパターン
+            bool[,] matPattern = null;
 
-            // 強制境界節点と内部領域節点を分離
-            foreach (FemNode node in Nodes)
+            if (SortedNodes == null)
             {
-                int nodeNumber = node.No;
-                if (ForceNodeNumberH.ContainsKey(nodeNumber))
+                // 節点番号リストをソートする
+                //   強制境界の除去する
+                //   バンドマトリクスのバンド幅を縮小する
+
+                // 強制境界節点と内部領域節点を分離
+                foreach (FemNode node in Nodes)
                 {
-                    //forceNodes.Add(nodeNumber);
+                    int nodeNumber = node.No;
+                    if (ForceNodeNumberH.ContainsKey(nodeNumber))
+                    {
+                        //forceNodes.Add(nodeNumber);
+                    }
+                    else
+                    {
+                        sortedNodes.Add(nodeNumber);
+                        toSorted.Add(nodeNumber, sortedNodes.Count - 1);
+                    }
                 }
-                else
                 {
-                    sortedNodes.Add(nodeNumber);
+                    // バンド幅を縮小する
+                    // 非０要素のパターンを取得
+                    getMatNonzeroPattern(Nodes, Elements, Ports, ForceBCNodes, toSorted, out matPattern);
+                    // subdiagonal、superdiagonalのサイズを取得する
+                    int subdiaSizeInitial = 0;
+                    int superdiaSizeInitial = 0;
+                    {
+                        Console.WriteLine("/////initial BandMat info///////");
+                        int rowcolSize;
+                        int subdiaSize;
+                        int superdiaSize;
+                        getBandMatrixSubDiaSizeAndSuperDiaSize(matPattern, out rowcolSize, out subdiaSize, out superdiaSize);
+                        subdiaSizeInitial = subdiaSize;
+                        superdiaSizeInitial = superdiaSize;
+                    }
+
+                    // 非０要素出現順に節点番号を格納
+                    IList<int> optNodes = new List<int>();
+                    Queue<int> chkQueue = new Queue<int>();
+                    int[] remainNodes = new int[matPattern.GetLength(0)];
+                    for (int i = 0; i < matPattern.GetLength(0); i++)
+                    {
+                        remainNodes[i] = i;
+                    }
+                    while (optNodes.Count < sortedNodes.Count)
+                    {
+                        // 飛び地領域対応
+                        for (int rIndex = 0; rIndex < remainNodes.Length; rIndex++)
+                        {
+                            int i = remainNodes[rIndex];
+                            if (i == -1) continue;
+                            //System.Diagnostics.Debug.Assert(!optNodes.Contains(i));
+                            chkQueue.Enqueue(i);
+                            remainNodes[rIndex] = -1;
+                            break;
+                        }
+                        while (chkQueue.Count > 0)
+                        {
+                            int i = chkQueue.Dequeue();
+                            optNodes.Add(i);
+                            for (int rIndex = 0; rIndex < remainNodes.Length; rIndex++)
+                            {
+                                int j = remainNodes[rIndex];
+                                if (j == -1) continue;
+                                //System.Diagnostics.Debug.Assert(i != j);
+                                if (matPattern[i, j])
+                                {
+                                    //System.Diagnostics.Debug.Assert(!optNodes.Contains(j) && !chkQueue.Contains(j));
+                                    chkQueue.Enqueue(j);
+                                    remainNodes[rIndex] = -1;
+                                }
+                            }
+                        }
+                    }
+                    IList<int> optNodesGlobal = new List<int>();
+                    Dictionary<int, int> toOptNodes = new Dictionary<int, int>();
+                    foreach (int i in optNodes)
+                    {
+                        int ino = sortedNodes[i];
+                        optNodesGlobal.Add(ino);
+                        toOptNodes.Add(ino, optNodesGlobal.Count - 1);
+                    }
+                    System.Diagnostics.Debug.Assert(optNodesGlobal.Count == sortedNodes.Count);
+                    // 改善できないこともあるのでチェックする
+                    bool improved = false;
+                    bool[,] optMatPattern = null;
+                    // 非０パターンを取得
+                    getMatNonzeroPattern(Nodes, Elements, Ports, ForceBCNodes, toOptNodes, out optMatPattern);
+                    // check
+                    {
+                        Console.WriteLine("/////opt BandMat info///////");
+                        int rowcolSize;
+                        int subdiaSize;
+                        int superdiaSize;
+                        getBandMatrixSubDiaSizeAndSuperDiaSize(optMatPattern, out rowcolSize, out subdiaSize, out superdiaSize);
+                        if (subdiaSize <= subdiaSizeInitial && superdiaSize <= superdiaSizeInitial)
+                        {
+                            improved = true;
+                        }
+                    }
+                    if (improved)
+                    {
+                        // 置き換え
+                        sortedNodes = optNodesGlobal;
+                        toSorted = toOptNodes;
+                        matPattern = optMatPattern;
+                    }
+                    else
+                    {
+                        Console.WriteLine("band with not optimized!");
+                    }
                 }
+                SortedNodes = sortedNodes;
+                FemMatPattern = matPattern;
             }
-            // 2D節点番号→ソート済みリストインデックスのマップ作成
-            for (int i = 0; i < sortedNodes.Count; i++)
+            else
             {
-                int nodeNumber = sortedNodes[i];
-                if (!toSorted.ContainsKey(nodeNumber))
+                // ソート済み節点番号リストを取得
+                sortedNodes = SortedNodes;
+
+                // 2D節点番号→ソート済みリストインデックスのマップ作成
+                for (int i = 0; i < sortedNodes.Count; i++)
                 {
-                    toSorted.Add(nodeNumber, i);
+                    int nodeNumber = sortedNodes[i];
+                    if (!toSorted.ContainsKey(nodeNumber))
+                    {
+                        toSorted.Add(nodeNumber, i);
+                    }
                 }
+
+                // 非０パターンを取得
+                //getMatNonzeroPattern(Nodes, Elements, Ports, ForceBCNodes, toSorted, out matPattern);
+                matPattern = FemMatPattern;
             }
 
             // 総節点数
@@ -990,19 +1251,43 @@ namespace HPlaneWGSimulatorXDelFEM
             nodesRegion = sortedNodes.ToArray();
 
             // 全体剛性行列初期化
-            if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgesv)
+            if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgesv || this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgbsv)
             {
                 //mat = new MyComplexMatrix(nodeCnt, nodeCnt, true);
                 //mat = new MyComplexMatrix(nodeCnt, nodeCnt);
                 // メモリ割り当てのコストが高いので変更する
                 if (FemMat == null)
                 {
-                    FemMat = new MyComplexMatrix(nodeCnt, nodeCnt);
+                    try
+                    {
+                        if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgbsv)
+                        {
+                            // バンドマトリクス(zgbsv)
+                            // バンドマトリクス情報を取得する
+                            int rowcolSize = 0;
+                            int subdiaSize = 0;
+                            int superdiaSize = 0;
+                            getBandMatrixSubDiaSizeAndSuperDiaSize(matPattern, out rowcolSize, out subdiaSize, out superdiaSize);
+                            FemMat = new MyComplexBandMatrix(rowcolSize, subdiaSize, superdiaSize);
+                        }
+                        else
+                        {
+                            // 一般行列(zgesv)
+                            FemMat = new MyComplexMatrix(nodeCnt, nodeCnt);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                        MessageBox.Show("メモリの確保に失敗しました。");
+                        return false;
+                    }
                 }
                 else
                 {
                     System.Diagnostics.Debug.Assert(FemMat.RowSize == nodeCnt);
-                    for (int i = 0; i < nodeCnt * nodeCnt; i++)
+                    int size = FemMat._rsize * FemMat._csize;
+                    for (int i = 0; i < size; i++)
                     {
                         FemMat._body[i].Real = 0;
                         FemMat._body[i].Imaginary = 0;
@@ -1019,7 +1304,7 @@ namespace HPlaneWGSimulatorXDelFEM
             else if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.PCOCG)
             {
                 DelFEMLsUtil.SetupLinearSystem(
-                    Nodes, Elements, Ports, ForceBCNodes, nodesRegion,
+                    matPattern,
                     out World, out FieldValId,
                     out Ls, out Prec, out TmpBuffer);
                 // 要素剛性行列(コーナ-コーナー)
@@ -1031,12 +1316,162 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 // 未実装の線形方程式解法
                 System.Diagnostics.Debug.Assert(false);
-                return;
+                return false;
             }
             foreach (FemElement element in Elements)
             {
                 addElementMat(waveLength, toSorted, element, ref mat, ref mat_cc, ref res_c, ref TmpBuffer);
             }
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// FEM行列の非０パターンを取得する
+        /// </summary>
+        /// <param name="Nodes"></param>
+        /// <param name="Elements"></param>
+        /// <param name="Ports"></param>
+        /// <param name="ForceBCNodes"></param>
+        /// <param name="toSorted">ソート済み節点番号→ソート済み節点リストのインデックスマップ</param>
+        /// <param name="matPattern">非０パターンの配列(非０の要素はtrue、０要素はfalse)</param>
+        private static void getMatNonzeroPattern(
+            IList<FemNode> Nodes,
+            IList<FemElement> Elements,
+            IList<IList<int>> Ports,
+            IList<int> ForceBCNodes,
+            Dictionary<int, int> toSorted,
+            out bool[,] matPattern
+            )
+        {
+            matPattern = null;
+
+            // 総節点数
+            int nodeCnt = toSorted.Count;
+
+            int matLen = Nodes.Count - ForceBCNodes.Count;
+
+            // 行列の非０パターンを取得する
+            matPattern = new bool[matLen, matLen];
+            for (int ino_global = 0; ino_global < matLen; ino_global++)
+            {
+                for (int jno_global = 0; jno_global < matLen; jno_global++)
+                {
+                    matPattern[ino_global, jno_global] = false;
+                }
+            }
+            // 領域の節点の行列要素パターン
+            foreach (FemElement element in Elements)
+            {
+                int[] nodeNumbers = element.NodeNumbers;
+
+                foreach (int iNodeNumber in nodeNumbers)
+                {
+                    //if (ForceBCNodes.Contains(iNodeNumber)) continue;
+                    //int ino_global = sortedNodes.IndexOf(iNodeNumber);
+                    //if (ino_global == -1) continue;
+                    if (!toSorted.ContainsKey(iNodeNumber)) continue;
+                    int ino_global = toSorted[iNodeNumber];
+                    foreach (int jNodeNumber in nodeNumbers)
+                    {
+                        //if (ForceBCNodes.Contains(jNodeNumber)) continue;
+                        //int jno_global = sortedNodes.IndexOf(jNodeNumber);
+                        //if (jno_global == -1) continue;
+                        if (!toSorted.ContainsKey(jNodeNumber)) continue;
+                        int jno_global = toSorted[jNodeNumber];
+                        matPattern[ino_global, jno_global] = true;
+                    }
+                }
+            }
+            // 境界上の節点の行列要素パターン
+            foreach (IList<int> portNodes in Ports)
+            {
+                foreach (int iNodeNumber in portNodes)
+                {
+                    //if (ForceBCNodes.Contains(iNodeNumber)) continue;
+                    //int ino_global = sortedNodes.IndexOf(iNodeNumber);
+                    //if (ino_global == -1) continue;
+                    if (!toSorted.ContainsKey(iNodeNumber)) continue;
+                    int ino_global = toSorted[iNodeNumber];
+                    foreach (int jNodeNumber in portNodes)
+                    {
+                        //if (ForceBCNodes.Contains(jNodeNumber)) continue;
+                        //int jno_global = sortedNodes.IndexOf(jNodeNumber);
+                        if (!toSorted.ContainsKey(jNodeNumber)) continue;
+                        int jno_global = toSorted[jNodeNumber];
+                        if (!matPattern[ino_global, jno_global])
+                        {
+                            matPattern[ino_global, jno_global] = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// FEM行列のバンドマトリクス情報を取得する
+        /// </summary>
+        /// <param name="matPattern">非０パターンの配列</param>
+        /// <param name="rowcolSize">行数=列数</param>
+        /// <param name="subdiaSize">subdiagonalのサイズ</param>
+        /// <param name="superdiaSize">superdiagonalのサイズ</param>
+        private static void getBandMatrixSubDiaSizeAndSuperDiaSize(
+            bool[,] matPattern,
+            out int rowcolSize,
+            out int subdiaSize,
+            out int superdiaSize)
+        {
+            rowcolSize = matPattern.GetLength(0);
+
+            // subdiaサイズ、superdiaサイズを取得する
+            subdiaSize = 0;
+            superdiaSize = 0;
+            // Note: c == rowcolSize - 1は除く
+            for (int c = 0; c < rowcolSize - 1; c++)
+            {
+                if (subdiaSize >= (rowcolSize - 1 - c))
+                {
+                    break;
+                }
+                int cnt = 0;
+                for (int r = rowcolSize - 1; r >= c + 1; r--)
+                {
+                    // 非０要素が見つかったら抜ける
+                    if (matPattern[r, c])
+                    {
+                        cnt = r - c;
+                        break;
+                    }
+                }
+                if (cnt > subdiaSize)
+                {
+                    subdiaSize = cnt;
+                }
+            }
+            // Note: c == 0は除く
+            for (int c = rowcolSize - 1; c >= 1; c--)
+            {
+                if (superdiaSize >= c)
+                {
+                    break;
+                }
+                int cnt = 0;
+                for (int r = 0; r <= c - 1; r++)
+                {
+                    // 非０要素が見つかったら抜ける
+                    if (matPattern[r, c])
+                    {
+                        cnt = c - r;
+                        break;
+                    }
+                }
+                if (cnt > superdiaSize)
+                {
+                    superdiaSize = cnt;
+                }
+            }
+            Console.WriteLine("rowcolSize: {0} subdiaSize: {1} superdiaSize: {2}", rowcolSize, subdiaSize, superdiaSize);
         }
 
         /// <summary>
@@ -1067,6 +1502,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     Nodes,
                     Medias,
                     ForceNodeNumberH,
+                    WaveModeDv,
                     ref mat,
                     ref mat_cc,
                     ref res_c,
@@ -1082,6 +1518,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     Nodes,
                     Medias,
                     ForceNodeNumberH,
+                    WaveModeDv,
                     ref mat,
                     ref mat_cc,
                     ref res_c,
@@ -1097,6 +1534,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     Nodes,
                     Medias,
                     ForceNodeNumberH,
+                    WaveModeDv,
                     ref mat,
                     ref mat_cc,
                     ref res_c,
@@ -1112,6 +1550,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     Nodes,
                     Medias,
                     ForceNodeNumberH,
+                    WaveModeDv,
                     ref mat,
                     ref mat_cc,
                     ref res_c,
@@ -1186,7 +1625,7 @@ namespace HPlaneWGSimulatorXDelFEM
              */
             if (isInputPort)
             {
-                int imode = 0;
+                int imode = IncidentModeIndex;
                 Complex betam = eigenValues[imode];
                 Complex[] fmVec = MyMatrixUtil.matrix_GetRowVec(eigenVecs, (int)imode);
                 // 2Dの境界積分
@@ -1213,7 +1652,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
             }
 
-            if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgesv)
+            if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgesv || this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgbsv)
             {
                 // 要素剛性行列にマージ
                 //   この定式化では行列のスパース性は失われている(隣接していない要素の節点間にも関連がある)
@@ -1230,7 +1669,9 @@ namespace HPlaneWGSimulatorXDelFEM
                         int jnoGlobal = toSorted[jNodeNumber];
 
                         //mat[inoGlobal, jnoGlobal] += matB[inoB, jnoB];
-                        mat._body[inoGlobal + jnoGlobal * mat.RowSize] += matB._body[inoB + jnoB * matB.RowSize];
+                        //mat._body[inoGlobal + jnoGlobal * mat.RowSize] += matB._body[inoB + jnoB * matB.RowSize];
+                        // Note: matBは一般行列 matはバンド行列
+                        mat._body[mat.GetBufferIndex(inoGlobal, jnoGlobal)] += matB._body[inoB + jnoB * matB.RowSize];
                     }
                 }
 
@@ -1528,6 +1969,7 @@ namespace HPlaneWGSimulatorXDelFEM
                         coords,
                         toSorted,
                         Medias,
+                        WaveModeDv,
                         ref txx_1d, ref ryy_1d, ref uzz_1d);
                 }
                 else
@@ -1538,6 +1980,7 @@ namespace HPlaneWGSimulatorXDelFEM
                         coords,
                         toSorted,
                         Medias,
+                        WaveModeDv,
                         ref txx_1d, ref ryy_1d, ref uzz_1d);
                 }
             }
@@ -1619,8 +2062,12 @@ namespace HPlaneWGSimulatorXDelFEM
 
                 // 伝搬定数の格納
                 eigenValues[imode] = betam;
-                //Console.WriteLine("eigenValues [ " + imode + "] = " + betam.Real + " + " + betam.Imaginary + " i " + " tagtModeIdx :" + tagtModeIdx + " " );
-                Console.WriteLine("β/k0 [ " + imode + "] = " + betam.Real/k0 + " + " + betam.Imaginary/k0 + " i " + " tagtModeIdx :" + tagtModeIdx + " " );
+                // check
+                if (imode < 5)
+                {
+                    //Console.WriteLine("eigenValues [ " + imode + "] = " + betam.Real + " + " + betam.Imaginary + " i " + " tagtModeIdx :" + tagtModeIdx + " " );
+                    Console.WriteLine("β/k0 [ " + imode + "] = " + betam.Real/k0 + " + " + betam.Imaginary/k0 + " i " + " tagtModeIdx :" + tagtModeIdx + " " );
+                }
                 // 固有ベクトルの格納(規格化定数を掛ける)
                 for (int inoSorted = 0; inoSorted < nodeCnt; inoSorted++)
                 {

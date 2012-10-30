@@ -221,7 +221,6 @@ namespace HPlaneWGSimulatorXDelFEM
             p = typeof(System.Windows.Forms.Control).GetProperty(
                          "DoubleBuffered",
                           System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
             // ダブルバッファを有効にする
             //SimpleOpenGlControlの場合は不要
             //p.SetValue(CadPanel, true, null);
@@ -683,6 +682,9 @@ namespace HPlaneWGSimulatorXDelFEM
             // 破棄処理
             CadLgc.Dispose();
             PostPro.Dispose();
+
+            // 一時ファイルの格納先ディレクトリを削除する
+            CadLogic.RemoveTmpFileDirectory();
         }
 
         /// <summary>
@@ -728,6 +730,10 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void CadPanel_MouseClick(object sender, MouseEventArgs e)
         {
+            if (IsCalculating)
+            {
+                return;
+            }
             CadLgc.CadPanelMouseClick(e);
             // 元に戻す、やり直しボタンの操作可能フラグをセットアップ
             setupUndoRedoEnable();
@@ -741,6 +747,10 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void CadPanel_MouseDown(object sender, MouseEventArgs e)
         {
+            if (IsCalculating)
+            {
+                return;
+            }
             CadLgc.CadPanelMouseDown(e);
         }
 
@@ -751,6 +761,10 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void CadPanel_MouseMove(object sender, MouseEventArgs e)
         {
+            if (IsCalculating)
+            {
+                return;
+            }
             CadLgc.CadPanelMouseMove(e);
         }
 
@@ -761,6 +775,10 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void CadPanel_MouseUp(object sender, MouseEventArgs e)
         {
+            if (IsCalculating)
+            {
+                return;
+            }
             CadLgc.CadPanelMouseUp(e);
             // 元に戻す、やり直しボタンの操作可能フラグをセットアップ
             setupUndoRedoEnable();
@@ -773,27 +791,42 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void FValuePanel_Paint(object sender, PaintEventArgs e)
         {
+            //Console.WriteLine("FValiePanel_Paint");
             try
             {
                 Graphics g = e.Graphics;
 
                 if (PostPro != null)
                 {
-                    PostPro.DrawField(g, FValuePanel);
+                    DrawField(g);
                     if (PostPro != null && IsCalculating)
                     {
                         //見づらいので削除
                         // 計算実行中はメッシュ表示
                         //PostPro.DrawMesh(g, FValuePanel, true);
                     }
-                    // 媒質の境界を表示
-                    PostPro.DrawMediaB(g, FValuePanel, true);
                 }
             }
             catch (Exception exception)
             {
                 Console.WriteLine(exception.Message + " " + exception.StackTrace);
             }
+        }
+
+        /// <summary>
+        /// フィールド描画
+        ///   等高線図 or ベクトル表示
+        /// </summary>
+        /// <param name="g"></param>
+        private void DrawField(Graphics g)
+        {
+            if (!PostPro.IsDataReady())
+            {
+                return;
+            }
+            PostPro.DrawField(g, FValuePanel);
+            // 媒質の境界を表示
+            PostPro.DrawMediaB(g, FValuePanel, true);
         }
 
         /// <summary>
@@ -862,6 +895,14 @@ namespace HPlaneWGSimulatorXDelFEM
                 calcSettingFrm.NormalizedFreq1, calcSettingFrm.NormalizedFreq2, calcSettingFrm.CalcFreqCnt,
                 calcSettingFrm.LsEqnSolverDv);
 
+            // 計算処理
+            doCalc();
+        }
+        /// <summary>
+        /// 計算処理
+        /// </summary>
+        private void doCalc()
+        {
             // ポストプロセッサの初期化
             PostPro.InitData(
                 Solver,
@@ -871,7 +912,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 SMatChart,
                 BetaChart,
                 EigenVecChart);
-            
+
             // 解析機のデータチェック
             bool chkResult = Solver.ChkInputData();
             if (!chkResult)
@@ -891,70 +932,75 @@ namespace HPlaneWGSimulatorXDelFEM
             // 選択中媒質を真空にする
             radioBtnMedia1.Checked = true;
             CadLgc.SelectedMediaIndex = CadLogic.VacumnMediaIndex;  // Ver1.3より 値が1になっている
-             */
             // 媒質選択グループボックスへ読み込み値を反映
             setupGroupBoxMedia();
             // 媒質選択ボタンの背景色とテキストを設定
             btnMediaSelect_SetColorAndText();
+             */
 
             // 周波数インデックス初期化
             FreqNo = -1;
 
-            SolverThread = new Thread(new ThreadStart(delegate()
-                {
-                    // 各波長の結果出力時に呼ばれるコールバックの定義
-                    ParameterizedInvokeDelegate eachDoneCallback = new ParameterizedInvokeDelegate(delegate(Object[] args)
-                        {
-                            // ポストプロセッサへ結果読み込み(freqNo: -1は最後の結果を読み込み)
-                            PostPro.LoadOutput(FemOutputDatFilePath, -1);
-
-                            // 結果をグラフィック表示
-                            this.Invoke(new InvokeDelegate(delegate()
-                                {
-                                    PostPro.SetOutputToGui(
-                                        FemOutputDatFilePath,
-                                        CadPanel,
-                                        FValuePanel,
-                                        FValueLegendPanel, labelFreqValue,
-                                        SMatChart,
-                                        BetaChart,
-                                        EigenVecChart,
-                                        true);
-                                }));
-                            // 描画イベントを処理させる
-                            Application.DoEvents();
-
-                        });
-                    // 解析実行
-                    Solver.Run(FemOutputDatFilePath, this, eachDoneCallback);
-
-                    // 解析終了したので[計算開始]ボタンを有効化
-                    this.Invoke(new InvokeDelegate(delegate()
-                        {
-                            //[計算開始]ボタンを有効化
-                            setCtrlEnable(true);
-                            btnCalc.Text = "計算開始";
-
-                            // 周波数インデックスを最後にセット
-                            //BUGFIX
-                            //周波数番号は1起点なので、件数 = 最後の番号となる
-                            //計算失敗の場合、上記は成り立たない
-                            int firstFreqNo;
-                            int lastFreqNo;
-                            int cnt = PostPro.GetCalculatedFreqCnt(FemOutputDatFilePath, out firstFreqNo, out lastFreqNo);
-                            FreqNo = lastFreqNo;
-                            // 周波数ボタンの有効・無効化
-                            setupBtnFreqEnable();
-
-                            // Cadパネル再描画（メッシュを消す）
-                            //CadPanel.Invalidate();
-
-                            // 等高線図再描画（メッシュを消す）
-                            //FValuePanel.Invalidate();
-                        }));
-                }));
+            SolverThread = new Thread(new ThreadStart(solverThreadProc));
             SolverThread.Name = "solverThread";
             SolverThread.Start();
+        }
+
+        /// <summary>
+        /// 計算スレッド関数
+        /// </summary>
+        private void solverThreadProc()
+        {
+            // 各波長の結果出力時に呼ばれるコールバックの定義
+            ParameterizedInvokeDelegate eachDoneCallback = new ParameterizedInvokeDelegate(delegate(Object[] args)
+                {
+                    // ポストプロセッサへ結果読み込み(freqNo: -1は最後の結果を読み込み)
+                    PostPro.LoadOutput(FemOutputDatFilePath, -1);
+
+                    // 結果をグラフィック表示
+                    this.Invoke(new InvokeDelegate(delegate()
+                        {
+                            PostPro.SetOutputToGui(
+                                FemOutputDatFilePath,
+                                CadPanel,
+                                FValuePanel,
+                                FValueLegendPanel, labelFreqValue,
+                                SMatChart,
+                                BetaChart,
+                                EigenVecChart,
+                                true);
+                        }));
+                    // 描画イベントを処理させる
+                    Application.DoEvents();
+
+                });
+            // 解析実行
+            Solver.Run(FemOutputDatFilePath, this, eachDoneCallback);
+
+            // 解析終了したので[計算開始]ボタンを有効化
+            this.Invoke(new InvokeDelegate(delegate()
+                {
+                    //[計算開始]ボタンを有効化
+                    setCtrlEnable(true);
+                    btnCalc.Text = "計算開始";
+
+                    // 周波数インデックスを最後にセット
+                    //BUGFIX
+                    //周波数番号は1起点なので、件数 = 最後の番号となる
+                    //計算失敗の場合、上記は成り立たない
+                    int firstFreqNo;
+                    int lastFreqNo;
+                    int cnt = PostPro.GetCalculatedFreqCnt(FemOutputDatFilePath, out firstFreqNo, out lastFreqNo);
+                    FreqNo = lastFreqNo;
+                    // 周波数ボタンの有効・無効化
+                    setupBtnFreqEnable();
+
+                    // Cadパネル再描画（メッシュを消す）
+                    //CadPanel.Invalidate();
+
+                    // 等高線図再描画（メッシュを消す）
+                    //FValuePanel.Invalidate();
+                }));
         }
 
         /// <summary>
@@ -1124,9 +1170,14 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 return;
             }
-            if (FreqNo <= 1)
+            int firstFreqNo = -1;
+            int lastFreqNo = -1;
+            int cnt = PostPro.GetCalculatedFreqCnt(FemOutputDatFilePath, out firstFreqNo, out lastFreqNo);
+            if (FreqNo <= firstFreqNo)
             {
-                return;
+                //return;
+                // 繰り返し
+                FreqNo = lastFreqNo + 1; // 後の処理でマイナス1される
             }
             // 前の周波数
             FreqNo--;
@@ -1163,7 +1214,9 @@ namespace HPlaneWGSimulatorXDelFEM
             int cnt = PostPro.GetCalculatedFreqCnt(FemOutputDatFilePath, out firstFreqNo, out lastFreqNo);
             if (FreqNo >= lastFreqNo)
             {
-                return;
+                //return;
+                // 繰り返し
+                FreqNo = firstFreqNo - 1; // 後の処理でプラス１される
             }
             // 次の周波数
             FreqNo++;
@@ -1192,8 +1245,11 @@ namespace HPlaneWGSimulatorXDelFEM
             int firstFreqNo;
             int lastFreqNo;
             int cnt = PostPro.GetCalculatedFreqCnt(FemOutputDatFilePath, out firstFreqNo, out lastFreqNo);
-            btnPrevFreq.Enabled = (FreqNo > firstFreqNo && FreqNo <= lastFreqNo);
-            btnNextFreq.Enabled = (FreqNo >= firstFreqNo && FreqNo <lastFreqNo);
+            //btnPrevFreq.Enabled = (FreqNo > firstFreqNo && FreqNo <= lastFreqNo);
+            //btnNextFreq.Enabled = (FreqNo >= firstFreqNo && FreqNo <lastFreqNo);
+            // 繰り返しの場合、始点終点もOK
+            btnPrevFreq.Enabled = (FreqNo >= firstFreqNo && FreqNo <= lastFreqNo);
+            btnNextFreq.Enabled = (FreqNo >= firstFreqNo && FreqNo <= lastFreqNo);
         }
 
         /// <summary>

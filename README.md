@@ -1,6 +1,10 @@
 ﻿#H面導波管シミュレーター X DelFEM  
   
 **News**  
+  2012-10-30 HPlaneWGSimulatorXDelFEM version1.0.0.3 Release  
+　　PCOCGの前処理をILU(0)→ILU(1)に変更しました。
+　　clapack解法にzgbsv(バンド行列)を追加しました。
+  
   2012-10-16 HPlaneWGSimulatorXDelFEM version1.0.0.2 Release  
 　　PCOCGの求解処理をDelFEMの機能をより多く使用し、計算速度を改善しました。
 　　Version1.2.0.1が最速かなと思っていましたがversion1.2.0.2は同等かそれ以上になっていると思います。  

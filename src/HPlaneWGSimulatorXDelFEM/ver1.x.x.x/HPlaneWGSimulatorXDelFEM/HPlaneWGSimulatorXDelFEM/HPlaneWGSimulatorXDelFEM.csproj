@@ -24,7 +24,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>5</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -166,6 +166,7 @@
     <Compile Include="MyComplexBandMatrix.cs" />
     <Compile Include="MyComplexMatrix.cs" />
     <Compile Include="MyDoubleMatrix.cs" />
+    <Compile Include="MyDoubleSymmetricBandMatrix.cs" />
     <Compile Include="MyMatrixUtil.cs" />
     <Compile Include="GraphPaperDrawer.cs" />
     <Compile Include="ICommand.cs" />

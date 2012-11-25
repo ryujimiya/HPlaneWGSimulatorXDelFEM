@@ -831,4 +831,8 @@ Medias,4
 1,1,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,1
 2,1,0,0,0,1,0,0,0,1,2.4025,0,0,0,2.4025,0,0,0,2.4025
 3,1,0,0,0,1,0,0,0,1,2.1025,0,0,0,2.1025,0,0,0,2.1025
-WaveLengthRange,0,2.37154150197628,253
+WaveLengthRange,0,2.4,250
+LsEqnSolverDv,PCOCG
+WaveModeDv,TM
+WGStructureDv,ParaPlate2D
+WaveguideWidthForEPlane,0

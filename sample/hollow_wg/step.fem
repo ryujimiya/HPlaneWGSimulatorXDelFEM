@@ -791,3 +791,6 @@ Medias,4
 3,1,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,1
 WaveLengthRange,20,10,100
 LsEqnSolverDv,PCOCG
+WaveModeDv,TE
+WGStructureDv,HPlane2D
+WaveguideWidthForEPlane,0

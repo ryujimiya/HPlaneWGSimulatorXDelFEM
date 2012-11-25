@@ -1,10 +1,10 @@
-AppVersion,1.0.0.2
+AppVersion,1.6.0.0
 UseUtility,DelFEM
 LoopList,1
-Loop,1,1,1
+Loop,1,2,1
 EdgeCollectionList,2
-EdgeCollection,1,1,1,5
-EdgeCollection,2,2,1,1
+EdgeCollection,1,1,1,9
+EdgeCollection,2,2,1,5
 IncidentPortNo,2
 Medias,4
 0,1,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,1

@@ -24,7 +24,9 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="Nodes">節点リスト</param>
         /// <param name="Medias">媒質リスト</param>
         /// <param name="ForceNodeNumberH">強制境界節点ハッシュ</param>
+        /// <param name="WGStructureDv">導波路構造区分</param>
         /// <param name="WaveModeDv">計算する波のモード区分</param>
+        /// <param name="waveguideWidthForEPlane">導波路幅(E面解析用)</param>
         /// <param name="mat">マージされる全体行列(clapack使用時)</param>
         /// <param name="mat_cc">マージされる全体行列(DelFEM使用時)</param>
         /// <param name="res_c">マージされる残差ベクトル(DelFEM使用時)</param>
@@ -35,7 +37,9 @@ namespace HPlaneWGSimulatorXDelFEM
             IList<FemNode> Nodes,
             MediaInfo[] Medias,
             Dictionary<int, bool> ForceNodeNumberH,
+            FemSolver.WGStructureDV WGStructureDv,
             FemSolver.WaveModeDV WaveModeDv,
+            double waveguideWidthForEPlane,
             ref MyComplexMatrix mat,
             ref DelFEM4NetMatVec.CZMatDia_BlkCrs_Ptr mat_cc,
             ref DelFEM4NetMatVec.CZVector_Blk_Ptr res_c,
@@ -61,22 +65,15 @@ namespace HPlaneWGSimulatorXDelFEM
             MediaInfo media = Medias[element.MediaIndex];  // ver1.1.0.0 媒質情報の取得
             double[,] media_P = null;
             double[,] media_Q = null;
-            if (WaveModeDv == FemSolver.WaveModeDV.TE)
-            {
-                media_P = media.P;
-                media_Q = media.Q;
-            }
-            else if (WaveModeDv == FemSolver.WaveModeDV.TM)
-            {
-                media_P = media.Q;
-                media_Q = media.P;
-            }
-            else
-            {
-                System.Diagnostics.Debug.Assert(false);
-            }
-            // [p]は逆数をとる
-            media_P = MyMatrixUtil.matrix_Inverse(media_P);
+            // ヘルムホルツ方程式のパラメータP,Qを取得する
+            FemSolver.GetHelmholtzMediaPQ(
+                k0,
+                media,
+                WGStructureDv,
+                WaveModeDv,
+                waveguideWidthForEPlane,
+                out media_P,
+                out media_Q);
 
             // 節点座標(IFの都合上配列の配列形式の2次元配列を作成)
             double[][] pp = new double[nno][];

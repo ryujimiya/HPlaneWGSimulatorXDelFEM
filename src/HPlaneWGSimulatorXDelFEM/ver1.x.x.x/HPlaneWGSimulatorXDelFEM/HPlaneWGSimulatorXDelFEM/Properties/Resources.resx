@@ -136,11 +136,14 @@
   <data name="モードクリア" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\モードクリア.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="開く" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\開く.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="入射ポート選択" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\入射ポート選択.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="媒質埋め込み" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\媒質埋め込み.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="delfem_logo48x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\delfem_logo48x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="入射ポート番号振り" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\入射ポート番号振り.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -154,10 +157,10 @@
   <data name="名前を付けて保存" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\名前を付けて保存.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="入射ポート選択" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\入射ポート選択.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="開く" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\開く.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="delfem_logo48x" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\delfem_logo48x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="自動計算" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\自動計算.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

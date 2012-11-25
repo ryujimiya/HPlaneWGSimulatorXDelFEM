@@ -32,6 +32,13 @@ namespace HPlaneWGSimulatorXDelFEM
         // 型
         ////////////////////////////////////////////////////////////////////////
         /// <summary>
+        /// 変更通知デリゲート
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="prevCadMode"></param>
+        public delegate void ChangeDeleagte(object sender, CadModeType prevCadMode);
+
+        /// <summary>
         /// 領域選択フラグアレイの思い出具象クラス
         ///   この派生クラスCadLogicでCadBaseのフィールドのポインタを格納すると、MementoCommand実行後、別のものを指してしまうので注意!!!!!
         /// </summary>
@@ -157,6 +164,11 @@ namespace HPlaneWGSimulatorXDelFEM
         ////////////////////////////////////////////////////////////////////////
         // フィールド
         ////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// 変更通知イベント
+        /// </summary>
+        public event ChangeDeleagte Change = null;
+
         /// <summary>
         /// バックアップファイルから読み込んだ？
         /// </summary>
@@ -1363,6 +1375,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
                 // 描画オブジェクトアレイの更新フラグを立てる
                 RefreshDrawerAryFlg = true;
+
             }
             if (executed && !isDirty)
             {
@@ -2216,6 +2229,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
                 // 描画オブジェクトアレイの更新フラグを立てる
                 RefreshDrawerAryFlg = true;
+                if (Change != null)
+                {
+                    Change(this, CadMode);
+                }
             }
             if (executed && !isDirty)
             {
@@ -2546,6 +2563,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
                 // 描画オブジェクトアレイの更新フラグを立てる
                 RefreshDrawerAryFlg = true;
+                if (Change != null)
+                {
+                    Change(this, CadMode);
+                }
             }
             if (executed && !isDirty)
             {
@@ -2648,6 +2669,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
                 // 描画オブジェクトアレイの更新フラグを立てる
                 RefreshDrawerAryFlg = true;
+                if (Change != null)
+                {
+                    Change(this, CadMode);
+                }
             }
             if (executed && !isDirty)
             {
@@ -2695,6 +2720,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
                 // 描画オブジェクトアレイの更新フラグを立てる
                 RefreshDrawerAryFlg = true;
+                if (Change != null)
+                {
+                    Change(this, CadMode);
+                }
             }
             if (executed && !isDirty)
             {
@@ -2920,6 +2949,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
                 // 描画オブジェクトアレイの更新フラグを立てる
                 RefreshDrawerAryFlg = true;
+                if (Change != null)
+                {
+                    Change(this, CadMode);
+                }
             }
             if (executed && !isDirty)
             {
@@ -3017,6 +3050,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
                 // 描画オブジェクトアレイの更新フラグを立てる
                 RefreshDrawerAryFlg = true;
+                if (Change != null)
+                {
+                    Change(this, CadMode);
+                }
             }
             if (executed && !isDirty)
             {
@@ -3123,6 +3160,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
                 // 描画オブジェクトアレイの更新フラグを立てる
                 RefreshDrawerAryFlg = true;
+                if (Change != null)
+                {
+                    Change(this, CadMode);
+                }
             }
             if (executed && !isDirty)
             {
@@ -4177,7 +4218,21 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="filename">ファイル名(*.cad)</param>
         /// <param name="elemShapeDv">要素形状</param>
         /// <param name="order">補間次数</param>
-        public void MkFemInputData(string filename, Constants.FemElementShapeDV elemShapeDv, int order)
+        /// <param name="normalizedFreq1">計算開始規格化周波数</param>
+        /// <param name="normalizedFreq2">計算終了規格化周波数</param>
+        /// <param name="calcCnt">計算する周波数の数</param>
+        /// <param name="wgStructureDv">導波路構造区分</param>
+        /// <param name="waveModeDv">計算モード区分</param>
+        /// <param name="lsEqnSolverDv">線形方程式解法区分</param>
+        /// <param name="waveguideWidthForEPlane">導波路幅(E面解析用)</param>
+        public void MkFemInputData(
+            string filename,
+            Constants.FemElementShapeDV elemShapeDv, int order,
+            double normalizedFreq1, double normalizedFreq2, int calcCnt,
+            FemSolver.WGStructureDV wgStructureDv,
+            FemSolver.WaveModeDV waveModeDv,
+            FemSolver.LinearSystemEqnSoverDV lsEqnSolverDv,
+            double waveguideWidthForEPlane)
         {
             IList<double[]> doubleCoords = null;
             IList<int[]> elements = null;
@@ -4257,14 +4312,24 @@ namespace HPlaneWGSimulatorXDelFEM
                 return;
             }
 
+            // 導波管幅の計算
+            double waveguideWidth = FemSolver.DefWaveguideWidth;
+            if (portList.Count > 0 && portList[0].Count >= 2)
+            {
+                IList<int> portNodes = portList[0];
+                double[] pp1 = doubleCoords[portNodes[0] - 1];
+                double[] pp2 = doubleCoords[portNodes[portNodes.Count - 1] - 1];
+                waveguideWidth = FemMeshLogic.GetDistance(pp1, pp2);
+            }
+            Console.WriteLine("(MkFemInputData) waveguideWidth:{0}", waveguideWidth);
+            // 計算開始、終了波長の計算
+            double firstWaveLength = FemSolver.GetWaveLengthFromNormalizedFreq(normalizedFreq1, waveguideWidth);
+            double lastWaveLength = FemSolver.GetWaveLengthFromNormalizedFreq(normalizedFreq2, waveguideWidth);
+
             // Fem入力データファイルへ保存
             int nodeCnt = doubleCoords.Count;
             int elemCnt = elements.Count;
             int portCnt = portList.Count;
-            double dummyFirstWaveLength = 0.0;
-            double dummyLastWaveLength = 0.0;
-            int dummyCalcCnt = 0;
-            FemSolver.LinearSystemEqnSoverDV dummyLsEqnSolverDv = FemSolver.LinearSystemEqnSoverDV.PCOCG;
             FemInputDatFile.SaveToFileFromCad(
                 filename,
                 nodeCnt, doubleCoords,
@@ -4273,11 +4338,13 @@ namespace HPlaneWGSimulatorXDelFEM
                 forceBCNodeNumbers,
                 IncidentPortNo,
                 Medias,
-                dummyFirstWaveLength,
-                dummyLastWaveLength,
-                dummyCalcCnt,
-                dummyLsEqnSolverDv);
-                
+                firstWaveLength,
+                lastWaveLength,
+                calcCnt,
+                wgStructureDv,
+                waveModeDv,
+                lsEqnSolverDv,
+                waveguideWidthForEPlane);
         }
 
         /// <summary>
@@ -4364,6 +4431,8 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         public void Undo()
         {
+            CadModeType prevCadMode = CadMode;
+
             // CadLogicBaseのUndoを実行
             CmdManager.Undo();
             // Undoによって作成されたシリアライズバッファから図面を読み込む
@@ -4377,8 +4446,13 @@ namespace HPlaneWGSimulatorXDelFEM
 
             RefreshDrawerAryFlg = true;
             refreshDrawerAry();
-            CadPanel.Invalidate();
             isDirty = true;
+
+            if (Change != null)
+            {
+                Change(this, prevCadMode);
+            }
+            CadPanel.Invalidate();
         }
 
         /// <summary>
@@ -4386,6 +4460,8 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         public void Redo()
         {
+            CadModeType prevCadMode = CadMode;
+
             // CadLogicBaseのRedoを実行
             CmdManager.Redo();
             // Redoによって作成されたシリアライズバッファから図面を読み込む
@@ -4399,8 +4475,14 @@ namespace HPlaneWGSimulatorXDelFEM
 
             RefreshDrawerAryFlg = true;
             refreshDrawerAry();
-            CadPanel.Invalidate();
+
             isDirty = true;
+
+            if (Change != null)
+            {
+                Change(this, prevCadMode);
+            }
+            CadPanel.Invalidate();
         }
 
         /// <summary>

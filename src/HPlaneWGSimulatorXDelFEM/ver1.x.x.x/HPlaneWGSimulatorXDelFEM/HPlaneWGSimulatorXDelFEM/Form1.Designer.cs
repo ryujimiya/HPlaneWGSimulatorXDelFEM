@@ -29,38 +29,29 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend8 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Title title8 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend9 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Title title9 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea46 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend46 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Title title46 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea47 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend47 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Title title47 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea48 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend48 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Title title48 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.FValuePanel = new System.Windows.Forms.Panel();
+            this.btnNextFValuePanel = new System.Windows.Forms.Button();
+            this.btnPrevFValuePanel = new System.Windows.Forms.Button();
             this.btnCalc = new System.Windows.Forms.Button();
             this.GroupBoxCadMode = new System.Windows.Forms.GroupBox();
-            this.radioBtnMediaFill = new System.Windows.Forms.RadioButton();
-            this.radioBtnNone = new System.Windows.Forms.RadioButton();
-            this.radioBtnPortNumbering = new System.Windows.Forms.RadioButton();
-            this.radioBtnIncidentPort = new System.Windows.Forms.RadioButton();
-            this.radioBtnErase = new System.Windows.Forms.RadioButton();
-            this.radioBtnPort = new System.Windows.Forms.RadioButton();
-            this.radioBtnArea = new System.Windows.Forms.RadioButton();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.btnPrevFreq = new System.Windows.Forms.Button();
             this.btnNextFreq = new System.Windows.Forms.Button();
             this.btnMediaSelect = new System.Windows.Forms.Button();
-            this.btnRedo = new System.Windows.Forms.Button();
-            this.btnUndo = new System.Windows.Forms.Button();
-            this.btnSaveAs = new System.Windows.Forms.Button();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnOpen = new System.Windows.Forms.Button();
-            this.btnNew = new System.Windows.Forms.Button();
             this.labelFreq = new System.Windows.Forms.Label();
             this.SMatChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.SMatChartContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMILogGraph = new System.Windows.Forms.ToolStripMenuItem();
             this.FValueLegendPanel = new System.Windows.Forms.Panel();
             this.labelFreqValue = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
@@ -80,12 +71,29 @@
             this.EigenVecChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.linkLblEigenShow = new System.Windows.Forms.LinkLabel();
             this.linkLabelMeshShow = new System.Windows.Forms.LinkLabel();
+            this.labelCalcMode = new System.Windows.Forms.Label();
             this.CadPanel = new Tao.Platform.Windows.SimpleOpenGlControl();
             this.HScrollBarOfCadPanel = new System.Windows.Forms.HScrollBar();
             this.VScrollBarOfCadPanel = new System.Windows.Forms.VScrollBar();
             this.btnLoadCancel = new System.Windows.Forms.Button();
+            this.chkboxAutoCalc = new System.Windows.Forms.CheckBox();
+            this.radioBtnMediaFill = new System.Windows.Forms.RadioButton();
+            this.radioBtnNone = new System.Windows.Forms.RadioButton();
+            this.radioBtnPortNumbering = new System.Windows.Forms.RadioButton();
+            this.radioBtnIncidentPort = new System.Windows.Forms.RadioButton();
+            this.radioBtnErase = new System.Windows.Forms.RadioButton();
+            this.radioBtnPort = new System.Windows.Forms.RadioButton();
+            this.radioBtnArea = new System.Windows.Forms.RadioButton();
+            this.btnRedo = new System.Windows.Forms.Button();
+            this.btnUndo = new System.Windows.Forms.Button();
+            this.btnSaveAs = new System.Windows.Forms.Button();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnOpen = new System.Windows.Forms.Button();
+            this.btnNew = new System.Windows.Forms.Button();
+            this.FValuePanel.SuspendLayout();
             this.GroupBoxCadMode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SMatChart)).BeginInit();
+            this.SMatChartContextMenuStrip.SuspendLayout();
             this.FValueLegendPanel.SuspendLayout();
             this.GroupBoxMedia.SuspendLayout();
             this.panelMedia.SuspendLayout();
@@ -95,6 +103,8 @@
             // 
             // FValuePanel
             // 
+            this.FValuePanel.Controls.Add(this.btnNextFValuePanel);
+            this.FValuePanel.Controls.Add(this.btnPrevFValuePanel);
             this.FValuePanel.Location = new System.Drawing.Point(514, 4);
             this.FValuePanel.Margin = new System.Windows.Forms.Padding(0);
             this.FValuePanel.Name = "FValuePanel";
@@ -102,16 +112,49 @@
             this.FValuePanel.TabIndex = 0;
             this.FValuePanel.Paint += new System.Windows.Forms.PaintEventHandler(this.FValuePanel_Paint);
             this.FValuePanel.DoubleClick += new System.EventHandler(this.FValuePanel_DoubleClick);
+            this.FValuePanel.MouseEnter += new System.EventHandler(this.FValuePanel_MouseEnter);
+            this.FValuePanel.MouseLeave += new System.EventHandler(this.FValuePanel_MouseLeave);
+            this.FValuePanel.MouseHover += new System.EventHandler(this.FValuePanel_MouseHover);
+            this.FValuePanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FValuePanel_MouseMove);
+            // 
+            // btnNextFValuePanel
+            // 
+            this.btnNextFValuePanel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNextFValuePanel.Location = new System.Drawing.Point(3, 219);
+            this.btnNextFValuePanel.Name = "btnNextFValuePanel";
+            this.btnNextFValuePanel.Size = new System.Drawing.Size(40, 40);
+            this.btnNextFValuePanel.TabIndex = 0;
+            this.btnNextFValuePanel.Text = ">";
+            this.toolTip1.SetToolTip(this.btnNextFValuePanel, "次のパネル");
+            this.btnNextFValuePanel.UseVisualStyleBackColor = true;
+            this.btnNextFValuePanel.Click += new System.EventHandler(this.btnNextFValuePanel_Click);
+            this.btnNextFValuePanel.MouseEnter += new System.EventHandler(this.btnNextFValuePanel_MouseEnter);
+            this.btnNextFValuePanel.MouseLeave += new System.EventHandler(this.btnNextFValuePanel_MouseLeave);
+            // 
+            // btnPrevFValuePanel
+            // 
+            this.btnPrevFValuePanel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPrevFValuePanel.Location = new System.Drawing.Point(3, 174);
+            this.btnPrevFValuePanel.Name = "btnPrevFValuePanel";
+            this.btnPrevFValuePanel.Size = new System.Drawing.Size(40, 40);
+            this.btnPrevFValuePanel.TabIndex = 0;
+            this.btnPrevFValuePanel.Text = "<";
+            this.toolTip1.SetToolTip(this.btnPrevFValuePanel, "前のパネル");
+            this.btnPrevFValuePanel.UseVisualStyleBackColor = true;
+            this.btnPrevFValuePanel.Click += new System.EventHandler(this.btnPrevFValuePanel_Click);
+            this.btnPrevFValuePanel.MouseEnter += new System.EventHandler(this.btnPrevFValuePanel_MouseEnter);
+            this.btnPrevFValuePanel.MouseLeave += new System.EventHandler(this.btnPrevFValuePanel_MouseLeave);
             // 
             // btnCalc
             // 
             this.btnCalc.AutoSize = true;
             this.btnCalc.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnCalc.Location = new System.Drawing.Point(324, 22);
+            this.btnCalc.ForeColor = System.Drawing.Color.Black;
+            this.btnCalc.Location = new System.Drawing.Point(348, 16);
             this.btnCalc.Name = "btnCalc";
-            this.btnCalc.Padding = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.btnCalc.Size = new System.Drawing.Size(71, 26);
-            this.btnCalc.TabIndex = 7;
+            this.btnCalc.Padding = new System.Windows.Forms.Padding(3);
+            this.btnCalc.Size = new System.Drawing.Size(69, 28);
+            this.btnCalc.TabIndex = 8;
             this.btnCalc.Text = "計算開始";
             this.btnCalc.UseVisualStyleBackColor = true;
             this.btnCalc.Click += new System.EventHandler(this.btnCalc_Click);
@@ -130,111 +173,13 @@
             this.GroupBoxCadMode.Name = "GroupBoxCadMode";
             this.GroupBoxCadMode.Padding = new System.Windows.Forms.Padding(0);
             this.GroupBoxCadMode.Size = new System.Drawing.Size(286, 54);
-            this.GroupBoxCadMode.TabIndex = 9;
+            this.GroupBoxCadMode.TabIndex = 10;
             this.GroupBoxCadMode.TabStop = false;
-            // 
-            // radioBtnMediaFill
-            // 
-            this.radioBtnMediaFill.Appearance = System.Windows.Forms.Appearance.Button;
-            this.radioBtnMediaFill.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.媒質埋め込み;
-            this.radioBtnMediaFill.Location = new System.Drawing.Point(84, 10);
-            this.radioBtnMediaFill.Name = "radioBtnMediaFill";
-            this.radioBtnMediaFill.Size = new System.Drawing.Size(40, 40);
-            this.radioBtnMediaFill.TabIndex = 2;
-            this.radioBtnMediaFill.TabStop = true;
-            this.radioBtnMediaFill.Text = "　";
-            this.toolTip1.SetToolTip(this.radioBtnMediaFill, "媒質埋め込み");
-            this.radioBtnMediaFill.UseVisualStyleBackColor = true;
-            this.radioBtnMediaFill.CheckedChanged += new System.EventHandler(this.radioBtnMediaFill_CheckedChanged);
-            // 
-            // radioBtnNone
-            // 
-            this.radioBtnNone.Appearance = System.Windows.Forms.Appearance.Button;
-            this.radioBtnNone.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.モードクリア;
-            this.radioBtnNone.Location = new System.Drawing.Point(6, 10);
-            this.radioBtnNone.Name = "radioBtnNone";
-            this.radioBtnNone.Size = new System.Drawing.Size(40, 40);
-            this.radioBtnNone.TabIndex = 0;
-            this.radioBtnNone.TabStop = true;
-            this.radioBtnNone.Text = "　";
-            this.toolTip1.SetToolTip(this.radioBtnNone, "描画モード解除");
-            this.radioBtnNone.UseVisualStyleBackColor = true;
-            this.radioBtnNone.CheckedChanged += new System.EventHandler(this.radioBtnNone_CheckedChanged);
-            // 
-            // radioBtnPortNumbering
-            // 
-            this.radioBtnPortNumbering.Appearance = System.Windows.Forms.Appearance.Button;
-            this.radioBtnPortNumbering.Image = ((System.Drawing.Image)(resources.GetObject("radioBtnPortNumbering.Image")));
-            this.radioBtnPortNumbering.Location = new System.Drawing.Point(240, 10);
-            this.radioBtnPortNumbering.Name = "radioBtnPortNumbering";
-            this.radioBtnPortNumbering.Size = new System.Drawing.Size(40, 40);
-            this.radioBtnPortNumbering.TabIndex = 6;
-            this.radioBtnPortNumbering.TabStop = true;
-            this.radioBtnPortNumbering.Text = "　";
-            this.toolTip1.SetToolTip(this.radioBtnPortNumbering, "ポート番号振り");
-            this.radioBtnPortNumbering.UseVisualStyleBackColor = true;
-            this.radioBtnPortNumbering.CheckedChanged += new System.EventHandler(this.radioBtnPortNumbering_CheckedChanged);
-            // 
-            // radioBtnIncidentPort
-            // 
-            this.radioBtnIncidentPort.Appearance = System.Windows.Forms.Appearance.Button;
-            this.radioBtnIncidentPort.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.入射ポート選択;
-            this.radioBtnIncidentPort.Location = new System.Drawing.Point(200, 10);
-            this.radioBtnIncidentPort.Name = "radioBtnIncidentPort";
-            this.radioBtnIncidentPort.Size = new System.Drawing.Size(40, 40);
-            this.radioBtnIncidentPort.TabIndex = 5;
-            this.radioBtnIncidentPort.TabStop = true;
-            this.radioBtnIncidentPort.Text = "　";
-            this.toolTip1.SetToolTip(this.radioBtnIncidentPort, "入射ポート選択");
-            this.radioBtnIncidentPort.UseVisualStyleBackColor = true;
-            this.radioBtnIncidentPort.CheckedChanged += new System.EventHandler(this.radioBtnIncidentPort_CheckedChanged);
-            // 
-            // radioBtnErase
-            // 
-            this.radioBtnErase.Appearance = System.Windows.Forms.Appearance.Button;
-            this.radioBtnErase.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.消しゴム;
-            this.radioBtnErase.Location = new System.Drawing.Point(160, 10);
-            this.radioBtnErase.Name = "radioBtnErase";
-            this.radioBtnErase.Size = new System.Drawing.Size(40, 40);
-            this.radioBtnErase.TabIndex = 4;
-            this.radioBtnErase.TabStop = true;
-            this.radioBtnErase.Text = "　";
-            this.toolTip1.SetToolTip(this.radioBtnErase, "消しゴム");
-            this.radioBtnErase.UseVisualStyleBackColor = true;
-            this.radioBtnErase.CheckedChanged += new System.EventHandler(this.radioBtnErase_CheckedChanged);
-            // 
-            // radioBtnPort
-            // 
-            this.radioBtnPort.Appearance = System.Windows.Forms.Appearance.Button;
-            this.radioBtnPort.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.境界選択;
-            this.radioBtnPort.Location = new System.Drawing.Point(120, 10);
-            this.radioBtnPort.Name = "radioBtnPort";
-            this.radioBtnPort.Size = new System.Drawing.Size(40, 40);
-            this.radioBtnPort.TabIndex = 3;
-            this.radioBtnPort.TabStop = true;
-            this.radioBtnPort.Text = "　";
-            this.toolTip1.SetToolTip(this.radioBtnPort, "ポーt境界");
-            this.radioBtnPort.UseVisualStyleBackColor = true;
-            this.radioBtnPort.CheckedChanged += new System.EventHandler(this.radioBtnPort_CheckedChanged);
-            // 
-            // radioBtnArea
-            // 
-            this.radioBtnArea.Appearance = System.Windows.Forms.Appearance.Button;
-            this.radioBtnArea.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.radioBtnArea.Image = ((System.Drawing.Image)(resources.GetObject("radioBtnArea.Image")));
-            this.radioBtnArea.Location = new System.Drawing.Point(46, 10);
-            this.radioBtnArea.Name = "radioBtnArea";
-            this.radioBtnArea.Size = new System.Drawing.Size(40, 40);
-            this.radioBtnArea.TabIndex = 1;
-            this.radioBtnArea.TabStop = true;
-            this.radioBtnArea.Text = "　";
-            this.toolTip1.SetToolTip(this.radioBtnArea, "図形作成");
-            this.radioBtnArea.UseVisualStyleBackColor = true;
-            this.radioBtnArea.CheckedChanged += new System.EventHandler(this.radioBtnArea_CheckedChanged);
             // 
             // btnPrevFreq
             // 
             this.btnPrevFreq.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnPrevFreq.ForeColor = System.Drawing.Color.Black;
             this.btnPrevFreq.Location = new System.Drawing.Point(0, 288);
             this.btnPrevFreq.Name = "btnPrevFreq";
             this.btnPrevFreq.Size = new System.Drawing.Size(30, 30);
@@ -247,6 +192,7 @@
             // btnNextFreq
             // 
             this.btnNextFreq.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnNextFreq.ForeColor = System.Drawing.Color.Black;
             this.btnNextFreq.Location = new System.Drawing.Point(36, 288);
             this.btnNextFreq.Name = "btnNextFreq";
             this.btnNextFreq.Size = new System.Drawing.Size(30, 30);
@@ -260,85 +206,20 @@
             // 
             this.btnMediaSelect.BackColor = System.Drawing.Color.Gray;
             this.btnMediaSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMediaSelect.ForeColor = System.Drawing.Color.Black;
             this.btnMediaSelect.Location = new System.Drawing.Point(294, 503);
             this.btnMediaSelect.Name = "btnMediaSelect";
             this.btnMediaSelect.Size = new System.Drawing.Size(44, 40);
-            this.btnMediaSelect.TabIndex = 10;
+            this.btnMediaSelect.TabIndex = 11;
             this.btnMediaSelect.Text = "媒質";
             this.toolTip1.SetToolTip(this.btnMediaSelect, "媒質");
             this.btnMediaSelect.UseVisualStyleBackColor = false;
             this.btnMediaSelect.Click += new System.EventHandler(this.btnMediaSelect_Click);
             // 
-            // btnRedo
-            // 
-            this.btnRedo.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.やり直し;
-            this.btnRedo.Location = new System.Drawing.Point(205, 4);
-            this.btnRedo.Name = "btnRedo";
-            this.btnRedo.Size = new System.Drawing.Size(40, 40);
-            this.btnRedo.TabIndex = 5;
-            this.toolTip1.SetToolTip(this.btnRedo, "やり直し Ctrl+Y");
-            this.btnRedo.UseVisualStyleBackColor = true;
-            this.btnRedo.Click += new System.EventHandler(this.btnRedo_Click);
-            // 
-            // btnUndo
-            // 
-            this.btnUndo.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.元に戻す;
-            this.btnUndo.Location = new System.Drawing.Point(165, 4);
-            this.btnUndo.Name = "btnUndo";
-            this.btnUndo.Size = new System.Drawing.Size(40, 40);
-            this.btnUndo.TabIndex = 4;
-            this.toolTip1.SetToolTip(this.btnUndo, "元に戻す Ctrl+Z");
-            this.btnUndo.UseVisualStyleBackColor = true;
-            this.btnUndo.Click += new System.EventHandler(this.btnUndo_Click);
-            // 
-            // btnSaveAs
-            // 
-            this.btnSaveAs.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.名前を付けて保存;
-            this.btnSaveAs.Location = new System.Drawing.Point(125, 4);
-            this.btnSaveAs.Name = "btnSaveAs";
-            this.btnSaveAs.Size = new System.Drawing.Size(40, 40);
-            this.btnSaveAs.TabIndex = 3;
-            this.toolTip1.SetToolTip(this.btnSaveAs, "名前を付けて保存");
-            this.btnSaveAs.UseVisualStyleBackColor = true;
-            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
-            // 
-            // btnSave
-            // 
-            this.btnSave.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.上書き保存;
-            this.btnSave.Location = new System.Drawing.Point(85, 4);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(40, 40);
-            this.btnSave.TabIndex = 2;
-            this.toolTip1.SetToolTip(this.btnSave, "上書き保存 Ctrl+S");
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // btnOpen
-            // 
-            this.btnOpen.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.開く;
-            this.btnOpen.Location = new System.Drawing.Point(45, 4);
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(40, 40);
-            this.btnOpen.TabIndex = 1;
-            this.toolTip1.SetToolTip(this.btnOpen, "開く Ctrl+O");
-            this.btnOpen.UseVisualStyleBackColor = true;
-            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
-            // 
-            // btnNew
-            // 
-            this.btnNew.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.新規;
-            this.btnNew.Location = new System.Drawing.Point(5, 4);
-            this.btnNew.Name = "btnNew";
-            this.btnNew.Size = new System.Drawing.Size(40, 40);
-            this.btnNew.TabIndex = 0;
-            this.toolTip1.SetToolTip(this.btnNew, "新規作成");
-            this.btnNew.UseVisualStyleBackColor = true;
-            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
-            // 
             // labelFreq
             // 
             this.labelFreq.AutoSize = true;
-            this.labelFreq.Location = new System.Drawing.Point(7, 249);
+            this.labelFreq.Location = new System.Drawing.Point(0, 249);
             this.labelFreq.Name = "labelFreq";
             this.labelFreq.Size = new System.Drawing.Size(48, 12);
             this.labelFreq.TabIndex = 0;
@@ -346,20 +227,35 @@
             // 
             // SMatChart
             // 
-            chartArea46.Name = "ChartArea1";
-            this.SMatChart.ChartAreas.Add(chartArea46);
-            legend46.Name = "Legend1";
-            this.SMatChart.Legends.Add(legend46);
+            chartArea8.Name = "ChartArea1";
+            this.SMatChart.ChartAreas.Add(chartArea8);
+            this.SMatChart.ContextMenuStrip = this.SMatChartContextMenuStrip;
+            legend8.Name = "Legend1";
+            this.SMatChart.Legends.Add(legend8);
             this.SMatChart.Location = new System.Drawing.Point(453, 326);
             this.SMatChart.Name = "SMatChart";
             this.SMatChart.Size = new System.Drawing.Size(448, 240);
             this.SMatChart.TabIndex = 0;
             this.SMatChart.TabStop = false;
             this.SMatChart.Text = "chart1";
-            title46.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            title46.Name = "Title1";
-            this.SMatChart.Titles.Add(title46);
+            title8.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            title8.Name = "Title1";
+            this.SMatChart.Titles.Add(title8);
             this.SMatChart.DoubleClick += new System.EventHandler(this.SMatChart_DoubleClick);
+            // 
+            // SMatChartContextMenuStrip
+            // 
+            this.SMatChartContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMILogGraph});
+            this.SMatChartContextMenuStrip.Name = "SMatChartContextMenuStrip";
+            this.SMatChartContextMenuStrip.Size = new System.Drawing.Size(125, 26);
+            // 
+            // toolStripMILogGraph
+            // 
+            this.toolStripMILogGraph.Name = "toolStripMILogGraph";
+            this.toolStripMILogGraph.Size = new System.Drawing.Size(124, 22);
+            this.toolStripMILogGraph.Text = "対数表示";
+            this.toolStripMILogGraph.Click += new System.EventHandler(this.toolStripMILogGraph_Click);
             // 
             // FValueLegendPanel
             // 
@@ -371,13 +267,13 @@
             this.FValueLegendPanel.Margin = new System.Windows.Forms.Padding(0);
             this.FValueLegendPanel.Name = "FValueLegendPanel";
             this.FValueLegendPanel.Size = new System.Drawing.Size(68, 320);
-            this.FValueLegendPanel.TabIndex = 13;
+            this.FValueLegendPanel.TabIndex = 14;
             // 
             // labelFreqValue
             // 
             this.labelFreqValue.AutoSize = true;
             this.labelFreqValue.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.labelFreqValue.Location = new System.Drawing.Point(12, 265);
+            this.labelFreqValue.Location = new System.Drawing.Point(5, 265);
             this.labelFreqValue.Name = "labelFreqValue";
             this.labelFreqValue.Size = new System.Drawing.Size(42, 19);
             this.labelFreqValue.TabIndex = 3;
@@ -523,45 +419,45 @@
             // panelMedia
             // 
             this.panelMedia.BackColor = System.Drawing.SystemColors.Control;
-            this.panelMedia.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelMedia.Controls.Add(this.GroupBoxMedia);
-            this.panelMedia.Location = new System.Drawing.Point(462, 8);
+            this.panelMedia.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.panelMedia.Location = new System.Drawing.Point(469, 269);
             this.panelMedia.Name = "panelMedia";
             this.panelMedia.Size = new System.Drawing.Size(242, 182);
-            this.panelMedia.TabIndex = 11;
+            this.panelMedia.TabIndex = 12;
             // 
             // BetaChart
             // 
-            chartArea47.Name = "ChartArea1";
-            this.BetaChart.ChartAreas.Add(chartArea47);
-            legend47.Name = "Legend1";
-            this.BetaChart.Legends.Add(legend47);
+            chartArea6.Name = "ChartArea1";
+            this.BetaChart.ChartAreas.Add(chartArea6);
+            legend6.Name = "Legend1";
+            this.BetaChart.Legends.Add(legend6);
             this.BetaChart.Location = new System.Drawing.Point(5, 568);
             this.BetaChart.Name = "BetaChart";
             this.BetaChart.Size = new System.Drawing.Size(448, 240);
             this.BetaChart.TabIndex = 0;
             this.BetaChart.TabStop = false;
             this.BetaChart.Text = "chart1";
-            title47.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            title47.Name = "Title1";
-            this.BetaChart.Titles.Add(title47);
+            title6.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            title6.Name = "Title1";
+            this.BetaChart.Titles.Add(title6);
             this.BetaChart.DoubleClick += new System.EventHandler(this.BetaChart_DoubleClick);
             // 
             // EigenVecChart
             // 
-            chartArea48.Name = "ChartArea1";
-            this.EigenVecChart.ChartAreas.Add(chartArea48);
-            legend48.Name = "Legend1";
-            this.EigenVecChart.Legends.Add(legend48);
+            chartArea9.Name = "ChartArea1";
+            this.EigenVecChart.ChartAreas.Add(chartArea9);
+            legend9.Name = "Legend1";
+            this.EigenVecChart.Legends.Add(legend9);
             this.EigenVecChart.Location = new System.Drawing.Point(453, 568);
             this.EigenVecChart.Name = "EigenVecChart";
             this.EigenVecChart.Size = new System.Drawing.Size(448, 240);
             this.EigenVecChart.TabIndex = 0;
             this.EigenVecChart.TabStop = false;
             this.EigenVecChart.Text = "chart1";
-            title48.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            title48.Name = "Title1";
-            this.EigenVecChart.Titles.Add(title48);
+            title9.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            title9.Name = "Title1";
+            this.EigenVecChart.Titles.Add(title9);
             this.EigenVecChart.DoubleClick += new System.EventHandler(this.EigenVecChart_DoubleClick);
             // 
             // linkLblEigenShow
@@ -570,7 +466,7 @@
             this.linkLblEigenShow.Location = new System.Drawing.Point(360, 531);
             this.linkLblEigenShow.Name = "linkLblEigenShow";
             this.linkLblEigenShow.Size = new System.Drawing.Size(87, 12);
-            this.linkLblEigenShow.TabIndex = 12;
+            this.linkLblEigenShow.TabIndex = 13;
             this.linkLblEigenShow.TabStop = true;
             this.linkLblEigenShow.Text = "固有モードを見る";
             this.linkLblEigenShow.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLblEigenShow_LinkClicked);
@@ -578,13 +474,24 @@
             // linkLabelMeshShow
             // 
             this.linkLabelMeshShow.AutoSize = true;
-            this.linkLabelMeshShow.Location = new System.Drawing.Point(251, 22);
+            this.linkLabelMeshShow.Location = new System.Drawing.Point(251, 32);
             this.linkLabelMeshShow.Name = "linkLabelMeshShow";
             this.linkLabelMeshShow.Size = new System.Drawing.Size(68, 12);
             this.linkLabelMeshShow.TabIndex = 6;
             this.linkLabelMeshShow.TabStop = true;
             this.linkLabelMeshShow.Text = "メッシュを見る";
             this.linkLabelMeshShow.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelMeshShow_LinkClicked);
+            // 
+            // labelCalcMode
+            // 
+            this.labelCalcMode.AutoSize = true;
+            this.labelCalcMode.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.labelCalcMode.ForeColor = System.Drawing.Color.Navy;
+            this.labelCalcMode.Location = new System.Drawing.Point(251, 10);
+            this.labelCalcMode.Name = "labelCalcMode";
+            this.labelCalcMode.Size = new System.Drawing.Size(48, 12);
+            this.labelCalcMode.TabIndex = 0;
+            this.labelCalcMode.Text = "H面 TE";
             // 
             // CadPanel
             // 
@@ -633,14 +540,192 @@
             // btnLoadCancel
             // 
             this.btnLoadCancel.AutoSize = true;
-            this.btnLoadCancel.Location = new System.Drawing.Point(401, 12);
+            this.btnLoadCancel.ForeColor = System.Drawing.Color.Black;
+            this.btnLoadCancel.Location = new System.Drawing.Point(423, 11);
             this.btnLoadCancel.Name = "btnLoadCancel";
-            this.btnLoadCancel.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.btnLoadCancel.Size = new System.Drawing.Size(72, 36);
-            this.btnLoadCancel.TabIndex = 8;
+            this.btnLoadCancel.Size = new System.Drawing.Size(75, 34);
+            this.btnLoadCancel.TabIndex = 9;
             this.btnLoadCancel.Text = "読み込み\r\nキャンセル";
             this.btnLoadCancel.UseVisualStyleBackColor = true;
             this.btnLoadCancel.Click += new System.EventHandler(this.btnLoadCancel_Click);
+            // 
+            // chkboxAutoCalc
+            // 
+            this.chkboxAutoCalc.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkboxAutoCalc.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.自動計算;
+            this.chkboxAutoCalc.Location = new System.Drawing.Point(319, 16);
+            this.chkboxAutoCalc.Name = "chkboxAutoCalc";
+            this.chkboxAutoCalc.Size = new System.Drawing.Size(28, 28);
+            this.chkboxAutoCalc.TabIndex = 7;
+            this.chkboxAutoCalc.Text = " ";
+            this.toolTip1.SetToolTip(this.chkboxAutoCalc, "自動計算");
+            this.chkboxAutoCalc.UseVisualStyleBackColor = true;
+            this.chkboxAutoCalc.CheckedChanged += new System.EventHandler(this.chkboxAutoCalc_CheckedChanged);
+            // 
+            // radioBtnMediaFill
+            // 
+            this.radioBtnMediaFill.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radioBtnMediaFill.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.媒質埋め込み;
+            this.radioBtnMediaFill.Location = new System.Drawing.Point(84, 10);
+            this.radioBtnMediaFill.Name = "radioBtnMediaFill";
+            this.radioBtnMediaFill.Size = new System.Drawing.Size(40, 40);
+            this.radioBtnMediaFill.TabIndex = 2;
+            this.radioBtnMediaFill.TabStop = true;
+            this.radioBtnMediaFill.Text = "　";
+            this.toolTip1.SetToolTip(this.radioBtnMediaFill, "媒質埋め込み");
+            this.radioBtnMediaFill.UseVisualStyleBackColor = true;
+            this.radioBtnMediaFill.CheckedChanged += new System.EventHandler(this.radioBtnMediaFill_CheckedChanged);
+            // 
+            // radioBtnNone
+            // 
+            this.radioBtnNone.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radioBtnNone.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.モードクリア;
+            this.radioBtnNone.Location = new System.Drawing.Point(6, 10);
+            this.radioBtnNone.Name = "radioBtnNone";
+            this.radioBtnNone.Size = new System.Drawing.Size(40, 40);
+            this.radioBtnNone.TabIndex = 0;
+            this.radioBtnNone.TabStop = true;
+            this.radioBtnNone.Text = "　";
+            this.toolTip1.SetToolTip(this.radioBtnNone, "描画モード解除");
+            this.radioBtnNone.UseVisualStyleBackColor = true;
+            this.radioBtnNone.CheckedChanged += new System.EventHandler(this.radioBtnNone_CheckedChanged);
+            // 
+            // radioBtnPortNumbering
+            // 
+            this.radioBtnPortNumbering.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radioBtnPortNumbering.Image = ((System.Drawing.Image)(resources.GetObject("radioBtnPortNumbering.Image")));
+            this.radioBtnPortNumbering.Location = new System.Drawing.Point(240, 10);
+            this.radioBtnPortNumbering.Name = "radioBtnPortNumbering";
+            this.radioBtnPortNumbering.Size = new System.Drawing.Size(40, 40);
+            this.radioBtnPortNumbering.TabIndex = 6;
+            this.radioBtnPortNumbering.TabStop = true;
+            this.radioBtnPortNumbering.Text = "　";
+            this.toolTip1.SetToolTip(this.radioBtnPortNumbering, "ポート番号振り");
+            this.radioBtnPortNumbering.UseVisualStyleBackColor = true;
+            this.radioBtnPortNumbering.CheckedChanged += new System.EventHandler(this.radioBtnPortNumbering_CheckedChanged);
+            // 
+            // radioBtnIncidentPort
+            // 
+            this.radioBtnIncidentPort.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radioBtnIncidentPort.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.入射ポート選択;
+            this.radioBtnIncidentPort.Location = new System.Drawing.Point(200, 10);
+            this.radioBtnIncidentPort.Name = "radioBtnIncidentPort";
+            this.radioBtnIncidentPort.Size = new System.Drawing.Size(40, 40);
+            this.radioBtnIncidentPort.TabIndex = 5;
+            this.radioBtnIncidentPort.TabStop = true;
+            this.radioBtnIncidentPort.Text = "　";
+            this.toolTip1.SetToolTip(this.radioBtnIncidentPort, "入射ポート選択");
+            this.radioBtnIncidentPort.UseVisualStyleBackColor = true;
+            this.radioBtnIncidentPort.CheckedChanged += new System.EventHandler(this.radioBtnIncidentPort_CheckedChanged);
+            // 
+            // radioBtnErase
+            // 
+            this.radioBtnErase.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radioBtnErase.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.消しゴム;
+            this.radioBtnErase.Location = new System.Drawing.Point(160, 10);
+            this.radioBtnErase.Name = "radioBtnErase";
+            this.radioBtnErase.Size = new System.Drawing.Size(40, 40);
+            this.radioBtnErase.TabIndex = 4;
+            this.radioBtnErase.TabStop = true;
+            this.radioBtnErase.Text = "　";
+            this.toolTip1.SetToolTip(this.radioBtnErase, "消しゴム");
+            this.radioBtnErase.UseVisualStyleBackColor = true;
+            this.radioBtnErase.CheckedChanged += new System.EventHandler(this.radioBtnErase_CheckedChanged);
+            // 
+            // radioBtnPort
+            // 
+            this.radioBtnPort.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radioBtnPort.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.境界選択;
+            this.radioBtnPort.Location = new System.Drawing.Point(120, 10);
+            this.radioBtnPort.Name = "radioBtnPort";
+            this.radioBtnPort.Size = new System.Drawing.Size(40, 40);
+            this.radioBtnPort.TabIndex = 3;
+            this.radioBtnPort.TabStop = true;
+            this.radioBtnPort.Text = "　";
+            this.toolTip1.SetToolTip(this.radioBtnPort, "ポーt境界");
+            this.radioBtnPort.UseVisualStyleBackColor = true;
+            this.radioBtnPort.CheckedChanged += new System.EventHandler(this.radioBtnPort_CheckedChanged);
+            // 
+            // radioBtnArea
+            // 
+            this.radioBtnArea.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radioBtnArea.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.radioBtnArea.Image = ((System.Drawing.Image)(resources.GetObject("radioBtnArea.Image")));
+            this.radioBtnArea.Location = new System.Drawing.Point(46, 10);
+            this.radioBtnArea.Name = "radioBtnArea";
+            this.radioBtnArea.Size = new System.Drawing.Size(40, 40);
+            this.radioBtnArea.TabIndex = 1;
+            this.radioBtnArea.TabStop = true;
+            this.radioBtnArea.Text = "　";
+            this.toolTip1.SetToolTip(this.radioBtnArea, "図形作成");
+            this.radioBtnArea.UseVisualStyleBackColor = true;
+            this.radioBtnArea.CheckedChanged += new System.EventHandler(this.radioBtnArea_CheckedChanged);
+            // 
+            // btnRedo
+            // 
+            this.btnRedo.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.やり直し;
+            this.btnRedo.Location = new System.Drawing.Point(205, 4);
+            this.btnRedo.Name = "btnRedo";
+            this.btnRedo.Size = new System.Drawing.Size(40, 40);
+            this.btnRedo.TabIndex = 5;
+            this.toolTip1.SetToolTip(this.btnRedo, "やり直し Ctrl+Y");
+            this.btnRedo.UseVisualStyleBackColor = true;
+            this.btnRedo.Click += new System.EventHandler(this.btnRedo_Click);
+            // 
+            // btnUndo
+            // 
+            this.btnUndo.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.元に戻す;
+            this.btnUndo.Location = new System.Drawing.Point(165, 4);
+            this.btnUndo.Name = "btnUndo";
+            this.btnUndo.Size = new System.Drawing.Size(40, 40);
+            this.btnUndo.TabIndex = 4;
+            this.toolTip1.SetToolTip(this.btnUndo, "元に戻す Ctrl+Z");
+            this.btnUndo.UseVisualStyleBackColor = true;
+            this.btnUndo.Click += new System.EventHandler(this.btnUndo_Click);
+            // 
+            // btnSaveAs
+            // 
+            this.btnSaveAs.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.名前を付けて保存;
+            this.btnSaveAs.Location = new System.Drawing.Point(125, 4);
+            this.btnSaveAs.Name = "btnSaveAs";
+            this.btnSaveAs.Size = new System.Drawing.Size(40, 40);
+            this.btnSaveAs.TabIndex = 3;
+            this.toolTip1.SetToolTip(this.btnSaveAs, "名前を付けて保存");
+            this.btnSaveAs.UseVisualStyleBackColor = true;
+            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.上書き保存;
+            this.btnSave.Location = new System.Drawing.Point(85, 4);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(40, 40);
+            this.btnSave.TabIndex = 2;
+            this.toolTip1.SetToolTip(this.btnSave, "上書き保存 Ctrl+S");
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnOpen
+            // 
+            this.btnOpen.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.開く;
+            this.btnOpen.Location = new System.Drawing.Point(45, 4);
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(40, 40);
+            this.btnOpen.TabIndex = 1;
+            this.toolTip1.SetToolTip(this.btnOpen, "開く Ctrl+O");
+            this.btnOpen.UseVisualStyleBackColor = true;
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            // 
+            // btnNew
+            // 
+            this.btnNew.Image = global::HPlaneWGSimulatorXDelFEM.Properties.Resources.新規;
+            this.btnNew.Location = new System.Drawing.Point(5, 4);
+            this.btnNew.Name = "btnNew";
+            this.btnNew.Size = new System.Drawing.Size(40, 40);
+            this.btnNew.TabIndex = 0;
+            this.toolTip1.SetToolTip(this.btnNew, "新規作成");
+            this.btnNew.UseVisualStyleBackColor = true;
+            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
             // 
             // Form1
             // 
@@ -649,18 +734,20 @@
             this.AutoScroll = true;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(953, 567);
-            this.Controls.Add(this.panelMedia);
-            this.Controls.Add(this.btnLoadCancel);
+            this.Controls.Add(this.chkboxAutoCalc);
+            this.Controls.Add(this.labelCalcMode);
             this.Controls.Add(this.linkLabelMeshShow);
             this.Controls.Add(this.HScrollBarOfCadPanel);
             this.Controls.Add(this.VScrollBarOfCadPanel);
+            this.Controls.Add(this.btnLoadCancel);
             this.Controls.Add(this.FValueLegendPanel);
             this.Controls.Add(this.linkLblEigenShow);
             this.Controls.Add(this.btnMediaSelect);
             this.Controls.Add(this.GroupBoxCadMode);
-            this.Controls.Add(this.btnCalc);
+            this.Controls.Add(this.panelMedia);
             this.Controls.Add(this.btnRedo);
             this.Controls.Add(this.btnUndo);
+            this.Controls.Add(this.btnCalc);
             this.Controls.Add(this.btnSaveAs);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnOpen);
@@ -685,8 +772,10 @@
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Form1_KeyPress);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
             this.Resize += new System.EventHandler(this.Form1_Resize);
+            this.FValuePanel.ResumeLayout(false);
             this.GroupBoxCadMode.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SMatChart)).EndInit();
+            this.SMatChartContextMenuStrip.ResumeLayout(false);
             this.FValueLegendPanel.ResumeLayout(false);
             this.FValueLegendPanel.PerformLayout();
             this.GroupBoxMedia.ResumeLayout(false);
@@ -738,6 +827,7 @@
         private System.Windows.Forms.Button btnUndo;
         private System.Windows.Forms.Button btnRedo;
         private System.Windows.Forms.LinkLabel linkLblEigenShow;
+        private System.Windows.Forms.Label labelCalcMode;
         private System.Windows.Forms.LinkLabel linkLabelMeshShow;
         private Tao.Platform.Windows.SimpleOpenGlControl CadPanel;
         private System.Windows.Forms.HScrollBar HScrollBarOfCadPanel;
@@ -746,6 +836,11 @@
         private System.Windows.Forms.RadioButton radioBtnMedia0;
         private System.Windows.Forms.RadioButton radioBtnMediaFill;
         private System.Windows.Forms.Button btnLoadCancel;
+        private System.Windows.Forms.Button btnPrevFValuePanel;
+        private System.Windows.Forms.Button btnNextFValuePanel;
+        private System.Windows.Forms.CheckBox chkboxAutoCalc;
+        private System.Windows.Forms.ContextMenuStrip SMatChartContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMILogGraph;
     }
 }
 

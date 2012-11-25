@@ -24,8 +24,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>5</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.6.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -255,6 +255,7 @@
   <ItemGroup>
     <Content Include="HPlaneWGSimulatorXDelFEM.ico" />
     <Content Include="ReleaseNotes.txt" />
+    <None Include="Resources\自動計算.png" />
     <None Include="Resources\delfem_logo48x.png" />
     <None Include="Resources\図形作成.png" />
     <None Include="Resources\媒質埋め込み.png" />

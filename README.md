@@ -1,6 +1,13 @@
 ﻿#H面導波管シミュレーター X DelFEM  
   
 **News**  
+  2012-12-02 HPlaneWGSimulatorXDelFEM version1.6.0.1 Release   
+　●パーツ移動追加   
+　　頂点や辺、領域をドラッグして図面のパーツを移動できます。   
+　　マス目に関係なく移動できるので位置やサイズの微調整にご利用ください。   
+　●その他   
+　　BUGFIX：図形作成のとき自動計算が実行されなかったのを修正   
+   
   2012-11-25 HPlaneWGSimulatorXDelFEM version1.6.0.0 Release   
 　通常版の機能をマージ   
 　●E面導波管、平行平板TMの計算ができます。   

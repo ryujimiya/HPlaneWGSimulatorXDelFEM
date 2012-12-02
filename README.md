@@ -60,6 +60,7 @@ FEMソルバー部分と電界分布図やSパラメータのグラフ等の結�
 - DelFEM  
 CAD、メッシュ生成と線形方程式解法(PCOCG)に梅谷信行氏のDelFEMを利用しています。また有限要素法の計算に関して、一部DelFEMを引用しています。  
 　　DelFEM　[有限要素法(FEM)のページ](http://ums.futene.net/)  
+　　DelFEM4Net　[DelFEM4Net　DelFEM wrapper for C# (.net framework) applications](http://code.google.com/p/delfem4net/)   
 - Lisys  
 行列の固有値計算及び線形方程式計算にKrdLab氏のLisysを用いています。  
 　　Lisys　 [KrdLabの不定期日記 2009-05-07](http://d.hatena.ne.jp/KrdLab/20090507)  

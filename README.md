@@ -18,7 +18,14 @@
   E面導波管TE   
 　　LSEモード(E面に垂直な電界が０)としてTEモードの定式化を行いました。   
 　　まだ定式化にバグがあるかもしれませんが試作機能として追加しています。   
-   
+　   
+　E面導波管伝達問題の計算例   
+　　[E面コーナーベンド](http://ryujimiya.hatenablog.com/entry/2012/11/22/002733)  
+　　[E面T分岐](http://ryujimiya.hatenablog.com/entry/2012/11/22/010458)   
+　　[E面スタブ](http://ryujimiya.hatenablog.com/entry/2012/11/22/015323)   
+　平行平板導波路(TMモード)の計算例   
+　　[誘電体スラブ導波路終端](http://ryujimiya.hatenablog.com/entry/2012/11/25/204048)   
+　   
 　●散乱係数周波数特性の対数グラフ   
 　●自動計算モード   
 　●等高線図   

@@ -2940,12 +2940,18 @@ namespace HPlaneWGSimulatorXDelFEM
                 Complex betam = Complex.Sqrt(evals[tagtModeIdx]);
                 // 定式化BUGFIX
                 //   減衰定数は符号がマイナス(β = -jα)
+                bool isConjugateMode = false;
                 if (betam.Imaginary >= 0.0)
                 {
                     betam = new Complex(betam.Real, -betam.Imaginary);
+                    isConjugateMode = true;
                 }
                 // 固有ベクトル
                 Complex[] evec = MyMatrixUtil.matrix_GetRowVec(evecs, tagtModeIdx);
+                if (isConjugateMode)
+                {
+                    evec = MyMatrixUtil.vector_Conjugate(evec);
+                }
                 // H面導波管のTMモードの場合、TEM波(TM10:Y方向に界の変化のない解)を除外する
                 if (WGStructureDv == WGStructureDV.HPlane2D && WaveModeDv == WaveModeDV.TM)
                 {

@@ -34,13 +34,15 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <summary>
         /// Cadモード
         ///   None 操作なし
+        ///   MoveObj 物体の移動
         ///   Area 図形作成
         ///   MediaFill 媒質埋め込み
         ///   Port ポート境界選択
         ///   Erase 消しゴム
-        ///   ポート番号振り
+        ///   IncidentPort 入力ポート選択
+        ///   PortNumbering ポート番号振り
         /// </summary>
-        public enum CadModeType { None, Area, MediaFill, Port, Erase, IncidentPort, PortNumbering };
+        public enum CadModeType { None, MoveObj, Area, MediaFill, Port, Erase, IncidentPort, PortNumbering };
 
         /// <summary>
         /// ループ情報

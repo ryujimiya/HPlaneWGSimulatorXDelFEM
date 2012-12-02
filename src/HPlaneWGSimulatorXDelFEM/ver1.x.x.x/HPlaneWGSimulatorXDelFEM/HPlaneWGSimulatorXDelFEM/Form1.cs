@@ -247,6 +247,7 @@ namespace HPlaneWGSimulatorXDelFEM
             CadModeRadioButtons = new RadioButton[]
             {
                 radioBtnNone,
+                radioBtnMoveObj,
                 radioBtnArea,
                 radioBtnMediaFill,
                 radioBtnPort,
@@ -258,6 +259,7 @@ namespace HPlaneWGSimulatorXDelFEM
             CadLogic.CadModeType[] cadModeTypeForRadioButtons = new CadLogic.CadModeType[]
             {
                 CadLogic.CadModeType.None,
+                CadLogic.CadModeType.MoveObj,
                 CadLogic.CadModeType.Area,
                 CadLogic.CadModeType.MediaFill,
                 CadLogic.CadModeType.Port,
@@ -1390,6 +1392,15 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void radioBtnPortNumbering_CheckedChanged(object sender, EventArgs e)
+        {
+            CadModeRadionBtn_CheckedChangedProc(sender, e);
+        }
+        /// <summary>
+        /// 「オブジェクト移動」ラジオボタンチェック状態変更イベントハンドラ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void radioBtnMoveObj_CheckedChanged(object sender, EventArgs e)
         {
             CadModeRadionBtn_CheckedChangedProc(sender, e);
         }

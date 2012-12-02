@@ -229,6 +229,26 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         private bool RefreshDrawerAryFlg = false;
         /// <summary>
+        /// マウス選択開始ポイント
+        /// </summary>
+        private Point StartPt;
+        /// <summary>
+        /// マウス選択終了ポイント
+        /// </summary>
+        private Point EndPt;
+        /// <summary>
+        /// ドラッグ中?
+        /// </summary>
+        private bool DragFlg = false;
+        /// <summary>
+        /// 移動対称CAD要素タイプ
+        /// </summary>
+        private CAD_ELEM_TYPE MovElemType = CAD_ELEM_TYPE.NOT_SET;
+        /// <summary>
+        /// 移動対称要素ID
+        /// </summary>
+        private uint MovObjId = 0;
+        /// <summary>
         /// Cadモード
         /// </summary>
         public CadModeType CadMode
@@ -251,7 +271,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <summary>
         /// 編集図面Cad
         /// </summary>
-        protected CCadObj2D EditCad2D = null;
+        protected CCadObj2D_Move EditCad2D = null;
         /// <summary>
         /// 図形を編集中？
         /// </summary>
@@ -315,7 +335,7 @@ namespace HPlaneWGSimulatorXDelFEM
             CadLogic.TmpEdgeColor = CadPanel.ForeColor;
 
             // Cadオブジェクトを生成
-            EditCad2D = new CCadObj2D();
+            EditCad2D = new CCadObj2D_Move();
 
             // 方眼紙描画オブジェクトを生成
             GraphPaper = new GraphPaperDrawer(GraphPaperWidth, GraphPaperDivX);
@@ -837,15 +857,23 @@ namespace HPlaneWGSimulatorXDelFEM
             bool executed = false;
             Point pt = e.Location;
 
-            /*
-            if (CadMode == CadModeType.Erase || CadMode == CadModeType.Port || CadMode == CadModeType.IncidentPort || CadMode == CadModeType.PortNumbering)
+            DragFlg = true;
+            StartPt = e.Location;
+            EndPt = StartPt;
+
+            if (CadMode == CadModeType.MoveObj)
             {
                 CAD_ELEM_TYPE partElemType;
                 uint partId;
                 bool hit = hitTest(pt, out partElemType, out partId);
+                if (hit)
+                {
+                    MovElemType = partElemType;
+                    MovObjId = partId;
+                }
                 executed = true; // 常に実行される
             }
-            */
+
 
             return executed;
         }
@@ -874,6 +902,7 @@ namespace HPlaneWGSimulatorXDelFEM
             Point pt = e.Location;
             Point prevpt = MouseMovePt;
             MouseMovePt = pt;
+            EndPt = e.Location;
 
             /*
             if (KeyModifiers.HasFlag(Keys.Control))
@@ -885,7 +914,23 @@ namespace HPlaneWGSimulatorXDelFEM
                 MousePan(prevpt, pt);
             }
             */
-            if (CadMode != CadModeType.None)
+            if (CadMode == CadModeType.MoveObj)
+            {
+                if (DragFlg)
+                {
+                    // Cadオブジェクトの移動
+                    executed = doMoveObject(true, ref StartPt, EndPt);
+                }
+                else
+                {
+                    CAD_ELEM_TYPE partElemType;
+                    uint partId;
+                    bool hit = hitTest(pt, out partElemType, out partId);
+                    executed = true; // 常に実行される
+                }
+
+            }
+            else if (CadMode != CadModeType.None)
             {
                 CAD_ELEM_TYPE partElemType;
                 uint partId;
@@ -994,9 +1039,40 @@ namespace HPlaneWGSimulatorXDelFEM
         {
             bool executed = false;
             Point pt = e.Location;
+            EndPt = e.Location;
+            DragFlg = false;
+            /*
+            Point minPt = new Point();
+            Point maxPt = new Point();
+            if (StartPt.X <= EndPt.X)
+            {
+                minPt.X = StartPt.X;
+                maxPt.X = EndPt.X;
+            }
+            else
+            {
+                minPt.X = EndPt.X;
+                maxPt.X = StartPt.X;
+            }
+            if (StartPt.Y <= EndPt.Y)
+            {
+                minPt.Y = StartPt.Y;
+                maxPt.Y = EndPt.Y;
+            }
+            else
+            {
+                minPt.Y = EndPt.Y;
+                maxPt.Y = StartPt.Y;
+            }
+             */
 
-            // 領域作成
-            executed = doMakeDisconArea(pt);
+            // Cadオブジェクトの移動
+            executed = doMoveObject(false, ref StartPt, EndPt);
+            if (!executed)
+            {
+                // 領域作成
+                executed = doMakeDisconArea(pt);
+            }
             if (!executed)
             {
                 // 領域削除
@@ -1136,6 +1212,118 @@ namespace HPlaneWGSimulatorXDelFEM
                     Console.WriteLine("EditPortNo cleared!");
                 }
             }
+        }
+
+        /// <summary>
+        /// Cadオブジェクトの移動
+        /// </summary>
+        /// <param name="elemType"></param>
+        /// <param name="objId"></param>
+        /// <param name="screenPt"></param>
+        private static bool moveObject(CCadObj2D_Move EditCad2D, CCamera Camera, CAD_ELEM_TYPE elemType, uint objId, Point startPt, Point endPt)
+        {
+            bool executed = false;
+            if (objId == 0)
+            {
+                return executed;
+            }
+            if (elemType == CAD_ELEM_TYPE.VERTEX)
+            {
+                double ox = 0.0;
+                double oy = 0.0;
+                CadLogic.ScreenPointToCoord(endPt, Camera, out ox, out oy);
+                uint id_v = objId;
+                bool ret = EditCad2D.MoveVertex(id_v, new CVector2D(ox, oy));
+                if (ret)
+                {
+                    executed = true;
+                }
+                else
+                {
+                    Console.WriteLine("failed: MoveVertex {0}, {1}, {2}", id_v, ox, oy);
+                }
+            }
+            else if (elemType == CAD_ELEM_TYPE.EDGE)
+            {
+                double movBeginX = 0.0;
+                double movBeginY = 0.0;
+                double movEndX = 0.0;
+                double movEndY = 0.0;
+                CadLogic.ScreenPointToCoord(startPt, Camera, out movBeginX, out movBeginY);
+                CadLogic.ScreenPointToCoord(endPt, Camera, out movEndX, out movEndY);
+                uint id_e = objId;
+                bool ret = EditCad2D.MoveEdge(id_e, new CVector2D(movEndX - movBeginX, movEndY - movBeginY));
+                if (ret)
+                {
+                    executed = true;
+                }
+                else
+                {
+                    Console.WriteLine("failed: MoveEdge {0}, {1}, {2}", id_e, movEndX - movBeginX, movEndY - movBeginY);
+                }
+            }
+            else if (elemType == CAD_ELEM_TYPE.LOOP)
+            {
+                double movBeginX = 0.0;
+                double movBeginY = 0.0;
+                double movEndX = 0.0;
+                double movEndY = 0.0;
+                CadLogic.ScreenPointToCoord(startPt, Camera, out movBeginX, out movBeginY);
+                CadLogic.ScreenPointToCoord(endPt, Camera, out movEndX, out movEndY);
+                uint id_l = objId;
+                bool ret = EditCad2D.MoveLoop(id_l, new CVector2D(movEndX - movBeginX, movEndY - movBeginY));
+                if (ret)
+                {
+                    executed = true;
+                }
+                else
+                {
+                    Console.WriteLine("failed: MoveLoop {0}, {1}, {2}", id_l, movEndX - movBeginX, movEndY - movBeginY);
+                }
+            }
+            return executed;
+        }
+
+        /// <summary>
+        /// Cadオブジェクト移動処理
+        /// </summary>
+        /// <param name="isDragging"></param>
+        /// <returns></returns>
+        private bool doMoveObject(bool isDragging, ref Point stPt, Point edPt)
+        {
+            bool executed = false;
+            if (CadMode == CadModeType.MoveObj)
+            {
+                // Cadオブジェクトの移動
+                executed = moveObject(EditCad2D, Camera, MovElemType, MovObjId, stPt, edPt);
+                stPt = edPt;
+                if (executed)
+                {
+                    if (isDragging)
+                    {
+                        // Undo対象にはしない,自動計算もしない
+                        // 描画オブジェクトアレイの更新フラグを立てる
+                        RefreshDrawerAryFlg = true;
+                    }
+                    else
+                    {
+                        // コマンドを実行する
+                        invokeCadOperationCmd();
+                        //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
+                        // 描画オブジェクトアレイの更新フラグを立てる
+                        RefreshDrawerAryFlg = true;
+                        if (Change != null)
+                        {
+                            Change(this, CadMode);
+                        }
+                    }
+                }
+                if (executed && !isDirty)
+                {
+                    isDirty = true;
+                }
+            }
+            return executed;
         }
 
         /// <summary>
@@ -1375,6 +1563,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  Note:ここでCadObjが新しくなるのでrefreshDrawerAry()をこの後実行すること
                 // 描画オブジェクトアレイの更新フラグを立てる
                 RefreshDrawerAryFlg = true;
+                if (Change != null)
+                {
+                    Change(this, CadMode);
+                }
 
             }
             if (executed && !isDirty)
@@ -2146,6 +2338,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     || (CadMode == CadModeType.MediaFill && partElemType == CAD_ELEM_TYPE.LOOP)
                     || ((CadMode == CadModeType.Port || CadMode == CadModeType.IncidentPort || CadMode == CadModeType.PortNumbering) && partElemType == CAD_ELEM_TYPE.EDGE)
                     || (CadMode == CadModeType.Erase && (partElemType == CAD_ELEM_TYPE.LOOP || partElemType == CAD_ELEM_TYPE.EDGE || partElemType == CAD_ELEM_TYPE.VERTEX))
+                    || (CadMode == CadModeType.MoveObj && (partElemType == CAD_ELEM_TYPE.LOOP || partElemType == CAD_ELEM_TYPE.EDGE || partElemType == CAD_ELEM_TYPE.VERTEX))
                     )
                 {
                     // 選択表示設定に追加する
@@ -4144,15 +4337,17 @@ namespace HPlaneWGSimulatorXDelFEM
             string out_useUtility;
 
             // Ver1.3.0.0
+            CCadObj2D cad2dref = EditCad2D;
             success = CadDatFile.LoadFromFile(
                 filename,
                 out out_appVersion,
                 out out_useUtility,
-                ref EditCad2D,
+                ref cad2dref,
                 ref LoopList,
                 ref EdgeCollectionList,
                 out IncidentPortNo,
                 ref Medias);
+            System.Diagnostics.Debug.Assert(cad2dref == EditCad2D);
 
             if (!success)
             {
@@ -4167,12 +4362,13 @@ namespace HPlaneWGSimulatorXDelFEM
                     success = CadDatFile_Ver_1_2.LoadFromFile_Ver_1_2(
                         filename,
                         out isBackupFile,
-                        ref EditCad2D,
+                        ref cad2dref,
                         ref LoopList,
                         ref EdgeCollectionList,
                         out IncidentPortNo,
                         ref Medias
                         );
+                    System.Diagnostics.Debug.Assert(cad2dref == EditCad2D);
                     IsBackupFile = isBackupFile;
                     if (!success)
                     {
@@ -4413,7 +4609,9 @@ namespace HPlaneWGSimulatorXDelFEM
             // ここで、再度Cadデータが自分自身にセットされる（mementoでデータ更新するのが本来の使用方法なので)
             bool ret = CmdManager.Invoke(cmd);
             // Invokeによって作成されたシリアライズバッファから図面を読み込む
-            loadEditCad2DFromSerializedBuffer(ref EditCad2D);
+            CCadObj2D cad2dref = EditCad2D;
+            loadEditCad2DFromSerializedBuffer(ref cad2dref);
+            System.Diagnostics.Debug.Assert(cad2dref == EditCad2D);
             // Invokeで作成されたシリアライズバッファを削除する
             clearSerializedCadObjBuffer();
             Console.WriteLine("  invoked");
@@ -4436,7 +4634,9 @@ namespace HPlaneWGSimulatorXDelFEM
             // CadLogicBaseのUndoを実行
             CmdManager.Undo();
             // Undoによって作成されたシリアライズバッファから図面を読み込む
-            loadEditCad2DFromSerializedBuffer(ref EditCad2D);
+            CCadObj2D cad2dref = EditCad2D;
+            loadEditCad2DFromSerializedBuffer(ref cad2dref);
+            System.Diagnostics.Debug.Assert(cad2dref == EditCad2D);
             // Undoで作成されたシリアライズバッファを削除する
             clearSerializedCadObjBuffer();
 
@@ -4465,7 +4665,9 @@ namespace HPlaneWGSimulatorXDelFEM
             // CadLogicBaseのRedoを実行
             CmdManager.Redo();
             // Redoによって作成されたシリアライズバッファから図面を読み込む
-            loadEditCad2DFromSerializedBuffer(ref EditCad2D);
+            CCadObj2D cad2dref = EditCad2D;
+            loadEditCad2DFromSerializedBuffer(ref cad2dref);
+            System.Diagnostics.Debug.Assert(cad2dref == EditCad2D);
             // Redoで作成されたシリアライズバッファを削除する
             clearSerializedCadObjBuffer();
 

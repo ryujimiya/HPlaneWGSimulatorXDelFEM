@@ -1220,37 +1220,49 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="elemType"></param>
         /// <param name="objId"></param>
         /// <param name="screenPt"></param>
-        private static bool moveObject(CCadObj2D_Move EditCad2D, CCamera Camera, CAD_ELEM_TYPE elemType, uint objId, Point startPt, Point endPt)
+        private static bool moveObject(
+            CCadObj2D_Move EditCad2D,
+            CCamera Camera,
+            CAD_ELEM_TYPE elemType,
+            uint objId,
+            Point startPt,
+            Point endPt)
         {
             bool executed = false;
             if (objId == 0)
             {
                 return executed;
             }
+            double movBeginX = 0.0;
+            double movBeginY = 0.0;
+            double movEndX = 0.0;
+            double movEndY = 0.0;
+            // デバイス座標系に変換
+            CadLogic.ScreenPointToCoord(startPt, Camera, out movBeginX, out movBeginY);
+            CadLogic.ScreenPointToCoord(endPt, Camera, out movEndX, out movEndY);
+            // マス目の長さ(デバイス座標系)
+            double delta = GraphPaperWidth / (double)GraphPaperDivX;
+            // 方眼紙のマス目の頂点に合わせる
+            movBeginX = Math.Round(movBeginX / delta) * delta;
+            movBeginY = Math.Round(movBeginY / delta) * delta;
+            movEndX = Math.Round(movEndX / delta) * delta;
+            movEndY = Math.Round(movEndY / delta) * delta;
+
             if (elemType == CAD_ELEM_TYPE.VERTEX)
             {
-                double ox = 0.0;
-                double oy = 0.0;
-                CadLogic.ScreenPointToCoord(endPt, Camera, out ox, out oy);
                 uint id_v = objId;
-                bool ret = EditCad2D.MoveVertex(id_v, new CVector2D(ox, oy));
+                bool ret = EditCad2D.MoveVertex(id_v, new CVector2D(movEndX, movEndY));
                 if (ret)
                 {
                     executed = true;
                 }
                 else
                 {
-                    Console.WriteLine("failed: MoveVertex {0}, {1}, {2}", id_v, ox, oy);
+                    Console.WriteLine("failed: MoveVertex {0}, {1}, {2}", id_v, movEndX, movEndY);
                 }
             }
             else if (elemType == CAD_ELEM_TYPE.EDGE)
             {
-                double movBeginX = 0.0;
-                double movBeginY = 0.0;
-                double movEndX = 0.0;
-                double movEndY = 0.0;
-                CadLogic.ScreenPointToCoord(startPt, Camera, out movBeginX, out movBeginY);
-                CadLogic.ScreenPointToCoord(endPt, Camera, out movEndX, out movEndY);
                 uint id_e = objId;
                 bool ret = EditCad2D.MoveEdge(id_e, new CVector2D(movEndX - movBeginX, movEndY - movBeginY));
                 if (ret)
@@ -1264,12 +1276,6 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             else if (elemType == CAD_ELEM_TYPE.LOOP)
             {
-                double movBeginX = 0.0;
-                double movBeginY = 0.0;
-                double movEndX = 0.0;
-                double movEndY = 0.0;
-                CadLogic.ScreenPointToCoord(startPt, Camera, out movBeginX, out movBeginY);
-                CadLogic.ScreenPointToCoord(endPt, Camera, out movEndX, out movEndY);
                 uint id_l = objId;
                 bool ret = EditCad2D.MoveLoop(id_l, new CVector2D(movEndX - movBeginX, movEndY - movBeginY));
                 if (ret)
@@ -1289,14 +1295,19 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         /// <param name="isDragging"></param>
         /// <returns></returns>
-        private bool doMoveObject(bool isDragging, ref Point stPt, Point edPt)
+        private bool doMoveObject(bool isDragging, ref Point startPt, Point endPt)
         {
             bool executed = false;
             if (CadMode == CadModeType.MoveObj)
             {
                 // Cadオブジェクトの移動
-                executed = moveObject(EditCad2D, Camera, MovElemType, MovObjId, stPt, edPt);
-                stPt = edPt;
+                executed = moveObject(EditCad2D,
+                    Camera,
+                    MovElemType,
+                    MovObjId,
+                    startPt,
+                    endPt);
+                startPt = endPt;
                 if (executed)
                 {
                     if (isDragging)

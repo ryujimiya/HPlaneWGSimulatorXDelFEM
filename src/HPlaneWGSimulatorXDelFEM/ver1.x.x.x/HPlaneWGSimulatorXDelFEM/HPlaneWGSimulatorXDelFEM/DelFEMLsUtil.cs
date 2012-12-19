@@ -85,7 +85,10 @@ namespace HPlaneWGSimulatorXDelFEM
                     using (UIntVectorIndexer index = crs.index)
                     using (UIntVectorIndexer ary = crs.array)
                     {
-                        for (int iblk = 0; iblk < (int)crs.Size(); iblk++)
+                        //BUGFIX
+                        //for (int iblk = 0; iblk < (int)crs.Size(); iblk++)
+                        // indexのサイズは crs.Size() + 1 (crs.Size() > 0のとき)
+                        for (int iblk = 0; iblk < index.Count; iblk++)
                         {
                             index[iblk] = 0;
                         }
@@ -108,7 +111,8 @@ namespace HPlaneWGSimulatorXDelFEM
                             if (col != -1 && ino_global != -1)
                             {
                                 // 関連付けられていない節点をその行の列データの最後に追加
-                                int last_index = (int)index[col + 1] - 1;
+                                //int last_index = (int)index[col + 1] - 1;
+                                //System.Diagnostics.Debug.Assert(last_index == ary.Count - 1);
                                 int add_cnt = 0;
                                 for (int jno_global = 0; jno_global < node_cnt; jno_global++)
                                 {
@@ -117,11 +121,13 @@ namespace HPlaneWGSimulatorXDelFEM
                                         continue;
                                     }
                                     uint row = (uint)jno_global;
-                                    if (ino_global != jno_global)  // 対角要素は除く
+                                    //if (ino_global != jno_global)  // 対角要素は除く
+                                    if (col != row)  // 対角要素は除く
                                     {
                                         if (!cur_rows.Contains(row))
                                         {
-                                            ary.Insert(last_index + 1 + add_cnt, row);
+                                            //ary.Insert(last_index + 1 + add_cnt, row);
+                                            ary.Add(row);
                                             add_cnt++;
                                             //System.Diagnostics.Debug.WriteLine("added:" + col + " " + row);
                                         }

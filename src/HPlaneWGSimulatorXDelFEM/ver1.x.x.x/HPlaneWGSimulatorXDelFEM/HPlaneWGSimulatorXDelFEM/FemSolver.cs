@@ -2379,6 +2379,21 @@ namespace HPlaneWGSimulatorXDelFEM
                     }
                 }
             }
+            // check 対称行列
+            for (int inoB = 0; inoB < matB.RowSize; inoB++)
+            {
+                for (int jnoB = inoB; jnoB < matB.ColumnSize; jnoB++)
+                {
+                    if (Math.Abs(matB[inoB, jnoB].Real - matB[jnoB, inoB].Real) >= Constants.PrecisionLowerLimit)
+                    {
+                        System.Diagnostics.Debug.Assert(false);
+                    }
+                    if (Math.Abs(matB[inoB, jnoB].Imaginary - matB[jnoB, inoB].Imaginary) >= Constants.PrecisionLowerLimit)
+                    {
+                        System.Diagnostics.Debug.Assert(false);
+                    }
+                }
+            }
             //MyMatrixUtil.printMatrix("matB", matB);
 
             // 残差ベクトルの作成

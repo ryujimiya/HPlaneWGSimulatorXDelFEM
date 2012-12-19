@@ -1,6 +1,10 @@
 ﻿#H面導波管シミュレーター X DelFEM  
   
 **News**  
+  2012-12-19 HPlaneWGSimulatorXDelFEM version1.6.0.3 Release   
+　　[DelFEM4Net 1.0.0.7](http://code.google.com/p/delfem4net/)に更新しました。   
+　　KrdLab.clapack.FunctionExt.zhbgv(複素エルミートバンド行列の一般化固有値問題解法)を追加しました。    
+    
   2012-12-03 HPlaneWGSimulatorXDelFEM version1.6.0.2(modified version1.6.0.1) Release   
 　●パーツ移動追加   
 　　頂点や辺、領域をドラッグして図面のパーツを移動できます。   

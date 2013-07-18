@@ -1,5 +1,12 @@
 ﻿HPlaneWGSimulatorXDelFEM Release Notes
 
+version1.6.9.4
+---(2013-07-18)
+  VS2012でビルド
+  フレームワークを.NET Framework 4.5に変更しました。
+  等高線図の凡例　目盛表示を界の値に変更しました。
+  固有モードの位相調整処理を入れました（最大値の位相を0にする)
+
 version1.6.0.3
 ---(2012-12-19)
   DelFEM4Net.dll更新(DelFEM本体修正)

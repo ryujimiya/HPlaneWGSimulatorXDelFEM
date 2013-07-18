@@ -3580,6 +3580,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
         }
 
+        /* 関数の名称からループIDが指定されたときその親が返却されるような誤解を生むので使用停止
         /// <summary>
         /// ヒットテスト結果のパーツID、要素タイプを用いて親ループIDを特定する
         /// </summary>
@@ -3609,6 +3610,7 @@ namespace HPlaneWGSimulatorXDelFEM
             Console.WriteLine("parentLoopId:{0}", parentLoopId);
             return parentLoopId;
         }
+         */
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>

@@ -4,6 +4,8 @@
 version1.6.0.4  
 　[installer](https://github.com/ryujimiya/HPlaneWGSimulatorXDelFEM/tree/master/publish)  
 
+![HPlaneWGSimulatorXDelFEM](http://cdn-ak.f.st-hatena.com/images/fotolife/r/ryujimiya/20120930/20120930073724.jpg)  
+
 **News**  
   2012-12-19 HPlaneWGSimulatorXDelFEM version1.6.0.3 Release   
 　　[DelFEM4Net 1.0.0.7](http://code.google.com/p/delfem4net/)に更新しました。   

@@ -17,13 +17,13 @@ namespace MyUtilLib
 
         public MementoCommand(Memento<T1, T2> prev, Memento<T1, T2> next)
         {
-            //Console.WriteLine("MementoCommand Constructor");
+            //System.Diagnostics.Debug.WriteLine("MementoCommand Constructor");
             _memento = prev;
             //  Note: 受け取ったMementoの破棄責任はMementoCommandにある
             _prev = prev.MementoData;
             _next = next.MementoData;
             //  Note: getしたインスタンスはコピーなので破棄の責任はMementoCommand側にある
-            //Console.WriteLine("  MementoCommand Constructor done");
+            //System.Diagnostics.Debug.WriteLine("  MementoCommand Constructor done");
         }
 
         #region ICommand メンバ
@@ -33,7 +33,7 @@ namespace MyUtilLib
         /// </summary>
         void ICommand.Invoke()
         {
-            //Console.WriteLine("MementoCommand Invoke");
+            //System.Diagnostics.Debug.WriteLine("MementoCommand Invoke");
             if (_prev != null && _prev is IDisposable)
             {
                 ((IDisposable)_prev).Dispose();
@@ -42,7 +42,7 @@ namespace MyUtilLib
             _prev = _memento.MementoData;
             //  Note: getしたインスタンスはコピーなので破棄の責任はMementoCommand側にある
             _memento.SetMemento(_next);
-            //Console.WriteLine("  MementoCommand Invoke done");
+            //System.Diagnostics.Debug.WriteLine("  MementoCommand Invoke done");
         }
 
         /// <summary>
@@ -50,9 +50,9 @@ namespace MyUtilLib
         /// </summary>
         void ICommand.Undo()
         {
-            //Console.WriteLine("MementoCommand Undo");
+            //System.Diagnostics.Debug.WriteLine("MementoCommand Undo");
             _memento.SetMemento(_prev);
-            //Console.WriteLine("  MementoCommand Undo done");
+            //System.Diagnostics.Debug.WriteLine("  MementoCommand Undo done");
         }
 
         /// <summary>
@@ -60,9 +60,9 @@ namespace MyUtilLib
         /// </summary>
         void ICommand.Redo()
         {
-            //Console.WriteLine("MementoCommand Redo");
+            //System.Diagnostics.Debug.WriteLine("MementoCommand Redo");
             _memento.SetMemento(_next);
-            //Console.WriteLine("  MementoCommand Redo done");
+            //System.Diagnostics.Debug.WriteLine("  MementoCommand Redo done");
         }
 
         /// <summary>
@@ -70,9 +70,9 @@ namespace MyUtilLib
         /// </summary>
         ~MementoCommand()
         {
-            //Console.WriteLine("MementoCommand Finalizer");
+            //System.Diagnostics.Debug.WriteLine("MementoCommand Finalizer");
             Dispose(false);
-            //Console.WriteLine("  MementoCommand Finalizer done");
+            //System.Diagnostics.Debug.WriteLine("  MementoCommand Finalizer done");
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace MyUtilLib
         /// <param name="dispoing"></param>
         private void Dispose(bool disposing)
         {
-            //Console.WriteLine("MementoCommand Dispose {0}", disposing);
+            //System.Diagnostics.Debug.WriteLine("MementoCommand Dispose {0}", disposing);
             if (_memento != null && _memento is IDisposable)
             {
                 ((IDisposable)_memento).Dispose();
@@ -97,7 +97,7 @@ namespace MyUtilLib
                 ((IDisposable)_next).Dispose();
                 _next = default(T1);
             }
-            //Console.WriteLine("  MementoCommand Dispose {0} done", disposing);
+            //System.Diagnostics.Debug.WriteLine("  MementoCommand Dispose {0} done", disposing);
         }
 
         /// <summary>
@@ -105,10 +105,10 @@ namespace MyUtilLib
         /// </summary>
         void IDisposable.Dispose()
         {
-            //Console.WriteLine("MementoCommand Dispose");
+            //System.Diagnostics.Debug.WriteLine("MementoCommand Dispose");
             Dispose(true);
             GC.SuppressFinalize(this);
-            //Console.WriteLine("  MementoCommand Dispose done");
+            //System.Diagnostics.Debug.WriteLine("  MementoCommand Dispose done");
         }
 
         /// <summary>

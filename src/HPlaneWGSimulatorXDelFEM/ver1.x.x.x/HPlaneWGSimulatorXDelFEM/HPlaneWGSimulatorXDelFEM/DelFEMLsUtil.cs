@@ -102,7 +102,7 @@ namespace HPlaneWGSimulatorXDelFEM
                                 ary.Add(row_index);
                             }
                             index[iblk + 1] = (uint)ary.Count;
-                            //Console.WriteLine("chk:{0} {1}", iblk, npsup);
+                            //System.Diagnostics.Debug.WriteLine("chk:{0} {1}", iblk, npsup);
                             // Note: インデックス設定はされていないので常にnpsup == 0 (cur_rows.Count == 0)
 
                             // すべての節点に関して列を追加
@@ -216,7 +216,7 @@ namespace HPlaneWGSimulatorXDelFEM
             //------------------------------------------------------------------
             // リニアシステムを解く
             //------------------------------------------------------------------
-            Console.WriteLine("Solve_PCOCG : CZSolverLsIter.Solve_PCOCG");
+            System.Diagnostics.Debug.WriteLine("Solve_PCOCG : CZSolverLsIter.Solve_PCOCG");
             // プリコンディショナに値を設定してILU分解を行う
             Prec.SetValue(Ls);
             //double tol = 1.0e-1;
@@ -233,17 +233,17 @@ namespace HPlaneWGSimulatorXDelFEM
             //uint maxIter = uint.MaxValue;
             uint iter = maxIter;
             bool ret = CZSolverLsIter.Solve_PCOCG(ref tol, ref iter, Ls, Prec);
-            Console.WriteLine("iter : " + iter + " Res : " + tol + " ret : " + ret);
+            System.Diagnostics.Debug.WriteLine("iter : " + iter + " Res : " + tol + " ret : " + ret);
             if (iter == maxIter)
             {
-                Console.WriteLine("Not converged");
+                System.Diagnostics.Debug.WriteLine("Not converged");
                 isConverged = false;
             }
             else
             {
                 isConverged = true;
             }
-            Console.WriteLine("Solve_PCOCG solved");
+            System.Diagnostics.Debug.WriteLine("Solve_PCOCG solved");
 
             //------------------------------------------------------------------
             // 計算結果の後処理
@@ -312,7 +312,7 @@ namespace HPlaneWGSimulatorXDelFEM
             World.Clear();
             World.Dispose();
             World = null;
-            Console.WriteLine("Solve_PCOCG End");
+            System.Diagnostics.Debug.WriteLine("Solve_PCOCG End");
             return success;
         }
 
@@ -334,7 +334,7 @@ namespace HPlaneWGSimulatorXDelFEM
 
             int matLen = mat.RowSize;
 
-            Console.WriteLine("SolvePCOCG 1");
+            System.Diagnostics.Debug.WriteLine("SolvePCOCG 1");
             //------------------------------------------------------------------
             // ワールド座標系を生成
             //------------------------------------------------------------------
@@ -348,7 +348,7 @@ namespace HPlaneWGSimulatorXDelFEM
             uint FieldValId = World.MakeField_FieldElemDim(baseId, 0,
                 FIELD_TYPE.ZSCALAR, FIELD_DERIVATION_TYPE.VALUE, ELSEG_TYPE.CORNER);
 
-            Console.WriteLine("SolvePCOCG 2");
+            System.Diagnostics.Debug.WriteLine("SolvePCOCG 2");
             //------------------------------------------------------------------
             // リニアシステム
             //------------------------------------------------------------------
@@ -392,7 +392,7 @@ namespace HPlaneWGSimulatorXDelFEM
                                 ary.Add(row_index);
                             }
                             index[iblk + 1] = (uint)ary.Count;
-                            //Console.WriteLine("chk:{0} {1}", iblk, npsup);
+                            //System.Diagnostics.Debug.WriteLine("chk:{0} {1}", iblk, npsup);
                             // Note: インデックス設定はされていないので常にnpsup == 0 (cur_rows.Count == 0)
 
                             // すべての節点に関して列を追加
@@ -441,7 +441,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
             }
 
-            Console.WriteLine("SolvePCOCG 3");
+            System.Diagnostics.Debug.WriteLine("SolvePCOCG 3");
             //------------------------------------------------------------------
             // プリコンディショナ―
             //------------------------------------------------------------------
@@ -462,7 +462,7 @@ namespace HPlaneWGSimulatorXDelFEM
             Prec.SetFillInLevel(DefFillInLevel);
             // ILU(0)のパターン初期化
             Prec.SetLinearSystem(Ls);
-            Console.WriteLine("SolvePCOCG 4");
+            System.Diagnostics.Debug.WriteLine("SolvePCOCG 4");
 
             //------------------------------------------------------------------
             // 剛性行列、残差ベクトルのマージ
@@ -565,7 +565,7 @@ namespace HPlaneWGSimulatorXDelFEM
             //------------------------------------------------------------------
             // リニアシステムを解く
             //------------------------------------------------------------------
-            Console.WriteLine("Solve_PCOCG 5: CZSolverLsIter.Solve_PCOCG");
+            System.Diagnostics.Debug.WriteLine("Solve_PCOCG 5: CZSolverLsIter.Solve_PCOCG");
             // プリコンディショナに値を設定してILU分解を行う
             Prec.SetValue(Ls);
             //double tol = 1.0e-1;
@@ -582,17 +582,17 @@ namespace HPlaneWGSimulatorXDelFEM
             //uint maxIter = uint.MaxValue;
             uint iter = maxIter;
             bool ret = CZSolverLsIter.Solve_PCOCG(ref tol, ref iter, Ls, Prec);
-            Console.WriteLine("iter : " + iter + " Res : " + tol + " ret : " + ret);
+            System.Diagnostics.Debug.WriteLine("iter : " + iter + " Res : " + tol + " ret : " + ret);
             if (iter == maxIter)
             {
-                Console.WriteLine("Not converged");
+                System.Diagnostics.Debug.WriteLine("Not converged");
                 isConverged = false;
             }
             else
             {
                 isConverged = true;
             }
-            Console.WriteLine("Solve_PCOCG 6");
+            System.Diagnostics.Debug.WriteLine("Solve_PCOCG 6");
 
             //------------------------------------------------------------------
             // 計算結果の後処理
@@ -658,7 +658,7 @@ namespace HPlaneWGSimulatorXDelFEM
             Prec.Dispose();
             World.Clear();
             World.Dispose();
-            Console.WriteLine("Solve_PCOCG End");
+            System.Diagnostics.Debug.WriteLine("Solve_PCOCG End");
             return success;
         }
 

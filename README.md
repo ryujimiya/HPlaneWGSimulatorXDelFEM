@@ -1,7 +1,7 @@
 ﻿#H面導波管シミュレーター X DelFEM  
   
 **Latest Release**  
-version1.6.0.5  
+version1.6.0.6  
 　[installer](https://github.com/ryujimiya/HPlaneWGSimulatorXDelFEM/tree/master/publish)  
 
 ![HPlaneWGSimulatorXDelFEM](http://cdn-ak.f.st-hatena.com/images/fotolife/r/ryujimiya/20120930/20120930073724.jpg)  

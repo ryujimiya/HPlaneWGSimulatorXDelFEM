@@ -403,7 +403,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     }
                     catch (Exception exception)
                     {
-                        Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                        System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                     }
                 }
             }
@@ -573,7 +573,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                 }
             }
         }

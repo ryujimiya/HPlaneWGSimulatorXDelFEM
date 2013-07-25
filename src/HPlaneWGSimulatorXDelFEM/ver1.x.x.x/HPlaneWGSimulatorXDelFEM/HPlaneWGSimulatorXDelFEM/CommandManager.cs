@@ -41,7 +41,7 @@ namespace MyUtilLib
         {
             if (_undoStack.Count >= _maxStack) return false;
             command.Invoke();
-            //Console.WriteLine("CommandManager _redoStack.Clear");
+            //System.Diagnostics.Debug.WriteLine("CommandManager _redoStack.Clear");
             //_redoStack.Clear();
             while (_redoStack.Count > 0)
             {
@@ -51,7 +51,7 @@ namespace MyUtilLib
                     ((IDisposable)work).Dispose();
                 }
             }
-            //Console.WriteLine("CommandManager _redoStack.Clear done");
+            //System.Diagnostics.Debug.WriteLine("CommandManager _redoStack.Clear done");
             _undoStack.Push(command);
             return true;
         }
@@ -85,7 +85,7 @@ namespace MyUtilLib
         {
             //_undoStack.Clear();
             //_redoStack.Clear();
-            //Console.WriteLine("CommandManager _undoStack.Clear");
+            //System.Diagnostics.Debug.WriteLine("CommandManager _undoStack.Clear");
             while (_undoStack.Count > 0)
             {
                 ICommand work = _undoStack.Pop();
@@ -94,8 +94,8 @@ namespace MyUtilLib
                     ((IDisposable)work).Dispose();
                 }
             }
-            //Console.WriteLine("  CommandManager _undoStack.Clear done");
-            //Console.WriteLine("CommandManager _reddoStack.Clear");
+            //System.Diagnostics.Debug.WriteLine("  CommandManager _undoStack.Clear done");
+            //System.Diagnostics.Debug.WriteLine("CommandManager _reddoStack.Clear");
             while (_redoStack.Count > 0)
             {
                 ICommand work = _redoStack.Pop();
@@ -104,7 +104,7 @@ namespace MyUtilLib
                     ((IDisposable)work).Dispose();
                 }
             }
-            //Console.WriteLine("CommandManager _reddoStack.Clear done");
+            //System.Diagnostics.Debug.WriteLine("CommandManager _reddoStack.Clear done");
         }
 
         /// <summary>

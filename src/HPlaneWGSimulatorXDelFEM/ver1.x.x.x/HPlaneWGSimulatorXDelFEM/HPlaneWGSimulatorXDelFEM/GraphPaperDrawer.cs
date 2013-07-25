@@ -66,7 +66,7 @@ namespace HPlaneWGSimulatorXDelFEM
             DeltaX = w / (double)ndiv; // マージンなし
             OfsX = - Width * 0.5;  // マージンなし
             Z = w * 0.5; // 最前面(方眼紙のマス目が物体で隠れないように)
-            Console.WriteLine("GraphPapaerDrawer Width:{0} MaxDiv:{1} OfsX:{2} DeltaX:{3} Z:{4}", Width, MaxDiv, DeltaX, OfsX, Z);
+            System.Diagnostics.Debug.WriteLine("GraphPapaerDrawer Width:{0} MaxDiv:{1} OfsX:{2} DeltaX:{3} Z:{4}", Width, MaxDiv, DeltaX, OfsX, Z);
         }
 
         public GraphPaperDrawer()

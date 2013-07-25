@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
 using DelFEM4NetCad;
@@ -41,109 +42,109 @@ namespace HPlaneWGSimulatorXDelFEM
             counter = 0;
             foreach (CVector2D pp in coords)
             {
-                Console.Write("coords[{0}] ", counter);
-                Console.Write("{0}, {1}　", pp.x, pp.y);
-                Console.WriteLine();
+                System.Diagnostics.Debug.Write(string.Format("coords[{0}] ", counter));
+                System.Diagnostics.Debug.Write(string.Format("{0}, {1}　", pp.x, pp.y));
+                System.Diagnostics.Debug.WriteLine("");
                 counter++;
             }
             counter = 0;
             foreach (SVertex vertex in vertexAry)
             {
-                Console.Write("vertexAry[{0}] ", counter);
+                System.Diagnostics.Debug.Write(string.Format("vertexAry[{0}] ", counter));
                 // ID
-                Console.Write("id: {0} ", vertex.id);
+                System.Diagnostics.Debug.Write(string.Format("id: {0} ", vertex.id));
                 // vertex id in CAD（0 if not related to CAD）
-                Console.Write("id_v_cad: {0} ", vertex.id_v_cad);
-                Console.Write("ilayer: {0}　", vertex.ilayer);
+                System.Diagnostics.Debug.Write(string.Format("id_v_cad: {0} ", vertex.id_v_cad));
+                System.Diagnostics.Debug.Write(string.Format("ilayer: {0}　", vertex.ilayer));
                 // index of node
-                Console.Write("v: {0}", vertex.v);
-                Console.WriteLine();
+                System.Diagnostics.Debug.Write(string.Format("v: {0}", vertex.v));
+                System.Diagnostics.Debug.WriteLine("");
                 counter++;
             }
             counter = 0;
             foreach (CBarAry barAry in barArySet)
             {
-                Console.Write("barArySet[{0}] ", counter);
-                Console.Write("id: {0} ", barAry.id);
-                Console.Write("id_e_cad: {0} ", barAry.id_e_cad);
-                Console.Write("id_lr:");
+                System.Diagnostics.Debug.Write(string.Format("barArySet[{0}] ", counter));
+                System.Diagnostics.Debug.Write(string.Format("id: {0} ", barAry.id));
+                System.Diagnostics.Debug.Write(string.Format("id_e_cad: {0} ", barAry.id_e_cad));
+                System.Diagnostics.Debug.Write("id_lr:");
                 foreach (uint id in barAry.id_lr)
                 {
-                    Console.Write(" {0} ", id);
+                    System.Diagnostics.Debug.Write(string.Format(" {0} ", id));
                 }
-                Console.Write("id_se:");
+                System.Diagnostics.Debug.Write("id_se:");
                 foreach (uint id in barAry.id_se)
                 {
-                    Console.Write(" {0} ", id);
+                    System.Diagnostics.Debug.Write(string.Format(" {0} ", id));
                 }
-                Console.Write("ilayer: {0} ", barAry.ilayer);
-                Console.WriteLine();
-                Console.Write("    m_aBar:");
+                System.Diagnostics.Debug.Write(string.Format("ilayer: {0} ", barAry.ilayer));
+                System.Diagnostics.Debug.WriteLine("");
+                System.Diagnostics.Debug.Write(string.Format("    m_aBar:"));
                 foreach (SBar bar in barAry.m_aBar)
                 {
                     // 頂点Index
-                    Console.Write("    bar.v: ");
+                    System.Diagnostics.Debug.Write("    bar.v: ");
                     foreach (uint v_val in bar.v)
                     {
-                        Console.Write(" {0} ", v_val);
+                        System.Diagnostics.Debug.Write(string.Format(" {0} ", v_val));
                     }
                     // 隣接要素Index
-                    Console.Write("    bar.s2: ");
+                    System.Diagnostics.Debug.Write("    bar.s2: ");
                     foreach (uint s2_val in bar.s2)
                     {
-                        Console.Write(" {0} ", s2_val);
+                        System.Diagnostics.Debug.Write(string.Format(" {0} ", s2_val));
                     }
                     // 隣接関係
-                    Console.Write("    bar.r2: ");
+                    System.Diagnostics.Debug.Write("    bar.r2: ");
                     foreach (uint r2_val in bar.r2)
                     {
-                        Console.Write(" {0} ", r2_val);
+                        System.Diagnostics.Debug.Write(string.Format(" {0} ", r2_val));
                     }
-                    Console.WriteLine();
+                    System.Diagnostics.Debug.WriteLine("");
                 }
-                Console.WriteLine();
+                System.Diagnostics.Debug.WriteLine("");
                 counter++;
             }
             counter = 0;
             foreach (CTriAry2D triAry in triArySet)
             {
-                Console.Write("triArySet[{0}] ", counter);
+                System.Diagnostics.Debug.Write(string.Format("triArySet[{0}] ", counter));
                 // ID
-                Console.Write("id: {0} ", triAry.id);
+                System.Diagnostics.Debug.Write(string.Format("id: {0} ", triAry.id));
                 // CADの面ID（CADに関連されてなければ０
-                Console.Write("id_l_cad: {0} ", triAry.id_l_cad);
-                Console.Write("ilayer: {0} ", triAry.ilayer);
-                Console.WriteLine();
-                Console.Write("    m_aTri:");
+                System.Diagnostics.Debug.Write(string.Format("id_l_cad: {0} ", triAry.id_l_cad));
+                System.Diagnostics.Debug.Write(string.Format("ilayer: {0} ", triAry.ilayer));
+                System.Diagnostics.Debug.WriteLine("");
+                System.Diagnostics.Debug.Write("    m_aTri:");
                 foreach (STri2D tri in triAry.m_aTri)
                 {
                     // 頂点Index
-                    Console.Write("    tri.v: ");
+                    System.Diagnostics.Debug.Write("    tri.v: ");
                     foreach (uint v_val in tri.v)
                     {
-                        Console.Write(" {0} ", v_val);
+                        System.Diagnostics.Debug.Write(string.Format(" {0} ", v_val));
                     }
                     // 隣接する要素配列ID(-1:隣接要素なし、-2:自分の要素配列に隣接)
-                    Console.Write("    tri.g2: ");
+                    System.Diagnostics.Debug.Write("    tri.g2: ");
                     foreach (uint g2_val in tri.g2)
                     {
-                        Console.Write(" {0} ", g2_val);
+                        System.Diagnostics.Debug.Write(string.Format(" {0} ", g2_val));
                     }
                     // 隣接要素Index
-                    Console.Write("    tri.s2: ");
+                    System.Diagnostics.Debug.Write("    tri.s2: ");
                     foreach (uint s2_val in tri.s2)
                     {
-                        Console.Write(" {0} ", s2_val);
+                        System.Diagnostics.Debug.Write(string.Format(" {0} ", s2_val));
                     }
                     // 隣接関係
-                    Console.Write("    tri.r2: ");
+                    System.Diagnostics.Debug.Write("    tri.r2: ");
                     foreach (uint r2_val in tri.r2)
                     {
-                        Console.Write(" {0} ", r2_val);
+                        System.Diagnostics.Debug.Write(string.Format(" {0} ", r2_val));
                     }
-                    Console.WriteLine();
+                    System.Diagnostics.Debug.WriteLine("");
                 }
-                Console.WriteLine();
+                System.Diagnostics.Debug.WriteLine("");
             }
         }
 
@@ -639,10 +640,10 @@ namespace HPlaneWGSimulatorXDelFEM
                                 System.Diagnostics.Debug.Assert(false);
                             }
                             //check
-                            //Console.WriteLine("===========");
+                            //System.Diagnostics.Debug.WriteLine("===========");
                             //foreach (int nodeNumber in portNodes)
                             //{
-                            //    Console.WriteLine(nodeNumber);
+                            //    System.Diagnostics.Debug.WriteLine(nodeNumber);
                             //}
                         }
                     }
@@ -681,10 +682,10 @@ namespace HPlaneWGSimulatorXDelFEM
             // check
             //foreach (IList<int> portNodes in portList)
             //{
-            //    Console.WriteLine("------------");
+            //    System.Diagnostics.Debug.WriteLine("------------");
             //    foreach (int nodeNumber in portNodes)
             //    {
-            //        Console.WriteLine("{0}:    {1},    {2}", nodeNumber, coords[nodeNumber - 1].x, coords[nodeNumber - 1].y);
+            //        System.Diagnostics.Debug.WriteLine("{0}:    {1},    {2}", nodeNumber, coords[nodeNumber - 1].x, coords[nodeNumber - 1].y);
             //    }
             //}
 
@@ -1263,11 +1264,11 @@ namespace HPlaneWGSimulatorXDelFEM
                     subArea_pp[2] = test_pp;
                     //foreach (double[] work_pp in subArea_pp)
                     //{
-                    //    Console.Write("{0},{1}  ", work_pp[0], work_pp[1]);
+                    //    System.Diagnostics.Debug.Write("{0},{1}  ", work_pp[0], work_pp[1]);
                     //}
                     double subArea = KerEMatTri.TriArea(subArea_pp[0], subArea_pp[1], subArea_pp[2]);
-                    //Console.Write("  subArea = {0}", subArea);
-                    //Console.WriteLine();
+                    //System.Diagnostics.Debug.Write("  subArea = {0}", subArea);
+                    //System.Diagnostics.Debug.WriteLine();
                     //BUGFIX
                     //if (subArea <= 0.0)
                     // 丁度辺上の場合は、サブエリアの１つが０になるのでこれは許可しないといけない

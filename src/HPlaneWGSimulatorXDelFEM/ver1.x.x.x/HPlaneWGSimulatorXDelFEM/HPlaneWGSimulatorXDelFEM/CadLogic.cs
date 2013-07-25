@@ -52,17 +52,17 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 get
                 {
-                    //Console.WriteLine("CadLogicBaseMemento get MementoData");
+                    //System.Diagnostics.Debug.WriteLine("CadLogicBaseMemento get MementoData");
                     CadLogicBase data = new CadLogicBase();
                     data.CopyData(_MementoData);
-                    //Console.WriteLine("  CadLogicBaseMemento get MementoData done");
+                    //System.Diagnostics.Debug.WriteLine("  CadLogicBaseMemento get MementoData done");
                     return data;
                 }
                 protected set
                 {
-                    //Console.WriteLine("CadLogicBaseMemento set MementoData");
+                    //System.Diagnostics.Debug.WriteLine("CadLogicBaseMemento set MementoData");
                     _MementoData.CopyData(value);
-                    //Console.WriteLine("  CadLogicBaseMemento set MementoData done");
+                    //System.Diagnostics.Debug.WriteLine("  CadLogicBaseMemento set MementoData done");
                 }
             }
 
@@ -73,12 +73,12 @@ namespace HPlaneWGSimulatorXDelFEM
             /// <param name="target"></param>
             public CadLogicBaseMemento(CadLogicBase mementoData, CadLogicBase target)
             {
-                //Console.WriteLine("CadLogicBaseMemento Constructor");
+                //System.Diagnostics.Debug.WriteLine("CadLogicBaseMemento Constructor");
                 _MementoData = new CadLogicBase();
                 //base.MementoData = mementoData;
                 _MementoData.CopyData(mementoData);  // コピーされる
                 base.Target = target;
-                //Console.WriteLine("  CadLogicBaseMemento Constructor done");
+                //System.Diagnostics.Debug.WriteLine("  CadLogicBaseMemento Constructor done");
             }
 
             /// <summary>
@@ -87,11 +87,11 @@ namespace HPlaneWGSimulatorXDelFEM
             /// <param name="mementoData"></param>
             public override void SetMemento(CadLogicBase mementoData)
             {
-                //Console.WriteLine("CadLogicBaseMemento SetMemento");
+                //System.Diagnostics.Debug.WriteLine("CadLogicBaseMemento SetMemento");
                 //base.MementoData = mementoData;
                 _MementoData.CopyData(mementoData);
                 base.Target.CopyData(mementoData);
-                //Console.WriteLine("  CadLogicBaseMemento SetMemento done");
+                //System.Diagnostics.Debug.WriteLine("  CadLogicBaseMemento SetMemento done");
             }
 
             /// <summary>
@@ -99,9 +99,9 @@ namespace HPlaneWGSimulatorXDelFEM
             /// </summary>
             ~CadLogicBaseMemento()
             {
-                //Console.WriteLine("CadLogicBaseMemento Finalizer");
+                //System.Diagnostics.Debug.WriteLine("CadLogicBaseMemento Finalizer");
                 Dispose(false);
-                //Console.WriteLine("  CadLogicBaseMemento Finalizer done");
+                //System.Diagnostics.Debug.WriteLine("  CadLogicBaseMemento Finalizer done");
             }
 
             /// <summary>
@@ -110,14 +110,14 @@ namespace HPlaneWGSimulatorXDelFEM
             /// <param name="disposing"></param>
             protected void Dispose(bool disposing)
             {
-                //Console.WriteLine("CadLogicBaseMemento Dispose {0}", disposing);
+                //System.Diagnostics.Debug.WriteLine("CadLogicBaseMemento Dispose {0}", disposing);
                 if (_MementoData != null)
                 {
                     CadLogicBase data = _MementoData;
                     data.Dispose();
                     _MementoData = null;
                 }
-                //Console.WriteLine("  CadLogicBaseMemento Dispose {0} done", disposing);
+                //System.Diagnostics.Debug.WriteLine("  CadLogicBaseMemento Dispose {0} done", disposing);
             }
 
             /// <summary>
@@ -125,10 +125,10 @@ namespace HPlaneWGSimulatorXDelFEM
             /// </summary>
             public void Dispose()
             {
-                //Console.WriteLine("CadLogicBaseMemento Dispose");
+                //System.Diagnostics.Debug.WriteLine("CadLogicBaseMemento Dispose");
                 Dispose(true);
                 GC.SuppressFinalize(this);
-                //Console.WriteLine("  CadLogicBaseMemento Dispose done");
+                //System.Diagnostics.Debug.WriteLine("  CadLogicBaseMemento Dispose done");
             }
         }
 
@@ -442,7 +442,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         ~CadLogic()
         {
-            Console.WriteLine("-------CadLogic Finalizer-------");
+            System.Diagnostics.Debug.WriteLine("-------CadLogic Finalizer-------");
             Dispose(false);
         }
 
@@ -452,7 +452,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="disposing">マネージ リソースが破棄される場合 true、破棄されない場合は false です。</param>
         protected override void Dispose(bool disposing)
         {
-            Console.WriteLine("-------CadLogic Dispose-------");
+            System.Diagnostics.Debug.WriteLine("-------CadLogic Dispose-------");
             /*修正済み
             // drawerAryのクリアでnative側でインスタンスを削除しているため、マネージ側で削除してはいけないが削除している,DelFEM4Netを修正する必要あり
             foreach (CDrawer drawer in DrawerAry.m_drawer_ary)
@@ -466,9 +466,9 @@ namespace HPlaneWGSimulatorXDelFEM
                 EditCad2D.Clear();
                 //if (this is CadLogic)  // DEBUG!!!!!!!
                 {
-                    Console.WriteLine("      EditCad2D Dispose");
+                    System.Diagnostics.Debug.WriteLine("      EditCad2D Dispose");
                     EditCad2D.Dispose();
-                    Console.WriteLine("      EditCad2D Dispose done");
+                    System.Diagnostics.Debug.WriteLine("      EditCad2D Dispose done");
                 }
                 EditCad2D = null;
             }
@@ -515,7 +515,7 @@ namespace HPlaneWGSimulatorXDelFEM
             Gl.glLoadIdentity();
             DrawerGlUtility.SetModelViewTransform(Camera);
 
-            //Console.WriteLine("renderScene:DrawerAry count = {0}", DrawerAry.m_drawer_ary.Count);
+            //System.Diagnostics.Debug.WriteLine("renderScene:DrawerAry count = {0}", DrawerAry.m_drawer_ary.Count);
             try
             {
                 if (MeshDrawFlg && Mesher2D != null)
@@ -538,7 +538,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message);
             }
 
@@ -551,7 +551,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         public void CadPanelResize(EventArgs e)
         {
-            Console.WriteLine("CadPanelResize");
+            System.Diagnostics.Debug.WriteLine("CadPanelResize");
             int scrollPosX = CadPanel.AutoScrollPosition.X;
             int scrollPosY = CadPanel.AutoScrollPosition.Y;
             int w = CadPanel.Width;
@@ -604,7 +604,7 @@ namespace HPlaneWGSimulatorXDelFEM
             Glu.gluUnProject((double)pt.X, (double)glY, depth,
                 modelviewMatrix, projectionMatrix, viewport,
                 out ox, out oy, out oz);
-            //Console.WriteLine("{0},{1},{2}", ox, oy, oz);
+            //System.Diagnostics.Debug.WriteLine("{0},{1},{2}", ox, oy, oz);
         }
 
         /// <summary>
@@ -619,7 +619,7 @@ namespace HPlaneWGSimulatorXDelFEM
             double inv_scale = 1.0 / camera.GetScale();
             ox *= inv_scale;
             oy *= inv_scale;
-            //Console.WriteLine("NormalizedCoord {0},{1}", ox, oy);
+            //System.Diagnostics.Debug.WriteLine("NormalizedCoord {0},{1}", ox, oy);
         }
 
 
@@ -651,7 +651,7 @@ namespace HPlaneWGSimulatorXDelFEM
             Glu.gluProject((double)x, (double)y, depth,
                 projectionMatrix, modelviewMatrix, viewport,
                 out ox, out oy, out oz);
-            //Console.WriteLine("{0},{1},{2}", ox, oy, oz);
+            //System.Diagnostics.Debug.WriteLine("{0},{1},{2}", ox, oy, oz);
             pt.X = (int)ox;
             pt.Y = (int)(winH - oy);
             return pt;
@@ -808,7 +808,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="g"></param>
         public void CadPanelPaint(Graphics g)
         {
-            //Console.WriteLine("CadPanelPaint");
+            //System.Diagnostics.Debug.WriteLine("CadPanelPaint");
             renderScene();
         }
 
@@ -1209,7 +1209,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 if (EditPortNo != 0)
                 {
                     EditPortNo = 0;
-                    Console.WriteLine("EditPortNo cleared!");
+                    System.Diagnostics.Debug.WriteLine("EditPortNo cleared!");
                 }
             }
         }
@@ -1258,7 +1258,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 else
                 {
-                    Console.WriteLine("failed: MoveVertex {0}, {1}, {2}", id_v, movEndX, movEndY);
+                    System.Diagnostics.Debug.WriteLine("failed: MoveVertex {0}, {1}, {2}", id_v, movEndX, movEndY);
                 }
             }
             else if (elemType == CAD_ELEM_TYPE.EDGE)
@@ -1271,7 +1271,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 else
                 {
-                    Console.WriteLine("failed: MoveEdge {0}, {1}, {2}", id_e, movEndX - movBeginX, movEndY - movBeginY);
+                    System.Diagnostics.Debug.WriteLine("failed: MoveEdge {0}, {1}, {2}", id_e, movEndX - movBeginX, movEndY - movBeginY);
                 }
             }
             else if (elemType == CAD_ELEM_TYPE.LOOP)
@@ -1284,7 +1284,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 else
                 {
-                    Console.WriteLine("failed: MoveLoop {0}, {1}, {2}", id_l, movEndX - movBeginX, movEndY - movBeginY);
+                    System.Diagnostics.Debug.WriteLine("failed: MoveLoop {0}, {1}, {2}", id_l, movEndX - movBeginX, movEndY - movBeginY);
                 }
             }
             return executed;
@@ -1652,8 +1652,8 @@ namespace HPlaneWGSimulatorXDelFEM
                 else
                 {
                     //System.Diagnostics.Debug.Assert(false);
-                    Console.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", CAD_ELEM_TYPE.LOOP, parentLoopId);
-                    Console.WriteLine("[ERROR] add edge pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
+                    System.Diagnostics.Debug.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", CAD_ELEM_TYPE.LOOP, parentLoopId);
+                    System.Diagnostics.Debug.WriteLine("[ERROR] add edge pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
                 }
             }
             return executed;
@@ -1715,8 +1715,8 @@ namespace HPlaneWGSimulatorXDelFEM
             else
             {
                 //System.Diagnostics.Debug.Assert(false);
-                Console.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", parentElemType, parentId);
-                Console.WriteLine("[ERROR] add vertex and edge pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
+                System.Diagnostics.Debug.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", parentElemType, parentId);
+                System.Diagnostics.Debug.WriteLine("[ERROR] add vertex and edge pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
             }
             return executed;
         }
@@ -1793,8 +1793,8 @@ namespace HPlaneWGSimulatorXDelFEM
                     else
                     {
                         //System.Diagnostics.Debug.Assert(false);
-                        Console.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", CAD_ELEM_TYPE.LOOP, parentLoopId);
-                        Console.WriteLine("[ERROR] add edge (last) pp: {0},{1} index_pp: {2}", pp, pp, index_pp);
+                        System.Diagnostics.Debug.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", CAD_ELEM_TYPE.LOOP, parentLoopId);
+                        System.Diagnostics.Debug.WriteLine("[ERROR] add edge (last) pp: {0},{1} index_pp: {2}", pp, pp, index_pp);
                     }
                 }
             }
@@ -1819,7 +1819,7 @@ namespace HPlaneWGSimulatorXDelFEM
 
                         CVector2D minVertexPt = EditCad2D.GetVertexCoord(minVId);
                         CVector2D maxVertexPt = EditCad2D.GetVertexCoord(maxVId);
-                        Console.WriteLine("split Edge index_pp: {0} pts: ({1},{2}) - ({3},{4}) - ({5},{6}) - ({7},{8})",
+                        System.Diagnostics.Debug.WriteLine("split Edge index_pp: {0} pts: ({1},{2}) - ({3},{4}) - ({5},{6}) - ({7},{8})",
                             index_pp, prev_pp.x, prev_pp.y, minVertexPt.x, minVertexPt.y, maxVertexPt.x, maxVertexPt.y, pp.x, pp.y);
 
                         // pps[index_pp - 1] と minVIdの間の辺の作成
@@ -1853,8 +1853,8 @@ namespace HPlaneWGSimulatorXDelFEM
                             else
                             {
                                 //System.Diagnostics.Debug.Assert(false);
-                                Console.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", CAD_ELEM_TYPE.LOOP, parentLoopId);
-                                Console.WriteLine("[ERROR] add edge (Split Behind) pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
+                                System.Diagnostics.Debug.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", CAD_ELEM_TYPE.LOOP, parentLoopId);
+                                System.Diagnostics.Debug.WriteLine("[ERROR] add edge (Split Behind) pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
                             }
                         }
                         // minVId - maxVId間は、既存の辺、頂点なので作成しない
@@ -1956,8 +1956,8 @@ namespace HPlaneWGSimulatorXDelFEM
                             else
                             {
                                 //System.Diagnostics.Debug.Assert(false);
-                                Console.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", CAD_ELEM_TYPE.LOOP, parentLoopId);
-                                Console.WriteLine("[ERROR] add edge pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
+                                System.Diagnostics.Debug.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", CAD_ELEM_TYPE.LOOP, parentLoopId);
+                                System.Diagnostics.Debug.WriteLine("[ERROR] add edge pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
                             }
                         }
                     }
@@ -2032,8 +2032,8 @@ namespace HPlaneWGSimulatorXDelFEM
                             else
                             {
                                 //System.Diagnostics.Debug.Assert(false);
-                                Console.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", parentElemType, parentId);
-                                Console.WriteLine("[ERROR] add vertex and edge pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
+                                System.Diagnostics.Debug.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", parentElemType, parentId);
+                                System.Diagnostics.Debug.WriteLine("[ERROR] add vertex and edge pp: {0},{1} index_pp: {2}", pp.x, pp.y, index_pp);
                             }
                         }
                         else
@@ -2055,8 +2055,8 @@ namespace HPlaneWGSimulatorXDelFEM
                             else
                             {
                                 //System.Diagnostics.Debug.Assert(false);
-                                Console.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", parentElemType, parentId);
-                                Console.WriteLine("[ERROR] add vertex pp: {0},{1}", pp.x, pp.y);
+                                System.Diagnostics.Debug.WriteLine("[ERROR]parentElemType:{0}, parentId:{1}", parentElemType, parentId);
+                                System.Diagnostics.Debug.WriteLine("[ERROR] add vertex pp: {0},{1}", pp.x, pp.y);
                             }
                         } // addEdgeFlg
                     } // hit_vId
@@ -2262,12 +2262,12 @@ namespace HPlaneWGSimulatorXDelFEM
             id_e = resConnectVertex.id_e_add;  // 追加された辺のIDを格納
             if (resConnectVertex.id_l_add != 0)
             {
-                Console.WriteLine("id_l_of_addVertex:{0}", id_l_of_addVertex);
-                Console.WriteLine("id_l_add:{0}", resConnectVertex.id_l_add);
-                Console.WriteLine("id_l_add:{0}", resConnectVertex.id_l);
+                System.Diagnostics.Debug.WriteLine("id_l_of_addVertex:{0}", id_l_of_addVertex);
+                System.Diagnostics.Debug.WriteLine("id_l_add:{0}", resConnectVertex.id_l_add);
+                System.Diagnostics.Debug.WriteLine("id_l_add:{0}", resConnectVertex.id_l);
 
                 id_l_add_by_connectVertex = (resConnectVertex.id_l_add != id_l_of_addVertex) ? resConnectVertex.id_l_add : resConnectVertex.id_l;  // 辺の作成でループが作成された場合ループIDを格納
-                Console.WriteLine("id_l_add_by_connectVertex:{0}", id_l_add_by_connectVertex);
+                System.Diagnostics.Debug.WriteLine("id_l_add_by_connectVertex:{0}", id_l_add_by_connectVertex);
             }
             else
             {
@@ -2320,10 +2320,10 @@ namespace HPlaneWGSimulatorXDelFEM
             //{
             //    if (buf != 0)
             //    {
-            //        Console.Write("[" + buf + "]");
+            //        System.Diagnostics.Debug.Write("[" + buf + "]");
             //    }
             //}
-            //Console.WriteLine();
+            //System.Diagnostics.Debug.WriteLine();
 
             DrawerAry.ClearSelected();
             if (aSelecObj.Count > 0)
@@ -2334,13 +2334,13 @@ namespace HPlaneWGSimulatorXDelFEM
                     if (drawerCad2d != null)
                     {
                         drawerCad2d.GetCadPartID(aSelecObj[0].name, ref partElemType, ref partId);
-                        //Console.WriteLine("partElemType:{0} partId:{1}", partElemType, partId);
+                        //System.Diagnostics.Debug.WriteLine("partElemType:{0} partId:{1}", partElemType, partId);
                     }
                 }
                 //int index = 0;
                 //foreach (int ival in aSelecObj[0].name)
                 //{
-                //    //Console.WriteLine("aSelecObj[0].name[{0}] = {1}", index, ival);
+                //    //System.Diagnostics.Debug.WriteLine("aSelecObj[0].name[{0}] = {1}", index, ival);
                 //    index++;
                 //}
                 if ((CadMode == CadModeType.Area 
@@ -2368,7 +2368,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 int index = 0;
                 foreach (int ival in aSelecObj[0].name)
                 {
-                    Console.WriteLine("aSelecObj[0].name[{0}] = {1}", index, ival);
+                    System.Diagnostics.Debug.WriteLine("aSelecObj[0].name[{0}] = {1}", index, ival);
                     index++;
                 }
                 DrawerAry.AddSelected(aSelecObj[0].name);
@@ -2639,7 +2639,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 {
                     // 以前のループIDがある
                     // 変更されていないとする
-                    Console.WriteLine("edge cnt = {0}, hit cnt = {1}", eIds.Count, loopIdsHash[prevLoopId]);
+                    System.Diagnostics.Debug.WriteLine("edge cnt = {0}, hit cnt = {1}", eIds.Count, loopIdsHash[prevLoopId]);
                 }
                 else
                 {
@@ -2662,7 +2662,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     Loop loop = getLoop(loopList, prevLoopId);
                     loop.Set(curLoopId, loop.MediaIndex);
 
-                    Console.WriteLine("loopId changed {0} → {1}", prevLoopId, curLoopId);
+                    System.Diagnostics.Debug.WriteLine("loopId changed {0} → {1}", prevLoopId, curLoopId);
                     //MessageBox.Show(string.Format("loopId changed {0} → {1}", prevLoopId, curLoopId));
                 }
             }
@@ -2832,7 +2832,7 @@ namespace HPlaneWGSimulatorXDelFEM
                             else
                             {
                                 // 隣でない
-                                Console.WriteLine("not nextdoor edge");
+                                System.Diagnostics.Debug.WriteLine("not nextdoor edge");
                             }
                         }
                         else
@@ -2848,7 +2848,7 @@ namespace HPlaneWGSimulatorXDelFEM
                                 if (KeyModifiers.HasFlag(Keys.Control))
                                 {
                                     EditPortNo = edge.No;
-                                    Console.WriteLine("EditPortNo written!");
+                                    System.Diagnostics.Debug.WriteLine("EditPortNo written!");
                                 }
                                 executed = true;
                             }
@@ -3340,14 +3340,14 @@ namespace HPlaneWGSimulatorXDelFEM
                                 //IncidentPortNo = edge.No;
                                 newIncidentPortNo = edge.No;
                             }
-                            //Console.Write("{0},", edge.No);
+                            //System.Diagnostics.Debug.Write("{0},", edge.No);
                         }
                         if (newIncidentPortNo != -1)
                         {
                             IncidentPortNo = newIncidentPortNo;
                         }
 
-                        //Console.WriteLine(" ");
+                        //System.Diagnostics.Debug.WriteLine(" ");
                         // 番号順に並び替え
                         ((List<EdgeCollection>)EdgeCollectionList).Sort();
                         // ポートの色をセットする
@@ -3607,7 +3607,7 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 parentLoopId = 0;
             }
-            Console.WriteLine("parentLoopId:{0}", parentLoopId);
+            System.Diagnostics.Debug.WriteLine("parentLoopId:{0}", parentLoopId);
             return parentLoopId;
         }
          */
@@ -3644,7 +3644,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="eIdList"></param>
         public static void GetEdgeVertexListOfLoop(CCadObj2D cad2d, uint id_l, out IList<uint> vIdList, out IList<uint> eIdList)
         {
-            //Console.WriteLine("GetEdgeVertexListOfLoop:id_l = {0}", id_l);
+            //System.Diagnostics.Debug.WriteLine("GetEdgeVertexListOfLoop:id_l = {0}", id_l);
             vIdList = new List<uint>();
             eIdList = new List<uint>();
             if (id_l == 0)
@@ -3667,7 +3667,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     uint id_v = itrl.GetIdVertex();
                     eIdList.Add(id_e);
                     vIdList.Add(id_v);
-                    //Console.WriteLine("    id_v = {0} id_e = {1}", id_v, id_e);
+                    //System.Diagnostics.Debug.WriteLine("    id_v = {0} id_e = {1}", id_v, id_e);
                 }
             }
         }
@@ -3727,7 +3727,7 @@ namespace HPlaneWGSimulatorXDelFEM
             else
             {
                 // 不完全な辺の作成も許可するようにしたので、Assertを外す
-                Console.WriteLine("[Warn]getLoopIdOfEdge: id_l_l == 0 && id_l_r == 0");
+                System.Diagnostics.Debug.WriteLine("[Warn]getLoopIdOfEdge: id_l_l == 0 && id_l_r == 0");
                 //System.Diagnostics.Debug.Assert(false);
                 loopId = 0;
             }
@@ -4530,7 +4530,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 double[] pp2 = doubleCoords[portNodes[portNodes.Count - 1] - 1];
                 waveguideWidth = FemMeshLogic.GetDistance(pp1, pp2);
             }
-            Console.WriteLine("(MkFemInputData) waveguideWidth:{0}", waveguideWidth);
+            System.Diagnostics.Debug.WriteLine("(MkFemInputData) waveguideWidth:{0}", waveguideWidth);
             // 計算開始、終了波長の計算
             double firstWaveLength = FemSolver.GetWaveLengthFromNormalizedFreq(normalizedFreq1, waveguideWidth);
             double lastWaveLength = FemSolver.GetWaveLengthFromNormalizedFreq(normalizedFreq2, waveguideWidth);
@@ -4603,7 +4603,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         private void invokeCadOperationCmd()
         {
-            Console.WriteLine("////invokeCadOperationCmd");
+            System.Diagnostics.Debug.WriteLine("////invokeCadOperationCmd");
 
             // 現在のMementoを生成する
             //   MementoにCadオブジェクトデータを渡すためにシリアライズバッファに保存する
@@ -4614,11 +4614,11 @@ namespace HPlaneWGSimulatorXDelFEM
             //  Memento側でファイルのコピーが終わったのでシリアライズバッファを削除する
             clearSerializedCadObjBuffer();
 
-            Console.WriteLine("  curMmnt created");
+            System.Diagnostics.Debug.WriteLine("  curMmnt created");
             var cmd = new MyUtilLib.MementoCommand<CadLogicBase, CadLogicBase>(CadLogicBaseMmnt, curMmnt);
             // Note: 第１引数のMementoはコマンドインスタンス内に格納される。第２引数のMementoはMementoのデータが参照されるだけで格納されない
             //       よって、第１引数の破棄の責任はMementoCommandへ移行するが、第２引数は依然こちらの責任となる
-            Console.WriteLine("  cmd created");
+            System.Diagnostics.Debug.WriteLine("  cmd created");
             // ここで、再度Cadデータが自分自身にセットされる（mementoでデータ更新するのが本来の使用方法なので)
             bool ret = CmdManager.Invoke(cmd);
             // Invokeによって作成されたシリアライズバッファから図面を読み込む
@@ -4627,14 +4627,14 @@ namespace HPlaneWGSimulatorXDelFEM
             System.Diagnostics.Debug.Assert(cad2dref == EditCad2D);
             // Invokeで作成されたシリアライズバッファを削除する
             clearSerializedCadObjBuffer();
-            Console.WriteLine("  invoked");
+            System.Diagnostics.Debug.WriteLine("  invoked");
             if (!ret)
             {
                 MessageBox.Show("状態の最大保存数を超えました。");
             }
             CadLogicBaseMmnt = curMmnt;
             // Note: ここでCadLogicBaseMntが変更されるが、変更される前のインスタンスの破棄責任はMementoCommandへ移行したので破棄処理は必要ない
-            Console.WriteLine("////invokeCadOperationCmd end");
+            System.Diagnostics.Debug.WriteLine("////invokeCadOperationCmd end");
         }
         
         /// <summary>

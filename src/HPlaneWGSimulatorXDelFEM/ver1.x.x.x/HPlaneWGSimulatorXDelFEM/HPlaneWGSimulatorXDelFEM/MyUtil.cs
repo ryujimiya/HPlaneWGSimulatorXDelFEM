@@ -44,7 +44,7 @@ namespace MyUtilLib
             //const string logPath = "debug.log" ;
 
             Debug.WriteLine(str);
-            //System.Console.WriteLine(str);
+            //System.System.Diagnostics.Debug.WriteLine(str);
 
             //using (StreamWriter sw = File.AppendText(logPath))
             //{
@@ -434,23 +434,23 @@ namespace MyUtilLib
                 if (creationTime != File.GetCreationTime(backupFilename))
                 {
                     File.SetCreationTime(backupFilename, creationTime);
-                    Console.WriteLine("set creation time : " + backupFilename);
+                    System.Diagnostics.Debug.WriteLine("set creation time : " + backupFilename);
                 }
                 if (lastWriteTime != File.GetLastWriteTime(backupFilename))
                 {
                     File.SetLastWriteTime(backupFilename, lastWriteTime);
-                    Console.WriteLine("set last write time : " + backupFilename);
+                    System.Diagnostics.Debug.WriteLine("set last write time : " + backupFilename);
                 }
                 if (lastAccessTime != File.GetLastAccessTime(backupFilename))
                 {
                     File.SetLastAccessTime(backupFilename, lastAccessTime);
-                    Console.WriteLine("set last access time : " + backupFilename);
+                    System.Diagnostics.Debug.WriteLine("set last access time : " + backupFilename);
                 }
                  */
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message);
             }
         }

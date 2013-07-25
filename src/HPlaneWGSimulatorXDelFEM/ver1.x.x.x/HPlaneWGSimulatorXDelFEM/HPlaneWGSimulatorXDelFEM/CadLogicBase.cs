@@ -209,8 +209,8 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         public CadLogicBase()
         {
-            //Console.WriteLine("CadLogicBase Constructor");
-            //Console.WriteLine("memory: {0}", GC.GetTotalMemory(false)); //DEBUG
+            //System.Diagnostics.Debug.WriteLine("CadLogicBase Constructor");
+            //System.Diagnostics.Debug.WriteLine("memory: {0}", GC.GetTotalMemory(false)); //DEBUG
             init();
         }
 
@@ -243,9 +243,9 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         ~CadLogicBase()
         {
-            //Console.WriteLine("  CadLogicBase Finalizer");
+            //System.Diagnostics.Debug.WriteLine("  CadLogicBase Finalizer");
             Dispose(false);
-            //Console.WriteLine("    CadLogicBase Finalizer done");
+            //System.Diagnostics.Debug.WriteLine("    CadLogicBase Finalizer done");
         }
 
         /// <summary>
@@ -254,11 +254,11 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="disposing">マネージ リソースが破棄される場合 true、破棄されない場合は false です。</param>
         protected virtual void Dispose(bool disposing)
         {
-            //Console.WriteLine("    CadLogicBase Dispose {0}", disposing);
+            //System.Diagnostics.Debug.WriteLine("    CadLogicBase Dispose {0}", disposing);
             // Cadオブジェクト一時ファイルを削除する
             clearSerializedCadObjBuffer();
 
-            //Console.WriteLine("      CadLogicBase Dispose {0} done", disposing);
+            //System.Diagnostics.Debug.WriteLine("      CadLogicBase Dispose {0} done", disposing);
         }
 
         /// <summary>
@@ -266,10 +266,10 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         public void Dispose()
         {
-            //Console.WriteLine("  CadLogicBase Dispose");
+            //System.Diagnostics.Debug.WriteLine("  CadLogicBase Dispose");
             Dispose(true);
             GC.SuppressFinalize(this);
-            //Console.WriteLine("    CadLogicBase Dispose done");
+            //System.Diagnostics.Debug.WriteLine("    CadLogicBase Dispose done");
         }
 
         /// <summary>
@@ -278,10 +278,10 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="src"></param>
         public void CopyData(CadLogicBase src)
         {
-            //Console.WriteLine("-------CadLogicBase CopyData-------");
+            //System.Diagnostics.Debug.WriteLine("-------CadLogicBase CopyData-------");
             if (src == this)
             {
-                Console.WriteLine("Why? another me exists!");
+                System.Diagnostics.Debug.WriteLine("Why? another me exists!");
                 //System.Diagnostics.Debug.Assert(false);
                 return;
             }
@@ -300,11 +300,11 @@ namespace HPlaneWGSimulatorXDelFEM
             //check
             //foreach (EdgeCollection work in EdgeCollectionList)
             //{
-            //    Console.WriteLine("  prev:No {0}  cnt {1}",  work.No, work.EdgeIds.Count);
+            //    System.Diagnostics.Debug.WriteLine("  prev:No {0}  cnt {1}",  work.No, work.EdgeIds.Count);
             //}
             //foreach (EdgeCollection work in src.EdgeCollectionList)
             //{
-            //    Console.WriteLine("  src:No {0}  cnt {1}", work.No, work.EdgeIds.Count);
+            //    System.Diagnostics.Debug.WriteLine("  src:No {0}  cnt {1}", work.No, work.EdgeIds.Count);
             //}
             EdgeCollectionList.Clear();
             foreach (EdgeCollection srcEdge in src.EdgeCollectionList)
@@ -316,7 +316,7 @@ namespace HPlaneWGSimulatorXDelFEM
             //check
             //foreach (EdgeCollection work in EdgeCollectionList)
             //{
-            //    Console.WriteLine("  setted:No {0}  cnt {1}", work.No, work.EdgeIds.Count);
+            //    System.Diagnostics.Debug.WriteLine("  setted:No {0}  cnt {1}", work.No, work.EdgeIds.Count);
             //}
 
             // edit
@@ -345,7 +345,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 Medias[i].SetP(src.Medias[i].P);
                 Medias[i].SetQ(src.Medias[i].Q);
             }
-            //Console.WriteLine("-------CadLogicBase CopyData end----------");
+            //System.Diagnostics.Debug.WriteLine("-------CadLogicBase CopyData end----------");
         }
 
         /// <summary>
@@ -373,7 +373,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                     MessageBox.Show(exception.Message);
                 }
             }
@@ -408,7 +408,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     }
                     catch (Exception exception)
                     {
-                        Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                        System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                         MessageBox.Show(exception.Message);
                     }
                 }
@@ -446,10 +446,10 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message);
             }
-            Console.WriteLine("SerializedCadObjBuff size = {0}", SerializedCadObjBuff.Length);
+            System.Diagnostics.Debug.WriteLine("SerializedCadObjBuff size = {0}", SerializedCadObjBuff.Length);
         }
 
         /// <summary>
@@ -484,7 +484,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                     MessageBox.Show(exception.Message);
                 }
             }

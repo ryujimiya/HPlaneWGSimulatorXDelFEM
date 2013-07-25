@@ -634,7 +634,7 @@ namespace HPlaneWGSimulatorXDelFEM
             double w1 = FemMeshLogic.GetDistance(Nodes[port1NodeNumber1 - 1].Coord, Nodes[port1NodeNumber2 - 1].Coord);
 
             WaveguideWidth = w1;
-            Console.WriteLine("WaveguideWidth:{0}", w1);
+            System.Diagnostics.Debug.WriteLine("WaveguideWidth:{0}", w1);
         }
 
         /// <summary>
@@ -943,7 +943,7 @@ namespace HPlaneWGSimulatorXDelFEM
             for (int i = 0; i < CornerNodes.Count; i++)
             {
                 int nodeNumber = CornerNodes[i];
-                Console.WriteLine("CornerNodes[{0}] : {1}", i, nodeNumber);
+                System.Diagnostics.Debug.WriteLine("CornerNodes[{0}] : {1}", i, nodeNumber);
             }
         }
          */
@@ -1225,17 +1225,17 @@ namespace HPlaneWGSimulatorXDelFEM
             TmpBuffer = null;
             try
             {
-                Console.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
+                System.Diagnostics.Debug.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
                 // GC.Collect 呼び出し後に GC.WaitForPendingFinalizers を呼び出します。これにより、すべてのオブジェクトに対するファイナライザが呼び出されるまで、現在のスレッドは待機します。
                 // ファイナライザ作動後は、回収すべき、(ファイナライズされたばかりの) アクセス不可能なオブジェクトが増えます。もう1度 GC.Collect を呼び出し、それらを回収します。
                 GC.Collect(); // アクセス不可能なオブジェクトを除去
                 GC.WaitForPendingFinalizers(); // ファイナライゼーションが終わるまでスレッド待機
                 GC.Collect(0); // ファイナライズされたばかりのオブジェクトに関連するメモリを開放
-                Console.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
+                System.Diagnostics.Debug.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message);
             }
 
@@ -1253,7 +1253,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     normalizedFreq = 1.0e-4;
                 }
                 double waveLength = GetWaveLengthFromNormalizedFreq(normalizedFreq, WaveguideWidth);
-                Console.WriteLine("2w/lamda = {0}", normalizedFreq);
+                System.Diagnostics.Debug.WriteLine("2w/lamda = {0}", normalizedFreq);
                 int freqNo = freqIndex + 1;
                 runEach(freqNo, outfilename, waveLength, maxMode);
                 eachDoneCallback.Method.Invoke(eachDoneCallbackObj, new object[]{new object[]{}, });
@@ -1343,17 +1343,17 @@ namespace HPlaneWGSimulatorXDelFEM
             TmpBuffer = null;
             try
             {
-                Console.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
+                System.Diagnostics.Debug.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
                 // GC.Collect 呼び出し後に GC.WaitForPendingFinalizers を呼び出します。これにより、すべてのオブジェクトに対するファイナライザが呼び出されるまで、現在のスレッドは待機します。
                 // ファイナライザ作動後は、回収すべき、(ファイナライズされたばかりの) アクセス不可能なオブジェクトが増えます。もう1度 GC.Collect を呼び出し、それらを回収します。
                 GC.Collect(); // アクセス不可能なオブジェクトを除去
                 GC.WaitForPendingFinalizers(); // ファイナライゼーションが終わるまでスレッド待機
                 GC.Collect(0); // ファイナライズされたばかりのオブジェクトに関連するメモリを開放
-                Console.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
+                System.Diagnostics.Debug.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message);
             }
 
@@ -1375,7 +1375,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     normalizedFreq = 1.0e-4;
                 }
                 double waveLength = GetWaveLengthFromNormalizedFreq(normalizedFreq, WaveguideWidth);
-                Console.WriteLine("2w/lamda = {0}", normalizedFreq);
+                System.Diagnostics.Debug.WriteLine("2w/lamda = {0}", normalizedFreq);
                 int freqNo = freqIndex + 1;
                 runEach(freqNo, outfilename, waveLength, maxMode);
                 eachDoneCallback.Method.Invoke(eachDoneCallbackObj, new object[] { new object[] { }, });
@@ -1413,7 +1413,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="waveLength">波長</param>
         private void runEach(int freqNo, string filename, double waveLength, int maxMode)
         {
-            Console.WriteLine("runEach 1");
+            System.Diagnostics.Debug.WriteLine("runEach 1");
             bool ret;
             // 全体剛性行列作成
             int[] nodesRegion = null;
@@ -1421,12 +1421,12 @@ namespace HPlaneWGSimulatorXDelFEM
             ret = getHelmholtzLinearSystemMatrix(waveLength, out nodesRegion, out mat);
             if (!ret)
             {
-                Console.WriteLine("Error at getHelmholtzLinearSystemMatrix ret: {0}", ret);
+                System.Diagnostics.Debug.WriteLine("Error at getHelmholtzLinearSystemMatrix ret: {0}", ret);
                 // 計算を中止する
                 IsCalcAborted = true;
                 return;
             }
-            Console.WriteLine("runEach 2");
+            System.Diagnostics.Debug.WriteLine("runEach 2");
 
             // 残差ベクトル初期化
             int nodeCnt = nodesRegion.Length;
@@ -1437,7 +1437,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 resVec[i] = new Complex();
             }
              */
-            Console.WriteLine("runEach 3");
+            System.Diagnostics.Debug.WriteLine("runEach 3");
 
             // 開口面境界条件の適用
             int portCnt = Ports.Count;
@@ -1465,7 +1465,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 // 境界条件をリニア方程式に追加
                 addPortBC(waveLength, isInputPort, nodesBoundary, ryy_1d, eigenValues, eigenVecs, nodesRegion, mat, resVec);
             }
-            Console.WriteLine("runEach 4");
+            System.Diagnostics.Debug.WriteLine("runEach 4");
             Complex[] valuesAll = null;
             if (this.LsEqnSolverDv == LinearSystemEqnSoverDV.Zgbsv)
             {
@@ -1492,14 +1492,14 @@ namespace HPlaneWGSimulatorXDelFEM
                 int ku = superdiaSize;
                 int b_row = nodeCnt;
                 int b_col = 1;
-                Console.WriteLine("run zgbsv");
+                System.Diagnostics.Debug.WriteLine("run zgbsv");
                 try
                 {
                     KrdLab.clapack.FunctionExt.zgbsv(ref X, ref x_row, ref x_col, A, a_row, a_col, kl, ku, B, b_row, b_col);
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                     MessageBox.Show(string.Format("計算中にエラーが発生しました。2W/λ = {0}" + System.Environment.NewLine + "    {1}",
                         GetNormalizedFreq(waveLength, WaveguideWidth), exception.Message));
                     return;
@@ -1536,17 +1536,17 @@ namespace HPlaneWGSimulatorXDelFEM
                 resVec = null;
                 try
                 {
-                    Console.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
+                    System.Diagnostics.Debug.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
                     // GC.Collect 呼び出し後に GC.WaitForPendingFinalizers を呼び出します。これにより、すべてのオブジェクトに対するファイナライザが呼び出されるまで、現在のスレッドは待機します。
                     // ファイナライザ作動後は、回収すべき、(ファイナライズされたばかりの) アクセス不可能なオブジェクトが増えます。もう1度 GC.Collect を呼び出し、それらを回収します。
                     GC.Collect(); // アクセス不可能なオブジェクトを除去
                     GC.WaitForPendingFinalizers(); // ファイナライゼーションが終わるまでスレッド待機
                     GC.Collect(0); // ファイナライズされたばかりのオブジェクトに関連するメモリを開放
-                    Console.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
+                    System.Diagnostics.Debug.WriteLine("TotalMemory: {0}", GC.GetTotalMemory(false));
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                     MessageBox.Show(exception.Message);
                 }
                  */
@@ -1557,7 +1557,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 int a_col = nodeCnt;
                 int b_row = nodeCnt;
                 int b_col = 1;
-                Console.WriteLine("run zgesv");
+                System.Diagnostics.Debug.WriteLine("run zgesv");
                 try
                 {
                     KrdLab.clapack.FunctionExt.zgesv(ref X, ref x_row, ref x_col, A, a_row, a_col, B, b_row, b_col);
@@ -1565,7 +1565,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                     MessageBox.Show(string.Format("計算中にエラーが発生しました。2W/λ = {0}" + System.Environment.NewLine + "    {1}",
                         GetNormalizedFreq(waveLength, WaveguideWidth), exception.Message));
                     return;
@@ -1579,7 +1579,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 for (int ino = 0; ino < nodeCnt; ino++)
                 {
                     Complex c = (Complex)X[ino];
-                    //Console.WriteLine("({0})  {1} + {2}i", ino, c.Real, c.Imaginary);
+                    //System.Diagnostics.Debug.WriteLine("({0})  {1} + {2}i", ino, c.Real, c.Imaginary);
                     valuesAll[ino] = c;
                 }
                  */
@@ -1597,7 +1597,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 DelFEMLsUtil.SolvePCOCG(ref mat, ref resVec, out valuesAll, out isConverged);
                 if (!isConverged)
                 {
-                    Console.WriteLine("Not converged at  2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth));
+                    System.Diagnostics.Debug.WriteLine("Not converged at  2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth));
                     //MessageBox.Show(string.Format("解が収束しませんでした 2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth)));
                     //MyUtilLib.MyUtil.MessageBox_ShowErrorAsync(string.Format("解が収束しませんでした 2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth)), "");
                     ErrorLogFrm.AddErrorLogMessage(filename, string.Format("解が収束しませんでした 2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth)));
@@ -1608,7 +1608,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 DelFEMLsUtil.SolvePCOCG(ref World, ref FieldValId, ref Ls, ref Prec, ref TmpBuffer, ref resVec, out valuesAll, out isConverged);
                 if (!isConverged)
                 {
-                    Console.WriteLine("Not converged at  2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth));
+                    System.Diagnostics.Debug.WriteLine("Not converged at  2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth));
                     //MessageBox.Show(string.Format("解が収束しませんでした 2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth)));
                     //MyUtilLib.MyUtil.MessageBox_ShowErrorAsync(string.Format("解が収束しませんでした 2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth)), "");
                     ErrorLogFrm.AddErrorLogMessage(filename, string.Format("解が収束しませんでした 2W/λ = {0}", GetNormalizedFreq(waveLength, WaveguideWidth)));
@@ -1635,7 +1635,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 Complex si1 = getWaveguidePortReflectionCoef(waveLength, iMode, isIncidentMode,
                                                              nodesBoundary, ryy_1d, eigenValues, eigenVecs,
                                                              nodesRegion, valuesAll);
-                Console.WriteLine("s{0}{1} = {2} + {3}i (|S| = {4} |S|^2 = {5})", portIndex + 1, IncidentPortNo, si1.Real, si1.Imaginary, Complex.Abs(si1), Complex.Abs(si1) * Complex.Abs(si1));
+                System.Diagnostics.Debug.WriteLine("s{0}{1} = {2} + {3}i (|S| = {4} |S|^2 = {5})", portIndex + 1, IncidentPortNo, si1.Real, si1.Imaginary, Complex.Abs(si1), Complex.Abs(si1) * Complex.Abs(si1));
                 scatterVec[portIndex] = si1;
             }
              */
@@ -1652,7 +1652,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 Complex[,] eigenVecs = eigenVecsList[portIndex];
                 int modeCnt = eigenValues.Length;
                 Complex[] portScatterVec = new Complex[modeCnt];
-                Console.WriteLine("port {0}", portIndex);
+                System.Diagnostics.Debug.WriteLine("port {0}", portIndex);
                 for (int iMode = 0; iMode < eigenValues.Length; iMode++)
                 {
                     bool isPropagationMode = (eigenValues[iMode].Real >= Constants.PrecisionLowerLimit);
@@ -1668,7 +1668,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     // check
                     if (iMode == 0)
                     {
-                        Console.WriteLine("  {0} s{1}{2}{3}{4} = {5} + {6}i " + System.Environment.NewLine + "        (|S| = {7} |S|^2 = {8})",
+                        System.Diagnostics.Debug.WriteLine("  {0} s{1}{2}{3}{4} = {5} + {6}i " + System.Environment.NewLine + "        (|S| = {7} |S|^2 = {8})",
                             isPropagationMode ? "P" : "E",
                             portIndex + 1, (iMode + 1), IncidentPortNo, (IncidentModeIndex + 1),
                             sim10.Real, sim10.Imaginary, Complex.Abs(sim10), Complex.Abs(sim10) * Complex.Abs(sim10));
@@ -1676,7 +1676,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 scatterVecList.Add(portScatterVec);
             }
-            Console.WriteLine("totalPower:{0}", totalPower);
+            System.Diagnostics.Debug.WriteLine("totalPower:{0}", totalPower);
 
             /////////////////////////////////////
             // 結果をファイルに出力
@@ -1762,7 +1762,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     int subdiaSizeInitial = 0;
                     int superdiaSizeInitial = 0;
                     {
-                        Console.WriteLine("/////initial BandMat info///////");
+                        System.Diagnostics.Debug.WriteLine("/////initial BandMat info///////");
                         int rowcolSize;
                         int subdiaSize;
                         int superdiaSize;
@@ -1825,7 +1825,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     getMatNonzeroPattern(Elements, Ports, toOptNodes, out optMatPattern);
                     // check
                     {
-                        Console.WriteLine("/////opt BandMat info///////");
+                        System.Diagnostics.Debug.WriteLine("/////opt BandMat info///////");
                         int rowcolSize;
                         int subdiaSize;
                         int superdiaSize;
@@ -1844,7 +1844,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     }
                     else
                     {
-                        Console.WriteLine("band with not optimized!");
+                        System.Diagnostics.Debug.WriteLine("band with not optimized!");
                     }
                 }
                 SortedNodes = sortedNodes;
@@ -1904,7 +1904,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     }
                     catch (Exception exception)
                     {
-                        Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                        System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                         MessageBox.Show("メモリの確保に失敗しました。");
                         return false;
                     }
@@ -2083,7 +2083,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     superdiaSize = cnt;
                 }
             }
-            Console.WriteLine("rowcolSize: {0} subdiaSize: {1} superdiaSize: {2}", rowcolSize, subdiaSize, superdiaSize);
+            System.Diagnostics.Debug.WriteLine("rowcolSize: {0} subdiaSize: {1} superdiaSize: {2}", rowcolSize, subdiaSize, superdiaSize);
         }
 
         /// <summary>
@@ -2612,8 +2612,8 @@ namespace HPlaneWGSimulatorXDelFEM
             s11 = MyMatrixUtil.vector_Dot(tmp_vec, valuesB);
             Complex betam = eigenValues[iMode];
             //s11 *= (Complex.Abs(betam) / (omega * myu0));
-            //Console.WriteLine("field impedance:" + omega*myu0/Complex.Norm(betam));
-            //Console.WriteLine("beta:" + Complex.Norm(betam));
+            //System.Diagnostics.Debug.WriteLine("field impedance:" + omega*myu0/Complex.Norm(betam));
+            //System.Diagnostics.Debug.WriteLine("beta:" + Complex.Norm(betam));
             //if (isIncidentMode)
             //{
             //    s11 += -1.0;
@@ -2667,7 +2667,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         private void solvePortWaveguideEigen(double waveLength, int portNo, int maxModeSpecified, out int[] nodesBoundary, out MyDoubleMatrix ryy_1d, out Complex[] eigenValues, out Complex[,] eigenVecs)
         {
-            //Console.WriteLine("solvePortWaveguideEigen: {0},{1}", waveLength, portNo);
+            //System.Diagnostics.Debug.WriteLine("solvePortWaveguideEigen: {0},{1}", waveLength, portNo);
             nodesBoundary = null;
             ryy_1d = null;
             eigenValues = null;
@@ -2753,7 +2753,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 coord[0] = node.Coord[0];
                 coord[1] = node.Coord[1];
                 double x = FemMeshLogic.GetDistance(coord, coord0);
-                //Console.WriteLine("{0},{1},{2},{3}", nodeIndex, coord[0], coord[1], x);
+                //System.Diagnostics.Debug.WriteLine("{0},{1},{2},{3}", nodeIndex, coord[0], coord[1], x);
                 coords.Add(x);
             }
 
@@ -2783,7 +2783,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 int nodeNumber = to1dNodes[nodeNumber2d];
                 if (ForceNodeNumberH.ContainsKey(nodeNumber2d))
                 {
-                    Console.WriteLine("{0}:    {1}    {2}", nodeNumber, Nodes[nodeNumber2d - 1].Coord[0], Nodes[nodeNumber2d - 1].Coord[1]);
+                    System.Diagnostics.Debug.WriteLine("{0}:    {1}    {2}", nodeNumber, Nodes[nodeNumber2d - 1].Coord[0], Nodes[nodeNumber2d - 1].Coord[1]);
                 }
                 else
                 {
@@ -2942,7 +2942,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                 System.Diagnostics.Debug.Assert(false);
             }
             for (int imode = 0; imode < evecs.GetLength(0); imode++)
@@ -3048,22 +3048,22 @@ namespace HPlaneWGSimulatorXDelFEM
                         dm = Complex.Sqrt(omega * myu0 / Complex.Abs(betam) / dm);
                     }
                 }
-                //Console.WriteLine("dm = " + dm);
+                //System.Diagnostics.Debug.WriteLine("dm = " + dm);
 
                 // 伝搬定数の格納
                 eigenValues[imode] = betam;
                 // check
                 if (imode < 5)
                 {
-                    //Console.WriteLine("eigenValues [ " + imode + "] = " + betam.Real + " + " + betam.Imaginary + " i " + " tagtModeIdx :" + tagtModeIdx + " " );
-                    Console.WriteLine("β/k0 [ " + imode + "] = " + betam.Real / k0 + " + " + betam.Imaginary / k0 + " i " + " tagtModeIdx :" + tagtModeIdx + " ");
+                    //System.Diagnostics.Debug.WriteLine("eigenValues [ " + imode + "] = " + betam.Real + " + " + betam.Imaginary + " i " + " tagtModeIdx :" + tagtModeIdx + " " );
+                    System.Diagnostics.Debug.WriteLine("β/k0 [ " + imode + "] = " + betam.Real / k0 + " + " + betam.Imaginary / k0 + " i " + " tagtModeIdx :" + tagtModeIdx + " ");
                 }
                 // 固有ベクトルの格納(規格化定数を掛ける)
                 for (int inoSorted = 0; inoSorted < nodeCnt; inoSorted++)
                 {
                     Complex fm = dm * evec[inoSorted];
                     eigenVecs[imode, inoSorted] = fm;
-                    //Console.WriteLine("eigenVecs [ " + imode + ", " + inoSorted + "] = " + fm.Real + " + " + fm.Imaginary + " i  Abs:" + Complex.Abs(fm));
+                    //System.Diagnostics.Debug.WriteLine("eigenVecs [ " + imode + ", " + inoSorted + "] = " + fm.Real + " + " + fm.Imaginary + " i  Abs:" + Complex.Abs(fm));
                 }
                 imode++;
             }
@@ -3168,7 +3168,7 @@ namespace HPlaneWGSimulatorXDelFEM
             // 対称行列なので、subdiaSize == superdiaSize
             subdiaSize = superdiaSize;
 
-            Console.WriteLine("(EigenValueProblem) rowcolSize: {0} subdiaSize: {1} superdiaSize: {2}", rowcolSize, subdiaSize, superdiaSize);
+            System.Diagnostics.Debug.WriteLine("(EigenValueProblem) rowcolSize: {0} subdiaSize: {1} superdiaSize: {2}", rowcolSize, subdiaSize, superdiaSize);
         }
 
         /*
@@ -3187,7 +3187,7 @@ namespace HPlaneWGSimulatorXDelFEM
             //for (int i = 0; i < evals.Length; i++)
             //{
             //    evals[i] = c_evals[i];
-            //    //Console.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
+            //    //System.Diagnostics.Debug.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
             //}
             evals = c_evals;
             evecs = new Complex[c_evecs.Length, c_evecs[0].Length];
@@ -3196,7 +3196,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 for (int j = 0; j < evecs.GetLength(1); j++)
                 {
                     evecs[i, j] = c_evecs[i][j];
-                    //Console.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
+                    //System.Diagnostics.Debug.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
                 }
             }
 
@@ -3222,7 +3222,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 //evals[i] = new Complex(r_evals[i], i_evals[i]);
                 evals[i].Real = r_evals[i];
                 evals[i].Imaginary = i_evals[i];
-                //Console.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
+                //System.Diagnostics.Debug.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
             }
             evecs = new Complex[r_evecs.Length, r_evecs[0].Length];
             for (int i = 0; i < evecs.GetLength(0); i++)
@@ -3232,7 +3232,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     //evecs[i, j] = new Complex(r_evecs[i][j], i_evecs[i][j]);
                     evecs[i, j].Real = r_evecs[i][j];
                     evecs[i, j].Imaginary = i_evecs[i][j];
-                    //Console.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
+                    //System.Diagnostics.Debug.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
                 }
             }
 
@@ -3255,7 +3255,7 @@ namespace HPlaneWGSimulatorXDelFEM
             //for (int i = 0; i < evals.Length; i++)
             //{
             //    evals[i] = c_evals[i];
-            //    //Console.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
+            //    //System.Diagnostics.Debug.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
             //}
             evals = c_evals;
             evecs = new Complex[c_evecs.Length, c_evecs[0].Length];
@@ -3264,7 +3264,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 for (int j = 0; j < evecs.GetLength(1); j++)
                 {
                     evecs[i, j] = c_evecs[i][j];
-                    //Console.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
+                    //System.Diagnostics.Debug.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
                 }
             }
 
@@ -3293,7 +3293,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 //evals[i] = new Complex(r_evals[i], i_evals[i]);
                 evals[i].Real = r_evals[i];
                 evals[i].Imaginary = i_evals[i];
-                //Console.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
+                //System.Diagnostics.Debug.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
             }
             evecs = new Complex[r_evecs.Length, r_evecs[0].Length];
             for (int i = 0; i < evecs.GetLength(0); i++)
@@ -3303,7 +3303,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     //evecs[i, j] = new Complex(r_evecs[i][j], i_evecs[i][j]);
                     evecs[i, j].Real = r_evecs[i][j];
                     evecs[i, j].Imaginary = i_evecs[i][j];
-                    //Console.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
+                    //System.Diagnostics.Debug.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
                 }
             }
 
@@ -3334,7 +3334,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 //evals[i] = new Complex(r_evals[i], 0.0);
                 evals[i].Real = r_evals[i];
                 evals[i].Imaginary = 0.0;
-                //Console.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
+                //System.Diagnostics.Debug.WriteLine("( " + i + " ) = " + evals[i].Real + " + " + evals[i].Imaginary + " i ");
             }
             evecs = new Complex[r_evecs.Length, r_evecs[0].Length];
             for (int i = 0; i < evecs.GetLength(0); i++)
@@ -3344,7 +3344,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     //evecs[i, j] = new Complex(r_evecs[i][j], 0.0);
                     evecs[i, j].Real = r_evecs[i][j];
                     evecs[i, j].Imaginary = 0.0;
-                    //Console.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
+                    //System.Diagnostics.Debug.WriteLine("( " + i + ", " + j + " ) = " + evecs[i, j].Real + " + " + evecs[i, j].Imaginary + " i ");
                 }
             }
 
@@ -3429,7 +3429,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     {
                         evals[i] = -evals[i];
                     }
-                    Console.WriteLine("eval sign changed");
+                    System.Diagnostics.Debug.WriteLine("eval sign changed");
                 }
             }
              */
@@ -3447,7 +3447,7 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 evals[imode] = item.eval;
                 MyMatrixUtil.matrix_setRowVec(evecs, (int)imode, item.evec);
-                //Console.WriteLine("[sorted]( " + imode + " ) = " + evals[imode].Real + " + " + evals[imode].Imaginary + " i ");
+                //System.Diagnostics.Debug.WriteLine("[sorted]( " + imode + " ) = " + evals[imode].Real + " + " + evals[imode].Imaginary + " i ");
                 imode++;
             }
 

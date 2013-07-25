@@ -68,9 +68,9 @@ namespace HPlaneWGSimulatorXDelFEM
                 System.Diagnostics.Debug.Assert(false);
                 return;
             }
-            //Console.WriteLine("    CP");
-            //Console.WriteLine("        prev. No:{0}, cnt:{1}", No, EdgeIds.Count);
-            //Console.WriteLine("        src. No:{0}, cnt:{1}", src.No, src.EdgeIds.Count);
+            //System.Diagnostics.Debug.WriteLine("    CP");
+            //System.Diagnostics.Debug.WriteLine("        prev. No:{0}, cnt:{1}", No, EdgeIds.Count);
+            //System.Diagnostics.Debug.WriteLine("        src. No:{0}, cnt:{1}", src.No, src.EdgeIds.Count);
             init();
 
             No = src.No;
@@ -79,8 +79,8 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 EdgeIds.Add(eId);
             }
-            //Console.WriteLine("        set. No:{0}, cnt:{1}", No, EdgeIds.Count);
-            //Console.WriteLine("    CP end");
+            //System.Diagnostics.Debug.WriteLine("        set. No:{0}, cnt:{1}", No, EdgeIds.Count);
+            //System.Diagnostics.Debug.WriteLine("    CP end");
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace HPlaneWGSimulatorXDelFEM
         {
             bool success = false;
 
-            //Console.WriteLine("addEdgeId");
+            //System.Diagnostics.Debug.WriteLine("addEdgeId");
             // 重複登録チェック
             if (EdgeIds.IndexOf(eId) >= 0)
             {
@@ -136,7 +136,7 @@ namespace HPlaneWGSimulatorXDelFEM
 
             // 先ず追加
             EdgeIds.Add(eId);
-            //Console.WriteLine("eId Added. EdgeCollection No:{0}, eId:{1} cnt:{2}", No, EdgeIds[EdgeIds.Count - 1], EdgeIds.Count);
+            //System.Diagnostics.Debug.WriteLine("eId Added. EdgeCollection No:{0}, eId:{1} cnt:{2}", No, EdgeIds[EdgeIds.Count - 1], EdgeIds.Count);
 
             if (chkFlg)
             {
@@ -153,7 +153,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 success = true;
             }
 
-            //Console.WriteLine("addEdgeId end");
+            //System.Diagnostics.Debug.WriteLine("addEdgeId end");
             return success;
         }
 
@@ -199,15 +199,15 @@ namespace HPlaneWGSimulatorXDelFEM
                 success = true;
                 return success;
             }
-            //Console.WriteLine("=========old========");
+            //System.Diagnostics.Debug.WriteLine("=========old========");
             // チェック用に退避する
             IList<uint> oldEIdList = new List<uint>();
             foreach (uint eId in EdgeIds)
             {
                 oldEIdList.Add(eId);
-                //Console.WriteLine("{0}", eId);
+                //System.Diagnostics.Debug.WriteLine("{0}", eId);
             }
-            //Console.WriteLine("=================");
+            //System.Diagnostics.Debug.WriteLine("=================");
             
             IList<uint> eIdList = new List<uint>();
             eIdList.Add(oldEIdList[0]);
@@ -283,13 +283,13 @@ namespace HPlaneWGSimulatorXDelFEM
             // ソート成功
             success = true;
             EdgeIds.Clear();
-            //Console.WriteLine("=========new========");
+            //System.Diagnostics.Debug.WriteLine("=========new========");
             foreach (uint eId in eIdList)
             {
                 EdgeIds.Add(eId);
-                //Console.WriteLine("{0}", eId);
+                //System.Diagnostics.Debug.WriteLine("{0}", eId);
             }
-            //Console.WriteLine("=================");
+            //System.Diagnostics.Debug.WriteLine("=================");
             return success;
         }
 

@@ -253,7 +253,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 else
                 {
-                    Console.WriteLine("not implemented");
+                    System.Diagnostics.Debug.WriteLine("not implemented");
                 }
                 return delta;
             }
@@ -351,7 +351,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message);
             }
         }
@@ -630,7 +630,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                 MessageBox.Show(exception.Message);
             }
 
@@ -746,7 +746,7 @@ namespace HPlaneWGSimulatorXDelFEM
                             }
                             catch (Exception exception)
                             {
-                                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
                                 MessageBox.Show(exception.Message);
                             }
                         }
@@ -965,7 +965,7 @@ namespace HPlaneWGSimulatorXDelFEM
             //uint baseLoopId = 0;
             for (int loopIndex = 0; loopIndex < loopList.Count; loopIndex++)
             {
-                Console.WriteLine("loopIndex: {0}", loopIndex);
+                System.Diagnostics.Debug.WriteLine("loopIndex: {0}", loopIndex);
                 DelFEM4NetCom.Pair<int, IList<Point>> loop = loopList[loopIndex];
                 // 媒質インデックス
                 int mediaIndex = loop.First;
@@ -1002,7 +1002,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     xx = pt.X - maxDiv.Width * 0.5;
                     yy = maxDiv.Height - pt.Y - maxDiv.Height * 0.5;
                     pps.Add(new CVector2D(xx, yy));
-                    Console.WriteLine("pps[{0}]: {1}, {2}", pps.Count - 1, pps[pps.Count - 1].x, pps[pps.Count - 1].y);
+                    System.Diagnostics.Debug.WriteLine("pps[{0}]: {1}, {2}", pps.Count - 1, pps[pps.Count - 1].x, pps[pps.Count - 1].y);
 
                     // check: 終点は次のエッジの始点のはず
                     if (loopEdgeIndex < loopEdgeList.Count - 1)
@@ -1043,7 +1043,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 // 多角形でループを作成するのを止める
                 //uint id_l = out_cad2d.AddPolygon(pps, baseLoopId).id_l_add;
                 // 自力でループ作成
-                Console.WriteLine("makeLoop: loopIndex: {0}", loopIndex);
+                System.Diagnostics.Debug.WriteLine("makeLoop: loopIndex: {0}", loopIndex);
                 id_l = CadLogic.makeLoop(out_cad2d, pps, out_LoopList, false);
                 if (id_l == 0)
                 {
@@ -1062,7 +1062,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     IList<IList<uint>> generatedEIdsList = new List<IList<uint>>();
                     // ループ作成時に辺が分割された場合も考慮
                     int eIdIndexOfs = 0;
-                    Console.WriteLine("pps[0]: {0},{1}", pps[0].x, pps[0].y);
+                    System.Diagnostics.Debug.WriteLine("pps[0]: {0},{1}", pps[0].x, pps[0].y);
                     {
                         Edge_Ver_1_2 loopEdge0 = loopEdgeList[0];
                         CVector2D loopEdge0_pp_v1;
@@ -1080,7 +1080,7 @@ namespace HPlaneWGSimulatorXDelFEM
                             yy = maxDiv.Height - pt.Y - maxDiv.Height * 0.5;
                             loopEdge0_pp_v2 = new CVector2D(xx, yy);
                         }
-                        Console.WriteLine("loopEdge0_pp_v1: {0},{1} loopEdge0_pp_v2: {2},{3}", loopEdge0_pp_v1.x, loopEdge0_pp_v1.y, loopEdge0_pp_v2.x, loopEdge0_pp_v2.y);
+                        System.Diagnostics.Debug.WriteLine("loopEdge0_pp_v1: {0},{1} loopEdge0_pp_v2: {2},{3}", loopEdge0_pp_v1.x, loopEdge0_pp_v1.y, loopEdge0_pp_v2.x, loopEdge0_pp_v2.y);
                         for (int eIdIndexSearch = 0; eIdIndexSearch < eIdList.Count; eIdIndexSearch++)
                         {
                             uint id_e = eIdList[eIdIndexSearch];
@@ -1092,7 +1092,7 @@ namespace HPlaneWGSimulatorXDelFEM
                             }
                         }
                     }
-                    Console.WriteLine("eIdIndexOfs:{0}", eIdIndexOfs);
+                    System.Diagnostics.Debug.WriteLine("eIdIndexOfs:{0}", eIdIndexOfs);
 
                     for (int loopEdgeIndex = 0; loopEdgeIndex < loopEdgeList.Count; loopEdgeIndex++)
                     {
@@ -1113,12 +1113,12 @@ namespace HPlaneWGSimulatorXDelFEM
                             yy = maxDiv.Height - pt.Y - maxDiv.Height * 0.5;
                             loopEdge_pp_v2 = new CVector2D(xx, yy);
                         }
-                        Console.WriteLine("  loopEdgeIndex:{0}", loopEdgeIndex);
-                        Console.WriteLine("    loopEdge_pp_v1: {0},{1} loopEdge0_pp_v2: {2},{3}", loopEdge_pp_v1.x, loopEdge_pp_v1.y, loopEdge_pp_v2.x, loopEdge_pp_v2.y);
+                        System.Diagnostics.Debug.WriteLine("  loopEdgeIndex:{0}", loopEdgeIndex);
+                        System.Diagnostics.Debug.WriteLine("    loopEdge_pp_v1: {0},{1} loopEdge0_pp_v2: {2},{3}", loopEdge_pp_v1.x, loopEdge_pp_v1.y, loopEdge_pp_v2.x, loopEdge_pp_v2.y);
                         for (int eIdIndex = 0; eIdIndex < eIdList.Count; eIdIndex++)
                         {
                             uint id_e = eIdList[(eIdIndex + eIdIndexOfs) % eIdList.Count]; // 1つずらして取得
-                            //Console.WriteLine("            {0} id_e:{1}", (eIdIndex + eIdIndexOfs) % eIdList.Count, id_e);
+                            //System.Diagnostics.Debug.WriteLine("            {0} id_e:{1}", (eIdIndex + eIdIndexOfs) % eIdList.Count, id_e);
                             bool isIncluding = CadLogic.isEdgeIncludingEdge(out_cad2d, loopEdge_pp_v1, loopEdge_pp_v2, id_e);
                             if (!isIncluding)
                             {
@@ -1132,7 +1132,7 @@ namespace HPlaneWGSimulatorXDelFEM
                                 CadLogic.getVertexIdsOfEdgeId(out_cad2d, id_e, out id_v1, out id_v2);
                                 CVector2D pp_v1 = out_cad2d.GetVertexCoord(id_v1);
                                 CVector2D pp_v2 = out_cad2d.GetVertexCoord(id_v2);
-                                Console.WriteLine("    eId: {0}, pp_v1: {1},{2} pp_v2: {3},{4}", id_e, pp_v1.x, pp_v1.y, pp_v2.x, pp_v2.y);
+                                System.Diagnostics.Debug.WriteLine("    eId: {0}, pp_v1: {1},{2} pp_v2: {3},{4}", id_e, pp_v1.x, pp_v1.y, pp_v2.x, pp_v2.y);
                             }
                         }
                         generatedEIdsList.Add(generatedEIds);
@@ -1354,7 +1354,7 @@ namespace HPlaneWGSimulatorXDelFEM
             bool mainLoopFlg = true;
             while (mainLoopFlg)
             {
-                Console.WriteLine("mainLoop:{0}", mainLoopCounter);
+                System.Diagnostics.Debug.WriteLine("mainLoop:{0}", mainLoopCounter);
 
                 Point stPt = emptyPt;
                 for (/*searchY = 0*/; searchY < maxDiv.Height; searchY++)
@@ -1378,7 +1378,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 {
                     mainLoopFlg = false;
                     //MessageBox.Show(string.Format("completed! {0}", mainLoopCounter));
-                    Console.WriteLine("completed! {0}", mainLoopCounter);
+                    System.Diagnostics.Debug.WriteLine("completed! {0}", mainLoopCounter);
                     break;
                 }
 
@@ -1398,7 +1398,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 //  2 ←  → 0
                 //      ↓
                 //       1
-                Console.WriteLine("stPt : {0},{1}", stPt.X, stPt.Y);
+                System.Diagnostics.Debug.WriteLine("stPt : {0},{1}", stPt.X, stPt.Y);
                 int fillingX = stPt.X;
                 int fillingY = stPt.Y;
                 {
@@ -1414,7 +1414,7 @@ namespace HPlaneWGSimulatorXDelFEM
                         //debugStr += string.Format("{0},{1}  ", pp[ino].X, pp[ino].Y);
                         debugStr += string.Format("{0},{1}  ", pts[pts.Count - 1].X, pts[pts.Count - 1].Y);
                     }
-                    Console.WriteLine(debugStr);
+                    System.Diagnostics.Debug.WriteLine(debugStr);
                     areaToMediaIndex[fillingY, fillingX] = -1;
                     areas.Add(new Point(fillingX, fillingY));
                 }
@@ -1428,11 +1428,11 @@ namespace HPlaneWGSimulatorXDelFEM
                 int prevdirection = 0; // X方向を走査して最初の点を見つけたので、0
                 int prevprevdirection = -1;
                 bool fillingLoopFlg = true;
-                Console.WriteLine("filling loop start {0},{1}", fillingX, fillingY);
+                System.Diagnostics.Debug.WriteLine("filling loop start {0},{1}", fillingX, fillingY);
                 int fillingLoopCounter = 0;
                 while (fillingLoopFlg)
                 {
-                    //Console.WriteLine("fillingLoop:{0}", fillingLoopCounter);
+                    //System.Diagnostics.Debug.WriteLine("fillingLoop:{0}", fillingLoopCounter);
                     int prevfillingX = fillingX;
                     int prevfillingY = fillingY;
                     int direction = -1;
@@ -1474,7 +1474,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     {
                         // 終わり?
                         fillingLoopFlg = false;
-                        Console.WriteLine("cannot find next direction! {0},{1}", fillingX, fillingY);
+                        System.Diagnostics.Debug.WriteLine("cannot find next direction! {0},{1}", fillingX, fillingY);
                         //MessageBox.Show(string.Format("cannot find next direction! {0},{1}", fillingX, fillingY));
                     }
                     else
@@ -1662,15 +1662,15 @@ namespace HPlaneWGSimulatorXDelFEM
                         }
                         areaToMediaIndex[fillingY, fillingX] = -1;
                         areas.Add(new Point(fillingX, fillingY));
-                        //Console.Write("    " + new char[] { '→', '↓', '←', '↑' }[direction] + " ");
-                        //Console.WriteLine(debugStr);
+                        //System.Diagnostics.Debug.Write("    " + new char[] { '→', '↓', '←', '↑' }[direction] + " ");
+                        //System.Diagnostics.Debug.WriteLine(debugStr);
 
                         /////////////////////////// 
                         // 1つのループ作成終了判定
                         if (isGoal)
                         {
                             fillingLoopFlg = false;
-                            Console.WriteLine("filling loop(No.{0}) end with {1},{2}", mainLoopCounter, fillingX, fillingY);
+                            System.Diagnostics.Debug.WriteLine("filling loop(No.{0}) end with {1},{2}", mainLoopCounter, fillingX, fillingY);
                         }
                     }
                     // 現在の方向を前の方向にセットして、次の点に進む
@@ -1699,10 +1699,10 @@ namespace HPlaneWGSimulatorXDelFEM
                 }
                 DelFEM4NetCom.Pair<int, IList<Point>> loop = new DelFEM4NetCom.Pair<int, IList<Point>>(mediaIndex, out_pts);
                 loopList.Add(loop);
-                Console.WriteLine("loop added");
+                System.Diagnostics.Debug.WriteLine("loop added");
 
                 // ループ内の媒質を消去
-                Console.WriteLine("erasing ");
+                System.Diagnostics.Debug.WriteLine("erasing ");
                 int erasingLoopCount = 0;
                 //Stack<Point> eraseAreaStack = new Stack<Point>();
                 Stack<string> eraseAreaStack = new Stack<string>(); // ポイントを文字列 X座標_Y座標形式で格納(Containsを使いたいので文字列にした)
@@ -1715,14 +1715,14 @@ namespace HPlaneWGSimulatorXDelFEM
                     }
                     else
                     {
-                        //Console.WriteLine("contains!!! eraseAreaStack:" + ptstr);
+                        //System.Diagnostics.Debug.WriteLine("contains!!! eraseAreaStack:" + ptstr);
                     }
                     //eraseAreaStack.Push(areaLeftTop);
-                    //Console.WriteLine("eraseAreaStack push:{0},{1}", areaLeftTop.X, areaLeftTop.Y);
+                    //System.Diagnostics.Debug.WriteLine("eraseAreaStack push:{0},{1}", areaLeftTop.X, areaLeftTop.Y);
                 }
                 while (eraseAreaStack.Count > 0)
                 {
-                    //Console.WriteLine("erasingLoop: {0}", erasingLoopCount);
+                    //System.Diagnostics.Debug.WriteLine("erasingLoop: {0}", erasingLoopCount);
                     Point eraseArea;
                     string eraseAreaStr = eraseAreaStack.Pop();
                     string[] tokens = eraseAreaStr.Split('_');
@@ -1752,16 +1752,16 @@ namespace HPlaneWGSimulatorXDelFEM
                                 }
                                 else
                                 {
-                                    //Console.WriteLine("contains!!! eraseAreaStack:" + ptstr);
+                                    //System.Diagnostics.Debug.WriteLine("contains!!! eraseAreaStack:" + ptstr);
                                 }
                                 //eraseAreaStack.Push(new Point(x, y));
-                                //Console.WriteLine("eraseAreaStack push:{0},{1}", x, y);
+                                //System.Diagnostics.Debug.WriteLine("eraseAreaStack push:{0},{1}", x, y);
                             }
                         }
                     }
                     erasingLoopCount++;
                 }
-                Console.WriteLine("erase done");
+                System.Diagnostics.Debug.WriteLine("erase done");
                 /*
                 int minX = int.MaxValue;
                 int minY = int.MaxValue;

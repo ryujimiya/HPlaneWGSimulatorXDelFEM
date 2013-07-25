@@ -92,7 +92,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             // 面積を求める
             double area = KerEMatTri.TriArea(pp[0], pp[1], pp[2]);
-            //Console.WriteLine("Elem No {0} area:  {1}", element.No, area);
+            //System.Diagnostics.Debug.WriteLine("Elem No {0} area:  {1}", element.No, area);
             System.Diagnostics.Debug.Assert(area >= 0.0);
 
             // 面積座標の微分を求める

@@ -303,7 +303,7 @@ namespace HPlaneWGSimulatorXDelFEM
             // アプリケーションの終了イベントハンドラを設定する
             AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
             {
-                Console.WriteLine("Process exiting");
+                System.Diagnostics.Debug.WriteLine("Process exiting");
                 //System.Diagnostics.Debug.WriteLine("Process exiting");
                 // フォームの破棄処理を呼び出す
                 this.Dispose();
@@ -358,7 +358,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="autoScroll"></param>
         private void setAutoScroll(bool autoScroll)
         {
-            Console.WriteLine("setAutoScroll:{0}", autoScroll);
+            System.Diagnostics.Debug.WriteLine("setAutoScroll:{0}", autoScroll);
             this.AutoScroll = autoScroll;
             this.AutoScrollOffset = new Point(0, 0);
             this.AutoScrollPosition = new Point(0, 0);
@@ -426,7 +426,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// </summary>
         private void fitPanelSizeToFrmSize()
         {
-            Console.WriteLine("fitPanelSizeToFrmSize");
+            System.Diagnostics.Debug.WriteLine("fitPanelSizeToFrmSize");
             Control[] ctrlList = { SMatChart, BetaChart, EigenVecChart };
             Point[] ctrlBaseLocationList = { SMatChartBaseLocation, BetaChartBaseLocation, EigenVecChartBaseLocation };
             Size[] ctrlBaseSizeList = { SMatChartBaseSize, BetaChartBaseSize, EigenVecChartBaseSize };
@@ -593,7 +593,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 visibleWidth = this.ClientSize.Width;
                 visibleHeight = this.ClientSize.Height - btnNew.Bottom;
             }
-            //Console.WriteLine("CadPanel visibleWidth = {0}, visibleHeight = {1}", visibleWidth, visibleHeight);
+            //System.Diagnostics.Debug.WriteLine("CadPanel visibleWidth = {0}, visibleHeight = {1}", visibleWidth, visibleHeight);
             int maxWidth = CadPanel.Width;
             int maxHeight = CadPanel.Height;
             // 垂直スクロールバー
@@ -613,8 +613,8 @@ namespace HPlaneWGSimulatorXDelFEM
             HScrollBarOfCadPanel.Value = 0;
             HScrollBarOfCadPanel.Visible = (HScrollBarOfCadPanel.Maximum > 0);
 
-            //Console.WriteLine("HSCrollBarOfCadPanel.Visible = {0}", HScrollBarOfCadPanel.Visible);
-            //Console.WriteLine("VSCrollBarOfCadPanel.Visible = {0}", VScrollBarOfCadPanel.Visible);
+            //System.Diagnostics.Debug.WriteLine("HSCrollBarOfCadPanel.Visible = {0}", HScrollBarOfCadPanel.Visible);
+            //System.Diagnostics.Debug.WriteLine("VSCrollBarOfCadPanel.Visible = {0}", VScrollBarOfCadPanel.Visible);
         }
 
         /// <summary>
@@ -820,7 +820,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
             }
         }
 
@@ -942,7 +942,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void FValuePanel_Paint(object sender, PaintEventArgs e)
         {
-            //Console.WriteLine("FValiePanel_Paint");
+            //System.Diagnostics.Debug.WriteLine("FValiePanel_Paint");
             try
             {
                 Graphics g = e.Graphics;
@@ -960,7 +960,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
             }
         }
 
@@ -1582,7 +1582,7 @@ namespace HPlaneWGSimulatorXDelFEM
         private void Form1_Shown(object sender, EventArgs e)
         {
             FrmNormalSize = this.Size;
-            //Console.WriteLine("FrmNormalSize:{0},{1}", FrmNormalSize.Width, FrmNormalSize.Height);
+            //System.Diagnostics.Debug.WriteLine("FrmNormalSize:{0},{1}", FrmNormalSize.Width, FrmNormalSize.Height);
 
             // パネルを再配置
             fitPanelSizeToFrmSize();
@@ -2469,7 +2469,7 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " " + exception.StackTrace);
+                System.Diagnostics.Debug.WriteLine(exception.Message + " " + exception.StackTrace);
             }
         }
 
@@ -2609,14 +2609,14 @@ namespace HPlaneWGSimulatorXDelFEM
             }
             //this.Size += new Size(0, dY);
             Size sizeToSet = this.Size + new Size(0, dY);
-            //Console.WriteLine("■same? Size:{0},{1}", this.Size.Width, this.Size.Height);
-            //Console.WriteLine("■add Size:{0},{1}", 0, dY);
-            //Console.WriteLine("■sizeToSet:{0},{1}", sizeToSet.Width, sizeToSet.Height);
+            //System.Diagnostics.Debug.WriteLine("■same? Size:{0},{1}", this.Size.Width, this.Size.Height);
+            //System.Diagnostics.Debug.WriteLine("■add Size:{0},{1}", 0, dY);
+            //System.Diagnostics.Debug.WriteLine("■sizeToSet:{0},{1}", sizeToSet.Width, sizeToSet.Height);
             this.Size = sizeToSet;  // ここでセットされない or セットした後書き換わっている
-            //Console.WriteLine("■Set! ret Size:{0},{1}", this.Size.Width, this.Size.Height);
+            //System.Diagnostics.Debug.WriteLine("■Set! ret Size:{0},{1}", this.Size.Width, this.Size.Height);
             if (!this.Size.Equals(sizeToSet))
             {
-                //Console.WriteLine("■Set! replaced? ret Size:{0},{1}", this.Size.Width, this.Size.Height);
+                //System.Diagnostics.Debug.WriteLine("■Set! replaced? ret Size:{0},{1}", this.Size.Width, this.Size.Height);
                 if (this.WindowState == FormWindowState.Normal)
                 {
                     // 追記: Form1_SizeChangedの処理を遅延実行することで、ここに来ることはなくなった
@@ -2628,7 +2628,7 @@ namespace HPlaneWGSimulatorXDelFEM
                     {
                         retryCnt++;
                         this.Size = sizeToSet;  // 再度セットする
-                        Console.WriteLine("■Set! ret Size:{0},{1}  retry = {2}", this.Size.Width, this.Size.Height, retryCnt);
+                        System.Diagnostics.Debug.WriteLine("■Set! ret Size:{0},{1}  retry = {2}", this.Size.Width, this.Size.Height, retryCnt);
                         if (retryCnt >= retryMax)
                         {
                             break;
@@ -2648,7 +2648,7 @@ namespace HPlaneWGSimulatorXDelFEM
         {
             FormWindowState windowState = this.WindowState;
 
-            //Console.WriteLine("■■■Size:{0},{1}", this.Size.Width, this.Size.Height);
+            //System.Diagnostics.Debug.WriteLine("■■■Size:{0},{1}", this.Size.Width, this.Size.Height);
             if (windowState == FormWindowState.Normal)
             {
                 if (PrevWindowState == FormWindowState.Maximized)
@@ -2667,15 +2667,15 @@ namespace HPlaneWGSimulatorXDelFEM
                                 {
                                     // 最大化前に記録したフォームのサイズを復元する
                                     this.Size = FrmNormalSize;
-                                    //Console.WriteLine("■■Set! ret Size:{0},{1}", this.Size.Width, this.Size.Height);
+                                    //System.Diagnostics.Debug.WriteLine("■■Set! ret Size:{0},{1}", this.Size.Width, this.Size.Height);
                                     // パネル再配置
                                     fitPanelSizeToFrmSize();
-                                    //Console.WriteLine("■■same? ret Size:{0},{1}", this.Size.Width, this.Size.Height);
+                                    //System.Diagnostics.Debug.WriteLine("■■same? ret Size:{0},{1}", this.Size.Width, this.Size.Height);
                                     if (MaximizedControl == null)
                                     {
                                         // 固有モードの表示/非表示にあったフォームのサイズを設定する
                                         setupFrmSizeForEigenShow();
-                                        //Console.WriteLine("■■changed!!!! ret Size:{0},{1}", this.Size.Width, this.Size.Height);
+                                        //System.Diagnostics.Debug.WriteLine("■■changed!!!! ret Size:{0},{1}", this.Size.Width, this.Size.Height);
                                     }
                                     // サイズ変更イベントハンドラを元に戻す
                                     this.SizeChanged += Form1_SizeChanged;
@@ -2690,7 +2690,7 @@ namespace HPlaneWGSimulatorXDelFEM
 
                     // サイズを記録する
                     FrmNormalSize = this.Size;
-                    //Console.WriteLine("■■FrmNormalSize:{0},{1}", FrmNormalSize.Width, FrmNormalSize.Height);
+                    //System.Diagnostics.Debug.WriteLine("■■FrmNormalSize:{0},{1}", FrmNormalSize.Width, FrmNormalSize.Height);
                 }
             }
             if (PrevWindowState != windowState)
@@ -2710,6 +2710,11 @@ namespace HPlaneWGSimulatorXDelFEM
             if (IsCalculating)
             {
                 // 計算中は保存しない(既に作成済み)
+            }
+            else if (!CadLgc.IsDirty)
+            {
+                // 図面が変更されていない
+                // 保存しない
             }
             else
             {
@@ -2746,7 +2751,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="m"></param>
         protected override void WndProc(ref Message m)
         {
-            //Console.WriteLine("m.Msg:{0}", m.Msg);
+            //System.Diagnostics.Debug.WriteLine("m.Msg:{0}", m.Msg);
             /*
             Point prevAutoScrollPos = this.AutoScrollPosition;
             Point prevAutoScrollOfs = this.AutoScrollOffset;
@@ -2758,7 +2763,7 @@ namespace HPlaneWGSimulatorXDelFEM
 
             if (m.Msg == 0x020A)
             {
-                Console.WriteLine("WM_MOUSEWHEEL");
+                System.Diagnostics.Debug.WriteLine("WM_MOUSEWHEEL");
                 if (VScrollBarOfCadPanel.Visible)
                 {
                     short mouseWheelDelta = (short)((((long)m.WParam) >> 0x10) & 0xffff);
@@ -2784,27 +2789,27 @@ namespace HPlaneWGSimulatorXDelFEM
             /*
             if (m.Msg == 0x210)
             {
-                Console.WriteLine("WM_PARENTNOTIFY wParam:{0}", m.WParam);
+                System.Diagnostics.Debug.WriteLine("WM_PARENTNOTIFY wParam:{0}", m.WParam);
             }
             if (m.Msg == 0x020A)
             {
-                Console.WriteLine("WM_MOUSEWHEEL");
+                System.Diagnostics.Debug.WriteLine("WM_MOUSEWHEEL");
                 needRefreshCadPanel = true;
             }
             if (m.Msg == 276)
             {
-                Console.WriteLine("WM_HSCROLL");
+                System.Diagnostics.Debug.WriteLine("WM_HSCROLL");
                 needRefreshCadPanel = true;
             }
             if (m.Msg == 277)
             {
-                Console.WriteLine("WM_VSCROLL");
+                System.Diagnostics.Debug.WriteLine("WM_VSCROLL");
                 needRefreshCadPanel = true;
             }
 
             if (!this.AutoScrollPosition.Equals(prevAutoScrollPos) || !this.AutoScrollOffset.Equals(prevAutoScrollOfs))
             {
-                Console.WriteLine("AutoScrollPosition changed!");
+                System.Diagnostics.Debug.WriteLine("AutoScrollPosition changed!");
                 needRefreshCadPanel = true;
             }
             if (needRefreshCadPanel)
@@ -2812,7 +2817,7 @@ namespace HPlaneWGSimulatorXDelFEM
                 CadPanel.Refresh();
                 //CadPanel.Invalidate();
             }
-            //Console.WriteLine("m.Msg:{0} end", m.Msg);
+            //System.Diagnostics.Debug.WriteLine("m.Msg:{0} end", m.Msg);
              */
         }
 
@@ -2825,7 +2830,7 @@ namespace HPlaneWGSimulatorXDelFEM
         {
             // SimpleOpenGlControl のときスクロールされても再描画されていないので自力でリフレッシュする
             //CadPanel.Refresh(); //リフレッシュでは再描画されなかった
-            Console.WriteLine("Form1_Scroll");
+            System.Diagnostics.Debug.WriteLine("Form1_Scroll");
             CadPanel.Invalidate();
         }
 
@@ -2837,7 +2842,7 @@ namespace HPlaneWGSimulatorXDelFEM
         private void CadPanel_Resize(object sender, EventArgs e)
         {
             /* Formのリサイズでサイズ変更の処理を呼び出しているので不要
-            Console.WriteLine("CadPanel_Resize");
+            System.Diagnostics.Debug.WriteLine("CadPanel_Resize");
             // SimpleOpenGlControlの場合必要
             if (CadLgc == null) return;
             CadLgc.CadPanelResize(e);
@@ -2929,7 +2934,7 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 return;
             }
-            //Console.WriteLine("FValuePanel_MouseEnter");
+            //System.Diagnostics.Debug.WriteLine("FValuePanel_MouseEnter");
             FValuePanelMovPt = new Point();
             // MouseMoveで表示させるように変更
             //showPrevNextFValuePanelBtn();
@@ -2942,7 +2947,7 @@ namespace HPlaneWGSimulatorXDelFEM
         {
             if (!btnPrevFValuePanel.Visible)
             {
-                //Console.WriteLine("showPrevNextFValuePanelBtn");
+                //System.Diagnostics.Debug.WriteLine("showPrevNextFValuePanelBtn");
                 int ofsX = 20;
                 int ofsY = 5;
                 // Note:[前のパネル][次のパネル]の親は等高線図パネル
@@ -2961,7 +2966,7 @@ namespace HPlaneWGSimulatorXDelFEM
         {
             if (btnPrevFValuePanel.Visible)
             {
-                //Console.WriteLine("hidePrevNextFValuePanelBtn");
+                //System.Diagnostics.Debug.WriteLine("hidePrevNextFValuePanelBtn");
                 // 等高線図パネルのマウスエンターイベントのイベントハンドラ処理を実行しない
                 IsDisabledMouseEnterOfFValuePanel = true;
                 FValuePanel.MouseEnter -= FValuePanel_MouseEnter;
@@ -2988,7 +2993,7 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 return;
             }
-            //Console.WriteLine("FValuePanel_MouseLeave");
+            //System.Diagnostics.Debug.WriteLine("FValuePanel_MouseLeave");
             FValuePanelMovPt = new Point();
             // 等高線図パネルのツールチップを非表示にする
             //toolTip1.Hide(FValuePanel);
@@ -3031,7 +3036,7 @@ namespace HPlaneWGSimulatorXDelFEM
             {
                 return;
             }
-            //Console.WriteLine("FValuePanel_MouseMove");
+            //System.Diagnostics.Debug.WriteLine("FValuePanel_MouseMove");
             if (FValuePanelMovPt.IsEmpty)
             {
                 FValuePanelMovPt = e.Location;
@@ -3053,7 +3058,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void FValuePanel_MouseHover(object sender, EventArgs e)
         {
-            //Console.WriteLine("FValuePanel_Hover");
+            //System.Diagnostics.Debug.WriteLine("FValuePanel_Hover");
         }
 
         /// <summary>
@@ -3186,7 +3191,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void btnPrevFValuePanel_MouseEnter(object sender, EventArgs e)
         {
-            //Console.WriteLine("btnPrevFValuePanel_MouseEnter");
+            //System.Diagnostics.Debug.WriteLine("btnPrevFValuePanel_MouseEnter");
             // [前のパネル]ボタン上にマウスポインタを持ってくると、親のFValuePanelがMouseEnter→MouseLeaveを繰り返す現象を抑制
             btnPrevFValuePanel.Focus();
         }
@@ -3198,7 +3203,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void btnPrevFValuePanel_MouseLeave(object sender, EventArgs e)
         {
-            //Console.WriteLine("btnPrevFValuePanel_MouseLeave");
+            //System.Diagnostics.Debug.WriteLine("btnPrevFValuePanel_MouseLeave");
             hidePrevNextFValuePanelBtn();
         }
 
@@ -3209,7 +3214,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void btnNextFValuePanel_MouseEnter(object sender, EventArgs e)
         {
-            //Console.WriteLine("btnNextFValuePanel_MouseEnter");
+            //System.Diagnostics.Debug.WriteLine("btnNextFValuePanel_MouseEnter");
             // [次のパネル]ボタン上にマウスポインタを持ってくると、親のFValuePanelがMouseEnter→MouseLeaveを繰り返す現象を抑制
             btnNextFValuePanel.Focus();
         }
@@ -3221,7 +3226,7 @@ namespace HPlaneWGSimulatorXDelFEM
         /// <param name="e"></param>
         private void btnNextFValuePanel_MouseLeave(object sender, EventArgs e)
         {
-            //Console.WriteLine("btnNextFValuePanel_MouseLeave");
+            //System.Diagnostics.Debug.WriteLine("btnNextFValuePanel_MouseLeave");
             // ボタン非表示
             hidePrevNextFValuePanelBtn();
         }

@@ -1,6 +1,10 @@
 ﻿HPlaneWGSimulatorXDelFEM Release Notes
 
-version1.6.9.4
+version1.6.0.5
+---(2013-07-25)
+  散乱係数周波数特性　複数モード対応
+
+version1.6.0.4
 ---(2013-07-18)
   VS2012でビルド
   フレームワークを.NET Framework 4.5に変更しました。

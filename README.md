@@ -6,6 +6,10 @@ version1.6.0.6
 
 ![HPlaneWGSimulatorXDelFEM](http://cdn-ak.f.st-hatena.com/images/fotolife/r/ryujimiya/20120930/20120930073724.jpg)  
 
+**Source dependencies**  
+　CLW.dll 導波路解析用に機能追加したもの [HPlaneWGSimulator/Lisys](https://github.com/ryujimiya/HPlaneWGSimulator/tree/master/src/Lisys)  
+　　CLW.dllはKrdLab氏の[Lisys](https://github.com/krdlab/lisys)がオリジナルです。  
+
 **News**  
   2012-12-19 HPlaneWGSimulatorXDelFEM version1.6.0.3 Release   
 　　[DelFEM4Net 1.0.0.7](http://code.google.com/p/delfem4net/)に更新しました。   
@@ -84,9 +88,4 @@ HPlaneWGSimulatorXDelFEMのアセンブリ、ソースコード（下記注釈�
 　　　　http://code.google.com/p/delfem/  
 　　Lisys: KrdLabの不定期日記  
 　　　　http://d.hatena.ne.jp/KrdLab/20090507  
-
-**Contact to Human**  
-  
-何かございましたら下記までご連絡ください。  
-りゅうじみや ryujimiya(あっと)mail.goo.ne.jp  
 
